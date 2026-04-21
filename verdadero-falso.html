@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Verdadero o Falso - TCAE SEPAD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#1a0a2e,#2d1b4e,#1a0a3b);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:10px}
+h1{font-size:1.4em;text-align:center;padding:10px;background:linear-gradient(90deg,#e040fb,#7c4dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:8px 0;font-size:.9em}
+.stat{padding:6px 14px;border-radius:20px}
+.stat-score{background:#4caf5033;color:#4caf50}
+.stat-wrong{background:#f4433633;color:#f44336}
+.stat-streak{background:#e040fb33;color:#e040fb}
+.stat-progress{background:#7c4dff33;color:#7c4dff}
+.timer-circle{width:70px;height:70px;border-radius:50%;border:4px solid #7c4dff;display:flex;align-items:center;justify-content:center;font-size:1.8em;font-weight:bold;margin:10px auto;transition:border-color .3s}
+.timer-circle.danger{border-color:#f44336;color:#f44336;animation:pulse .4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.card{background:linear-gradient(135deg,#2d1b6e,#3d2b8e);border:2px solid #7c4dff;border-radius:20px;padding:25px 20px;text-align:center;max-width:500px;width:100%;margin:10px auto;min-height:150px;display:flex;align-items:center;justify-content:center;font-size:1.2em;line-height:1.6;transition:all .3s}
+.card.flash-correct{border-color:#4caf50;background:linear-gradient(135deg,#1b4e2d,#2d6e3d)}
+.card.flash-wrong{border-color:#f44336;background:linear-gradient(135deg,#4e1b1b,#6e2d2d)}
+.buttons{display:flex;gap:15px;justify-content:center;margin:15px 0;width:100%;max-width:500px}
+.btn-vf{flex:1;padding:18px;border:none;border-radius:14px;font-size:1.2em;font-weight:bold;cursor:pointer;min-height:60px;touch-action:manipulation;transition:all .2s}
+.btn-vf:active{transform:scale(.95)}
+.btn-true{background:linear-gradient(135deg,#4caf50,#66bb6a);color:#fff}
+.btn-false{background:linear-gradient(135deg,#f44336,#ef5350);color:#fff}
+.btn-start{background:linear-gradient(135deg,#e040fb,#7c4dff);color:#fff;font-size:1.2em;padding:18px 40px;border:none;border-radius:14px;cursor:pointer;min-height:54px;touch-action:manipulation;margin:20px}
+.btn-start:active{transform:scale(.95)}
+.explanation{text-align:center;font-size:.95em;color:#ccc;margin:5px 0;min-height:24px;max-width:500px;line-height:1.4}
+.keyboard-hint{text-align:center;color:#666;font-size:.8em;margin:5px}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay-box{background:linear-gradient(135deg,#2d1b6e,#3d2b8e);border:2px solid #e040fb;border-radius:20px;padding:30px;text-align:center;max-width:420px;width:100%}
+.overlay-box h2{color:#e040fb;font-size:1.6em;margin-bottom:15px}
+.overlay-box p{font-size:1.05em;margin:8px 0;line-height:1.5}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h1>VERDADERO O FALSO - TCAE</h1>
+<div class="stats">
+  <span class="stat stat-score" id="sCorrect">Aciertos: 0</span>
+  <span class="stat stat-wrong" id="sWrong">Fallos: 0</span>
+  <span class="stat stat-streak" id="sStreak">Racha: 0</span>
+  <span class="stat stat-progress" id="sProgress">0 / 50</span>
+</div>
+<div class="timer-circle" id="timerEl">12</div>
+<div class="card" id="card">
+  <div>Pulsa COMENZAR para empezar</div>
+</div>
+<div class="explanation" id="explanation"></div>
+<div class="buttons" id="btnArea">
+  <button class="btn-start" onclick="startGame()">COMENZAR</button>
+</div>
+<div class="keyboard-hint">Teclado: V = Verdadero, F = Falso</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-box">
+    <h2>RESULTADO FINAL</h2>
+    <p id="endMsg"></p>
+    <button class="btn-start" onclick="location.reload()">JUGAR DE NUEVO</button>
+  </div>
+</div>
+
+<script>
+const statements=[
+  {s:'La Constitucion Espanola fue aprobada el 6 de diciembre de 1978.',v:true,e:'Fue aprobada en referendum el 6/12/1978.'},
+  {s:'La escala de Barthel mide el riesgo de ulceras por presion.',v:false,e:'Barthel mide ABVD. Norton mide riesgo de UPP.'},
+  {s:'Los cambios posturales se realizan cada 4-6 horas.',v:false,e:'Se realizan cada 2-3 horas.'},
+  {s:'La Ley General de Sanidad es la Ley 14/1986.',v:true,e:'Ley 14/1986, de 25 de abril.'},
+  {s:'El angulo de inyeccion intramuscular es de 90 grados.',v:true,e:'IM = 90 grados.'},
+  {s:'La posicion de Fowler eleva el cabecero a 90 grados.',v:false,e:'Fowler eleva a 45 grados. A 90 grados es Fowler alta.'},
+  {s:'La escala de Glasgow valora el nivel de consciencia.',v:true,e:'Glasgow: respuesta ocular, verbal y motora (3-15).'},
+  {s:'La temperatura corporal de 37.5 grados C se considera fiebre.',v:false,e:'37.5 es febricula. Fiebre es >= 38 grados C.'},
+  {s:'La frecuencia cardiaca normal en adultos es de 60-100 lpm.',v:true,e:'60-100 latidos por minuto en reposo.'},
+  {s:'La Ley 41/2002 regula la autonomia del paciente.',v:true,e:'Ley basica de autonomia del paciente.'},
+  {s:'El angulo de inyeccion intradermica es de 45 grados.',v:false,e:'Intradermica = 15 grados. Subcutanea = 45 grados.'},
+  {s:'La posicion de Trendelenburg situa la cabeza mas baja que los pies.',v:true,e:'Usada en shock, lipotimias, etc.'},
+  {s:'La RCP basica en adultos usa una relacion 15:2.',v:false,e:'La relacion correcta es 30:2.'},
+  {s:'La infeccion nosocomial mas frecuente es la neumonia.',v:false,e:'Es la infeccion del tracto urinario (ITU).'},
+  {s:'El decubito prono es boca abajo.',v:true,e:'Prono = boca abajo, supino = boca arriba.'},
+  {s:'La escala de Lawton mide las actividades instrumentales de la vida diaria.',v:true,e:'AIVD: cocinar, limpiar, manejar dinero, etc.'},
+  {s:'La frecuencia respiratoria normal en adultos es 12-20 rpm.',v:true,e:'12-20 respiraciones por minuto.'},
+  {s:'La asepsia es la eliminacion de germenes patogenos.',v:false,e:'Asepsia = ausencia total de microorganismos. La eliminacion de patogenos es desinfeccion/antisepsia.'},
+  {s:'La tuberculosis requiere aislamiento de contacto.',v:false,e:'Requiere aislamiento aereo (respiratorio).'},
+  {s:'La escala de Norton tiene 5 parametros y puntua de 5 a 20.',v:true,e:'Estado fisico, mental, actividad, movilidad, incontinencia.'},
+  {s:'La tension arterial normal es menor de 140/90 mmHg.',v:true,e:'Hipertension: >= 140/90 mmHg.'},
+  {s:'El autoclave esteriliza mediante calor seco.',v:false,e:'El autoclave usa calor humedo (vapor a presion). Calor seco es el horno Pasteur/Poupinel.'},
+  {s:'La posicion de Sims es decubito lateral con pierna superior flexionada.',v:true,e:'Usada para enemas, exploracion rectal.'},
+  {s:'La Ley 16/2003 es la Ley de Cohesion y Calidad del SNS.',v:true,e:'Ley 16/2003, de 28 de mayo.'},
+  {s:'El pulso se toma habitualmente en la arteria radial.',v:true,e:'Arteria radial en la muneca, lado del pulgar.'},
+  {s:'La diuresis normal es de 500-1000 ml al dia.',v:false,e:'La diuresis normal es de 1000-1500 ml/dia (o 1200-1500).'},
+  {s:'La Ley 33/2011 es la Ley General de Salud Publica.',v:true,e:'Ley 33/2011, de 4 de octubre.'},
+  {s:'Los residuos sanitarios del grupo III son residuos asimilables a urbanos.',v:false,e:'Grupo III son residuos sanitarios especiales/peligrosos. Grupo II son asimilables a urbanos.'},
+  {s:'El sondaje vesical es una tecnica esteril.',v:true,e:'Requiere tecnica esteril para evitar infecciones.'},
+  {s:'La escala de Braden tambien mide riesgo de UPP.',v:true,e:'Norton y Braden son las principales escalas de riesgo de UPP.'},
+  {s:'La posicion ginecologica tambien se llama posicion de litotomia.',v:true,e:'Paciente en decubito supino con piernas en estribos.'},
+  {s:'El oximetro de pulso mide la presion arterial.',v:false,e:'Mide la saturacion de oxigeno (SpO2). La PA se mide con esfigmomanometro.'},
+  {s:'El material critico es aquel que contacta con piel intacta.',v:false,e:'Critico: contacta con tejido esteril/sangre. Semicritico: mucosas. No critico: piel intacta.'},
+  {s:'La via oral es la mas comoda y economica de administracion de farmacos.',v:true,e:'Via oral: comoda, economica, pero absorcion variable.'},
+  {s:'La glucemia basal normal es de 70-110 mg/dl.',v:true,e:'Valores normales de glucosa en ayunas.'},
+  {s:'El Estatuto de Autonomia de Extremadura se aprobo por LO 1/1983.',v:true,e:'Ley Organica 1/1983, de 25 de febrero.'},
+  {s:'Las ulceras por presion de grado I presentan perdida total del espesor de la piel.',v:false,e:'Grado I: eritema no blanqueable. Grado III: perdida total del espesor de la piel.'},
+  {s:'La esterilizacion destruye todos los microorganismos incluidas las esporas.',v:true,e:'A diferencia de la desinfeccion, elimina esporas.'},
+  {s:'Un paciente encamado debe beber al menos 2 litros de agua al dia si no hay contraindicacion.',v:true,e:'Hidratacion adecuada: 1.5-2 litros diarios.'},
+  {s:'La posicion de Roser o Proetz es con hiperextension del cuello.',v:true,e:'Usada para intubacion, lavado de cabello encamado.'},
+  {s:'La higiene de manos con solucion hidroalcoholica sustituye siempre al lavado con agua y jabon.',v:false,e:'No sustituye cuando las manos estan visiblemente sucias.'},
+  {s:'El IMC se calcula dividiendo el peso entre la talla al cuadrado.',v:true,e:'IMC = peso(kg) / talla(m)^2.'},
+  {s:'La escala de Pfeiffer valora el deterioro cognitivo.',v:true,e:'Test de Pfeiffer: 10 preguntas para detectar deterioro cognitivo.'},
+  {s:'Los guantes esteriles se colocan primero en la mano no dominante.',v:false,e:'Primero en la mano dominante.'},
+  {s:'La dieta astringente es rica en fibra.',v:false,e:'La dieta astringente es baja en fibra (para diarrea). Rica en fibra es la dieta laxante.'},
+  {s:'El celador puede administrar medicacion en situaciones de urgencia.',v:false,e:'El celador no administra medicacion en ningun caso.'},
+  {s:'La escala EVA mide la intensidad del dolor.',v:true,e:'Escala Visual Analogica: de 0 (sin dolor) a 10 (maximo dolor).'},
+  {s:'La presion arterial sistolica corresponde a la relajacion del corazon.',v:false,e:'Sistolica = contraccion. Diastolica = relajacion.'},
+  {s:'El residuo del grupo IV son residuos citotoxicos.',v:true,e:'Grupo IV: residuos especiales (citotoxicos, radiactivos, etc).'},
+  {s:'La cama ocupada se hace cuando el paciente puede levantarse.',v:false,e:'Cama ocupada: paciente encamado que no puede levantarse. Si puede levantarse se hace cama desocupada.'},
+];
+
+let queue=[], failed=[], current=null, idx=0, total=0, correctCount=0, wrongCount=0, streak=0, maxStreak=0;
+let timer=12, timerInterval=null, playing=false, answered=false;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function startGame(){
+  queue=shuffle([...statements]);
+  idx=0;total=0;correctCount=0;wrongCount=0;streak=0;maxStreak=0;failed=[];
+  playing=true;
+  showNext();
+}
+
+function showNext(){
+  if(idx>=queue.length){
+    if(failed.length>0){
+      queue=shuffle([...failed]);
+      failed=[];
+      idx=0;
+    } else {
+      endGame();return;
+    }
+  }
+  current=queue[idx];
+  answered=false;
+  document.getElementById('card').className='card';
+  document.getElementById('card').innerHTML=current.s;
+  document.getElementById('explanation').textContent='';
+  document.getElementById('btnArea').innerHTML=`
+    <button class="btn-vf btn-true" onclick="answer(true)">VERDADERO (V)</button>
+    <button class="btn-vf btn-false" onclick="answer(false)">FALSO (F)</button>`;
+  startTimer();
+}
+
+function startTimer(){
+  timer=12;
+  document.getElementById('timerEl').textContent=timer;
+  document.getElementById('timerEl').classList.remove('danger');
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timer--;
+    document.getElementById('timerEl').textContent=timer;
+    if(timer<=4)document.getElementById('timerEl').classList.add('danger');
+    if(timer<=0){clearInterval(timerInterval);answer(null)}
+  },1000);
+}
+
+function answer(val){
+  if(answered)return;
+  answered=true;
+  if(timerInterval)clearInterval(timerInterval);
+  total++;
+  const card=document.getElementById('card');
+  const isCorrect=val===current.v;
+  if(val===null){
+    // time out = wrong
+    card.classList.add('flash-wrong');
+    wrongCount++;streak=0;
+    failed.push(current);
+    document.getElementById('explanation').textContent='Tiempo agotado. '+current.e;
+  } else if(isCorrect){
+    card.classList.add('flash-correct');
+    correctCount++;streak++;
+    if(streak>maxStreak)maxStreak=streak;
+    document.getElementById('explanation').textContent=current.e;
+  } else {
+    card.classList.add('flash-wrong');
+    wrongCount++;streak=0;
+    failed.push(current);
+    document.getElementById('explanation').textContent='Incorrecto. '+current.e;
+  }
+  updateStats();
+  setTimeout(()=>{idx++;showNext()},2000);
+}
+
+function updateStats(){
+  document.getElementById('sCorrect').textContent='Aciertos: '+correctCount;
+  document.getElementById('sWrong').textContent='Fallos: '+wrongCount;
+  document.getElementById('sStreak').textContent='Racha: '+streak;
+  document.getElementById('sProgress').textContent=total+' / '+statements.length;
+}
+
+function endGame(){
+  playing=false;
+  const ov=document.getElementById('endOverlay');
+  ov.classList.remove('hidden');
+  const pct=Math.round(correctCount/(correctCount+wrongCount)*100)||0;
+  document.getElementById('endMsg').innerHTML=
+    `<span style="color:#4caf50">Aciertos: ${correctCount}</span><br>
+     <span style="color:#f44336">Fallos: ${wrongCount}</span><br>
+     Racha maxima: ${maxStreak}<br>
+     Porcentaje: ${pct}%`;
+}
+
+document.addEventListener('keydown',e=>{
+  if(!playing||answered)return;
+  if(e.key==='v'||e.key==='V')answer(true);
+  if(e.key==='f'||e.key==='F')answer(false);
+});
+</script>
+</body>
+</html>

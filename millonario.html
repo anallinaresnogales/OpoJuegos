@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Quien Quiere Ser Millonario - TCAE SEPAD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#0a1628,#0d2137,#091a30);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:10px}
+h1{font-size:1.3em;text-align:center;padding:10px;background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.game-layout{display:flex;flex-direction:column;width:100%;max-width:600px;gap:10px}
+.ladder{display:flex;flex-direction:column;gap:3px;padding:5px;background:rgba(0,0,0,.3);border-radius:12px;margin-bottom:5px}
+.ladder-row{display:flex;justify-content:space-between;padding:6px 14px;border-radius:8px;font-size:.85em;transition:all .3s}
+.ladder-row.current{background:linear-gradient(90deg,#ffd70044,#ffd70022);border:1px solid #ffd700;font-weight:bold}
+.ladder-row.safe{color:#ffd700;font-weight:bold}
+.ladder-row.done{color:#666;text-decoration:line-through}
+.ladder-row.won{background:#4caf5033;color:#4caf50}
+.question-box{background:linear-gradient(135deg,#0d2850,#1a3a6e);border:2px solid #ffd700;border-radius:16px;padding:20px;text-align:center;margin:5px 0}
+.question-box .q-number{font-size:.85em;color:#ffd700;margin-bottom:8px}
+.question-box .q-text{font-size:1.15em;line-height:1.5;margin-bottom:15px}
+.answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ans-btn{padding:16px 12px;border:2px solid #335588;border-radius:12px;background:linear-gradient(135deg,#0d2850,#1a3a6e);color:#fff;font-size:1em;cursor:pointer;transition:all .3s;min-height:54px;touch-action:manipulation;text-align:left}
+.ans-btn:active{transform:scale(.97)}
+.ans-btn.correct{background:linear-gradient(135deg,#2e7d32,#4caf50)!important;border-color:#66bb6a!important}
+.ans-btn.wrong{background:linear-gradient(135deg,#c62828,#f44336)!important;border-color:#ef5350!important}
+.ans-btn.fifty-out{opacity:.2;pointer-events:none}
+.ans-btn .letter{color:#ffd700;font-weight:bold;margin-right:6px}
+.lifelines{display:flex;gap:10px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+.lifeline{width:56px;height:56px;border-radius:50%;border:2px solid #ffd700;background:rgba(255,215,0,.1);display:flex;align-items:center;justify-content:center;font-size:1.4em;cursor:pointer;transition:all .3s;touch-action:manipulation}
+.lifeline.used{opacity:.25;pointer-events:none;border-color:#555}
+.lifeline:active{transform:scale(.9)}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay-box{background:linear-gradient(135deg,#0d2850,#1a3a6e);border:2px solid #ffd700;border-radius:20px;padding:30px;text-align:center;max-width:420px;width:100%}
+.overlay-box h2{color:#ffd700;font-size:1.6em;margin-bottom:15px}
+.overlay-box p{font-size:1.1em;margin:8px 0;line-height:1.5}
+.btn-main{padding:16px 36px;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#ffd700,#ff9800);color:#000;min-height:48px;touch-action:manipulation;margin-top:12px}
+.btn-main:active{transform:scale(.95)}
+.hidden{display:none}
+.poll-chart{display:flex;align-items:flex-end;justify-content:center;gap:15px;height:120px;margin:15px 0}
+.poll-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.poll-bar{width:40px;border-radius:6px 6px 0 0;transition:height .5s}
+.poll-label{font-size:.85em;color:#aaa}
+.poll-pct{font-size:.9em;font-weight:bold}
+.phone-bubble{background:rgba(255,255,255,.1);border-radius:16px;padding:15px;margin:15px 0;font-style:italic;line-height:1.5}
+</style>
+</head>
+<body>
+
+<h1>QUIEN QUIERE SER MILLONARIO</h1>
+
+<div class="game-layout" id="gameArea">
+  <div class="lifelines" id="lifelines">
+    <div class="lifeline" id="ll50" onclick="useFifty()" title="50:50">50</div>
+    <div class="lifeline" id="llAud" onclick="useAudience()" title="Publico">👥</div>
+    <div class="lifeline" id="llPhone" onclick="usePhone()" title="Llamada">📞</div>
+  </div>
+  <div class="ladder" id="ladder"></div>
+  <div class="question-box" id="qBox">
+    <div style="text-align:center"><button class="btn-main" onclick="startGame()">COMENZAR</button></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-box">
+    <h2 id="endTitle"></h2>
+    <p id="endMsg"></p>
+    <button class="btn-main" onclick="location.reload()">JUGAR DE NUEVO</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="lifelineOverlay">
+  <div class="overlay-box">
+    <h2 id="llTitle"></h2>
+    <div id="llContent"></div>
+    <button class="btn-main" onclick="closeLLOverlay()">CONTINUAR</button>
+  </div>
+</div>
+
+<script>
+const prizes=['100','200','300','500','1.000','2.000','4.000','8.000','16.000','32.000','64.000','125.000','250.000','500.000','1.000.000'];
+const safeIndexes=[4,9];
+
+const allQuestions=[
+  {q:'Cual es la temperatura corporal normal?',a:['36-37 grados C','35-36 grados C','37-38 grados C','38-39 grados C'],c:0},
+  {q:'Que ley regula la autonomia del paciente?',a:['Ley 41/2002','Ley 14/1986','Ley 33/2011','Ley 16/2003'],c:0},
+  {q:'La RCP basica en adultos tiene una relacion compresiones-ventilaciones de:',a:['30:2','15:2','30:1','15:1'],c:0},
+  {q:'Que escala mide las ABVD (actividades basicas de la vida diaria)?',a:['Barthel','Norton','Glasgow','Lawton'],c:0},
+  {q:'El angulo de inyeccion intramuscular es de:',a:['90 grados','45 grados','15 grados','30 grados'],c:0},
+  {q:'La Ley General de Sanidad es la:',a:['Ley 14/1986','Ley 41/2002','Ley 33/2011','Ley 16/2003'],c:0},
+  {q:'El angulo de inyeccion subcutanea es de:',a:['45 grados','90 grados','15 grados','30 grados'],c:0},
+  {q:'Que escala mide el riesgo de ulceras por presion?',a:['Norton','Barthel','Glasgow','Braden'],c:0},
+  {q:'La posicion de Trendelenburg situa:',a:['La cabeza mas baja que los pies','La cabeza mas alta que los pies','Al paciente de lado','Al paciente sentado'],c:0},
+  {q:'Cada cuanto se deben realizar los cambios posturales?',a:['Cada 2-3 horas','Cada 4-6 horas','Cada 8 horas','Cada 12 horas'],c:0},
+  {q:'La Constitucion Espanola fue aprobada el:',a:['6 de diciembre de 1978','6 de diciembre de 1976','29 de diciembre de 1978','1 de enero de 1979'],c:0},
+  {q:'Que escala valora el nivel de consciencia?',a:['Glasgow','Norton','Barthel','Pfeiffer'],c:0},
+  {q:'El angulo de inyeccion intradermica es de:',a:['15 grados','45 grados','90 grados','30 grados'],c:0},
+  {q:'La infeccion nosocomial mas frecuente es:',a:['ITU (infeccion urinaria)','Neumonia','Infeccion de herida quirurgica','Bacteriemia'],c:0},
+  {q:'La escala de Lawton mide:',a:['Actividades instrumentales (AIVD)','Actividades basicas (ABVD)','Riesgo de caidas','Nivel de consciencia'],c:0},
+  {q:'Que tipo de aislamiento requiere la tuberculosis?',a:['Aereo (respiratorio)','De contacto','Por gotas','Protector'],c:0},
+  {q:'La posicion de Fowler eleva el cabecero a:',a:['45 grados','90 grados','30 grados','60 grados'],c:0},
+  {q:'El pulso normal en adulto en reposo es:',a:['60-100 lpm','40-60 lpm','100-120 lpm','80-140 lpm'],c:0},
+  {q:'La frecuencia respiratoria normal en adultos es:',a:['12-20 rpm','8-12 rpm','20-30 rpm','6-10 rpm'],c:0},
+  {q:'El Estatuto de Autonomia de Extremadura fue aprobado por:',a:['LO 1/1983','LO 2/1983','LO 1/1986','LO 3/1979'],c:0},
+];
+
+let currentQ=0, gameQuestions=[], playing=false, answered=false, usedFifty=false, usedAud=false, usedPhone=false;
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+
+function buildLadder(){
+  const el=document.getElementById('ladder');
+  el.innerHTML='';
+  for(let i=14;i>=0;i--){
+    const row=document.createElement('div');
+    row.className='ladder-row'+(safeIndexes.includes(i)?' safe':'')+(i===currentQ?' current':'')+(i<currentQ?' done won':'');
+    row.id='lr'+i;
+    row.innerHTML=`<span>${i+1}</span><span>${prizes[i]} EUR</span>`;
+    el.appendChild(row);
+  }
+}
+
+function showQuestion(){
+  answered=false;
+  const qd=gameQuestions[currentQ];
+  buildLadder();
+  const box=document.getElementById('qBox');
+  const letters=['A','B','C','D'];
+  box.innerHTML=`
+    <div class="q-number">Pregunta ${currentQ+1} de 15 — ${prizes[currentQ]} EUR</div>
+    <div class="q-text">${qd.q}</div>
+    <div class="answers-grid">
+      ${qd.a.map((a,i)=>`<button class="ans-btn" id="ab${i}" onclick="answer(${i})"><span class="letter">${letters[i]}:</span> ${a}</button>`).join('')}
+    </div>`;
+}
+
+function answer(i){
+  if(answered)return;
+  answered=true;
+  const qd=gameQuestions[currentQ];
+  const btns=document.querySelectorAll('.ans-btn');
+  btns.forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('ab'+i).classList.add(i===qd.c?'correct':'wrong');
+  if(i!==qd.c) document.getElementById('ab'+qd.c).classList.add('correct');
+
+  setTimeout(()=>{
+    if(i===qd.c){
+      if(currentQ===14){endGame(true);return}
+      currentQ++;
+      showQuestion();
+    } else {
+      endGame(false);
+    }
+  },1500);
+}
+
+function useFifty(){
+  if(usedFifty||answered)return;
+  usedFifty=true;
+  document.getElementById('ll50').classList.add('used');
+  const qd=gameQuestions[currentQ];
+  let wrong=[];
+  for(let i=0;i<4;i++)if(i!==qd.c)wrong.push(i);
+  shuffle(wrong);
+  document.getElementById('ab'+wrong[0]).classList.add('fifty-out');
+  document.getElementById('ab'+wrong[1]).classList.add('fifty-out');
+}
+
+function useAudience(){
+  if(usedAud||answered)return;
+  usedAud=true;
+  document.getElementById('llAud').classList.add('used');
+  const qd=gameQuestions[currentQ];
+  let pcts=[0,0,0,0];
+  const correctPct=50+Math.floor(Math.random()*35);
+  pcts[qd.c]=correctPct;
+  let remaining=100-correctPct;
+  for(let i=0;i<4;i++){
+    if(i===qd.c)continue;
+    const v=i<3?Math.floor(Math.random()*remaining):remaining;
+    pcts[i]=v;remaining-=v;
+  }
+  if(remaining>0)pcts[qd.c]+=remaining;
+  const letters=['A','B','C','D'];
+  const colors=['#f44336','#2196f3','#ffc107','#4caf50'];
+  document.getElementById('llTitle').textContent='Votacion del Publico';
+  document.getElementById('llContent').innerHTML=`
+    <div class="poll-chart">
+      ${pcts.map((p,i)=>`<div class="poll-bar-wrap">
+        <div class="poll-pct">${p}%</div>
+        <div class="poll-bar" style="height:${p}px;background:${colors[i]}"></div>
+        <div class="poll-label">${letters[i]}</div>
+      </div>`).join('')}
+    </div>`;
+  document.getElementById('lifelineOverlay').classList.remove('hidden');
+}
+
+function usePhone(){
+  if(usedPhone||answered)return;
+  usedPhone=true;
+  document.getElementById('llPhone').classList.add('used');
+  const qd=gameQuestions[currentQ];
+  const letters=['A','B','C','D'];
+  const sure=Math.random()>.3;
+  const hint=sure?qd.c:Math.floor(Math.random()*4);
+  const msgs=[
+    `Estoy bastante seguro de que es la ${letters[hint]}... si, ve con la ${letters[hint]}.`,
+    `Yo diria que la respuesta correcta es la ${letters[hint]}, pero no estoy 100% seguro.`,
+    `Hmm, creo que es la ${letters[hint]}. Si, la ${letters[hint]}.`
+  ];
+  document.getElementById('llTitle').textContent='Llamada a un amigo';
+  document.getElementById('llContent').innerHTML=`<div class="phone-bubble">"${msgs[Math.floor(Math.random()*msgs.length)]}"</div>`;
+  document.getElementById('lifelineOverlay').classList.remove('hidden');
+}
+
+function closeLLOverlay(){document.getElementById('lifelineOverlay').classList.add('hidden')}
+
+function startGame(){
+  playing=true;
+  gameQuestions=shuffle([...allQuestions]).slice(0,15);
+  // shuffle each question's answers
+  gameQuestions.forEach(q=>{
+    const correctAns=q.a[q.c];
+    const indices=[0,1,2,3];
+    shuffle(indices);
+    const newA=indices.map(i=>q.a[i]);
+    q.a=newA;
+    q.c=newA.indexOf(correctAns);
+  });
+  currentQ=0;
+  buildLadder();
+  showQuestion();
+}
+
+function endGame(won){
+  const ov=document.getElementById('endOverlay');
+  ov.classList.remove('hidden');
+  let safe=-1;
+  if(!won){for(let s of safeIndexes)if(currentQ>s)safe=s}
+  const prize=won?prizes[14]:(safe>=0?prizes[safe]:'0');
+  document.getElementById('endTitle').textContent=won?'ENHORABUENA! MILLON!':'FIN DEL JUEGO';
+  document.getElementById('endMsg').innerHTML=won?
+    'Has respondido las 15 preguntas correctamente!<br>Te llevas <b>1.000.000 EUR</b>':
+    `Has fallado en la pregunta ${currentQ+1}.<br>Te llevas: <b>${prize} EUR</b>`;
+}
+
+buildLadder();
+</script>
+</body>
+</html>

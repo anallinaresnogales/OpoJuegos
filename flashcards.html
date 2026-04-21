@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flashcards TCAE SEPAD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#0a1a3e,#1a2a5e,#0d1a4b);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:10px}
+h1{font-size:1.4em;text-align:center;padding:10px;background:linear-gradient(90deg,#42a5f5,#7c4dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:5px 0;font-size:.85em}
+.stat{padding:5px 12px;border-radius:18px}
+.stat-remaining{background:#42a5f533;color:#42a5f5}
+.stat-known{background:#4caf5033;color:#4caf50}
+.stat-learning{background:#ff980033;color:#ff9800}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0;max-width:500px}
+.filter-btn{padding:6px 10px;border:1px solid #555;border-radius:8px;background:transparent;color:#aaa;font-size:.75em;cursor:pointer;touch-action:manipulation;transition:all .2s}
+.filter-btn.active{background:#7c4dff;color:#fff;border-color:#7c4dff}
+.card-container{perspective:1000px;width:100%;max-width:450px;margin:15px auto}
+.card{width:100%;min-height:220px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .5s;touch-action:manipulation}
+.card.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;top:0;left:0;right:0;bottom:0;backface-visibility:hidden;border-radius:20px;padding:25px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:1.15em;line-height:1.6;min-height:220px}
+.card-front{background:linear-gradient(135deg,#1a2a6e,#2a3a8e);border:2px solid #42a5f5}
+.card-back{background:linear-gradient(135deg,#1a4e2a,#2a6e3a);border:2px solid #4caf50;transform:rotateY(180deg)}
+.card-label{font-size:.75em;color:#aaa;margin-bottom:8px;position:absolute;top:12px;left:16px}
+.card-tema{font-size:.7em;color:#7c4dff;position:absolute;top:12px;right:16px}
+.card-text{font-size:1.2em;font-weight:500}
+.rate-row{display:flex;gap:10px;justify-content:center;margin:15px 0;width:100%;max-width:450px}
+.rate-btn{flex:1;padding:16px 8px;border:none;border-radius:12px;font-size:.95em;font-weight:bold;cursor:pointer;min-height:54px;touch-action:manipulation;transition:all .2s}
+.rate-btn:active{transform:scale(.95)}
+.rate-1{background:linear-gradient(135deg,#f44336,#ef5350);color:#fff}
+.rate-2{background:linear-gradient(135deg,#ff9800,#ffb74d);color:#fff}
+.rate-3{background:linear-gradient(135deg,#4caf50,#66bb6a);color:#fff}
+.flip-hint{text-align:center;color:#666;font-size:.85em;margin:5px}
+.btn-start{background:linear-gradient(135deg,#42a5f5,#7c4dff);color:#fff;font-size:1.1em;padding:16px 36px;border:none;border-radius:14px;cursor:pointer;min-height:48px;touch-action:manipulation;margin:15px}
+.btn-start:active{transform:scale(.95)}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay-box{background:linear-gradient(135deg,#1a2a6e,#2a3a8e);border:2px solid #7c4dff;border-radius:20px;padding:30px;text-align:center;max-width:420px;width:100%}
+.overlay-box h2{color:#7c4dff;font-size:1.6em;margin-bottom:15px}
+.overlay-box p{font-size:1.05em;margin:8px 0;line-height:1.5}
+.hidden{display:none}
+.progress-bar{width:100%;max-width:450px;height:8px;background:#1a1a4e;border-radius:4px;margin:5px 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#42a5f5,#7c4dff);border-radius:4px;transition:width .3s}
+</style>
+</head>
+<body>
+
+<h1>FLASHCARDS TCAE</h1>
+<div class="stats">
+  <span class="stat stat-remaining" id="sRem">Pendientes: 0</span>
+  <span class="stat stat-learning" id="sLearn">Aprendiendo: 0</span>
+  <span class="stat stat-known" id="sKnown">Sabidas: 0</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0"></div></div>
+
+<div class="filter-row" id="filterRow"></div>
+
+<div class="card-container" id="cardContainer">
+  <div style="text-align:center;padding:40px">
+    <p style="margin-bottom:15px;color:#aaa">Selecciona temas y pulsa comenzar</p>
+    <button class="btn-start" onclick="startStudy()">COMENZAR</button>
+  </div>
+</div>
+<div class="rate-row hidden" id="rateRow">
+  <button class="rate-btn rate-1" onclick="rate(1)">No lo se (1)</button>
+  <button class="rate-btn rate-2" onclick="rate(2)">Mas o menos (2)</button>
+  <button class="rate-btn rate-3" onclick="rate(3)">Me la se (3)</button>
+</div>
+<div class="flip-hint" id="flipHint"></div>
+
+<div class="overlay hidden" id="endOverlay">
+  <div class="overlay-box">
+    <h2>SESION COMPLETADA</h2>
+    <p id="endMsg"></p>
+    <button class="btn-start" onclick="location.reload()">NUEVA SESION</button>
+  </div>
+</div>
+
+<script>
+const allCards=[
+  // T1: Constitucion y legislacion
+  {q:'Fecha de aprobacion de la Constitucion Espanola',a:'6 de diciembre de 1978',t:'T1'},
+  {q:'Articulo de la CE que reconoce el derecho a la proteccion de la salud',a:'Articulo 43',t:'T1'},
+  {q:'Ley General de Sanidad (numero y anio)',a:'Ley 14/1986',t:'T1'},
+  {q:'Ley de autonomia del paciente',a:'Ley 41/2002',t:'T1'},
+  {q:'Ley de Cohesion y Calidad del SNS',a:'Ley 16/2003',t:'T1'},
+  {q:'Ley General de Salud Publica',a:'Ley 33/2011',t:'T1'},
+  {q:'Estatuto de Autonomia de Extremadura',a:'LO 1/1983, de 25 de febrero',t:'T1'},
+  // T2: Organizacion sanitaria
+  {q:'Que es el SEPAD?',a:'Servicio Extremeno de Promocion de la Autonomia y Atencion a la Dependencia',t:'T2'},
+  {q:'Que mide la escala de Barthel?',a:'Actividades Basicas de la Vida Diaria (ABVD)',t:'T2'},
+  {q:'Que mide la escala de Lawton?',a:'Actividades Instrumentales de la Vida Diaria (AIVD)',t:'T2'},
+  // T3-T5: Escalas y valoracion
+  {q:'Que escala mide el riesgo de UPP?',a:'Norton (y Braden)',t:'T3'},
+  {q:'Parametros de la escala de Norton (5)',a:'Estado fisico, mental, actividad, movilidad, incontinencia',t:'T3'},
+  {q:'Puntuacion de la escala de Norton',a:'De 5 a 20 (menor = mayor riesgo)',t:'T3'},
+  {q:'Escala que valora el nivel de consciencia',a:'Glasgow (3-15)',t:'T3'},
+  {q:'Componentes de la escala de Glasgow',a:'Respuesta ocular, verbal y motora',t:'T3'},
+  {q:'Escala que mide la intensidad del dolor',a:'EVA (Escala Visual Analogica, 0-10)',t:'T3'},
+  {q:'Escala que detecta deterioro cognitivo',a:'Pfeiffer (10 preguntas)',t:'T4'},
+  {q:'Que son las ABVD? Ejemplos',a:'Actividades Basicas: banarse, vestirse, comer, ir al WC',t:'T4'},
+  {q:'Que son las AIVD? Ejemplos',a:'Actividades Instrumentales: cocinar, limpiar, manejar dinero, telefono',t:'T4'},
+  // T5-T8: Constantes vitales
+  {q:'Temperatura corporal normal',a:'36 - 37 grados C',t:'T5'},
+  {q:'A partir de que temperatura se considera fiebre?',a:'38 grados C (37.5 = febricula)',t:'T5'},
+  {q:'Frecuencia cardiaca normal en adultos',a:'60-100 latidos por minuto',t:'T5'},
+  {q:'Frecuencia respiratoria normal en adultos',a:'12-20 respiraciones por minuto',t:'T5'},
+  {q:'Tension arterial normal (valores)',a:'Menor de 140/90 mmHg',t:'T5'},
+  {q:'Donde se toma habitualmente el pulso?',a:'Arteria radial (muneca, lado del pulgar)',t:'T5'},
+  {q:'Que mide el pulsioximetro?',a:'Saturacion de oxigeno en sangre (SpO2)',t:'T5'},
+  {q:'SpO2 normal',a:'95-100%',t:'T5'},
+  {q:'Glucemia basal normal',a:'70-110 mg/dl',t:'T6'},
+  {q:'Diuresis normal diaria',a:'1000-1500 ml/dia (aprox. 1200-1500)',t:'T6'},
+  // T9-T12: Posiciones y tecnicas
+  {q:'Posicion de Fowler: descripcion',a:'Semisentado, cabecero elevado 45 grados',t:'T9'},
+  {q:'Posicion de Trendelenburg',a:'Cabeza mas baja que los pies (plano inclinado)',t:'T9'},
+  {q:'Posicion de Sims',a:'Decubito lateral con pierna superior flexionada',t:'T9'},
+  {q:'Posicion de Roser o Proetz',a:'Decubito supino con hiperextension del cuello',t:'T9'},
+  {q:'Posicion de litotomia',a:'Decubito supino con piernas en estribos (ginecologica)',t:'T9'},
+  {q:'Decubito supino',a:'Boca arriba',t:'T9'},
+  {q:'Decubito prono',a:'Boca abajo',t:'T9'},
+  {q:'Cada cuanto se hacen cambios posturales?',a:'Cada 2-3 horas',t:'T10'},
+  {q:'Grado I de UPP',a:'Eritema no blanqueable en piel intacta',t:'T10'},
+  {q:'Grado II de UPP',a:'Perdida parcial del espesor de la piel (ampolla/abrasion)',t:'T10'},
+  {q:'Grado III de UPP',a:'Perdida total del espesor de la piel',t:'T10'},
+  {q:'Grado IV de UPP',a:'Perdida total con afectacion de musculo, hueso o estructuras de soporte',t:'T10'},
+  // T13-T16: Administracion de farmacos
+  {q:'Angulo de inyeccion intradermica',a:'15 grados',t:'T13'},
+  {q:'Angulo de inyeccion subcutanea',a:'45 grados',t:'T13'},
+  {q:'Angulo de inyeccion intramuscular',a:'90 grados',t:'T13'},
+  {q:'Via de administracion mas comoda y economica',a:'Via oral',t:'T13'},
+  {q:'Que es la via sublingual?',a:'Debajo de la lengua, absorcion rapida, evita primer paso hepatico',t:'T13'},
+  {q:'Zonas de inyeccion IM (3 principales)',a:'Deltoides, vasto externo del muslo, gluteo (dorsoglutea/ventroglutea)',t:'T13'},
+  {q:'Relacion compresiones:ventilaciones en RCP adultos',a:'30:2',t:'T14'},
+  {q:'Profundidad de compresiones en RCP adultos',a:'5-6 cm',t:'T14'},
+  {q:'Frecuencia de compresiones en RCP',a:'100-120 por minuto',t:'T14'},
+  // T17-T20: Higiene e infeccion
+  {q:'Infeccion nosocomial mas frecuente',a:'ITU (infeccion del tracto urinario)',t:'T17'},
+  {q:'Que es la asepsia?',a:'Ausencia total de microorganismos',t:'T17'},
+  {q:'Diferencia entre desinfeccion y esterilizacion',a:'Desinfeccion elimina patogenos (no esporas). Esterilizacion elimina todo, incluidas esporas.',t:'T17'},
+  {q:'Metodo de esterilizacion del autoclave',a:'Calor humedo (vapor a presion)',t:'T17'},
+  {q:'Temperatura y tiempo del autoclave',a:'121 grados C durante 20 min o 134 grados C durante 5-7 min',t:'T17'},
+  {q:'Calor seco: que aparato se usa?',a:'Horno Pasteur o Poupinel',t:'T17'},
+  {q:'Cuando NO se puede sustituir lavado de manos por solucion hidroalcoholica?',a:'Cuando las manos estan visiblemente sucias',t:'T17'},
+  {q:'El sondaje vesical es tecnica esteril o limpia?',a:'Esteril',t:'T18'},
+  {q:'Aislamiento que requiere la tuberculosis',a:'Aereo (respiratorio)',t:'T18'},
+  {q:'Material critico (clasificacion Spaulding)',a:'Contacta con tejido esteril o torrente sanguineo. Requiere esterilizacion.',t:'T18'},
+  {q:'Material semicritico',a:'Contacta con mucosas o piel no intacta. Requiere desinfeccion de alto nivel.',t:'T18'},
+  {q:'Material no critico',a:'Contacta solo con piel intacta. Desinfeccion de bajo nivel.',t:'T18'},
+  // T21-T25: Nutricion, residuos, otros
+  {q:'Formula del IMC',a:'Peso (kg) / Talla (m) al cuadrado',t:'T21'},
+  {q:'IMC normal',a:'18.5 - 24.9',t:'T21'},
+  {q:'Dieta astringente: para que sirve?',a:'Para tratar la diarrea (baja en fibra)',t:'T21'},
+  {q:'Dieta laxante: caracteristica',a:'Rica en fibra, para el estrenimiento',t:'T21'},
+  {q:'Residuos sanitarios Grupo I',a:'Residuos asimilables a urbanos (sin riesgo)',t:'T22'},
+  {q:'Residuos sanitarios Grupo II',a:'Residuos sanitarios no especificos (asimilables a urbanos con gestion especial)',t:'T22'},
+  {q:'Residuos sanitarios Grupo III',a:'Residuos sanitarios especiales/peligrosos (biologico)',t:'T22'},
+  {q:'Residuos sanitarios Grupo IV',a:'Residuos citotoxicos, radiactivos (especial tratamiento)',t:'T22'},
+  {q:'Cama ocupada: cuando se hace?',a:'Cuando el paciente no puede levantarse (encamado)',t:'T23'},
+  {q:'Tipos de cama hospitalaria segun uso',a:'Abierta, cerrada, ocupada, quirurgica (anestesia)',t:'T23'},
+  {q:'Presion arterial sistolica corresponde a:',a:'Contraccion del corazon (sistole)',t:'T5'},
+  {q:'Presion arterial diastolica corresponde a:',a:'Relajacion del corazon (diastole)',t:'T5'},
+  {q:'Que es la taquicardia?',a:'FC mayor de 100 lpm',t:'T5'},
+  {q:'Que es la bradicardia?',a:'FC menor de 60 lpm',t:'T5'},
+  {q:'Que es la taquipnea?',a:'FR mayor de 20 rpm',t:'T5'},
+  {q:'Que es la bradipnea?',a:'FR menor de 12 rpm',t:'T5'},
+  {q:'Funciones del TCAE (3 ejemplos)',a:'Higiene del paciente, hacer camas, distribuir comidas, toma de constantes (delegada)',t:'T24'},
+  {q:'Puede el TCAE administrar medicacion?',a:'No, excepto aplicacion topica por delegacion',t:'T24'},
+];
+
+let deck=[], known=[], learning=[], currentCard=null, currentIdx=0, isFlipped=false, studying=false;
+let totalCards=0;
+const temas=new Set(allCards.map(c=>c.t));
+let selectedTemas=new Set(temas);
+
+function buildFilters(){
+  const row=document.getElementById('filterRow');
+  // All button
+  const allBtn=document.createElement('button');
+  allBtn.className='filter-btn active';
+  allBtn.textContent='Todos';
+  allBtn.onclick=()=>{
+    selectedTemas=new Set(temas);
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.add('active'));
+  };
+  row.appendChild(allBtn);
+  [...temas].sort((a,b)=>{
+    const na=parseInt(a.slice(1)),nb=parseInt(b.slice(1));return na-nb;
+  }).forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='filter-btn active';
+    btn.textContent=t;
+    btn.onclick=()=>{
+      btn.classList.toggle('active');
+      if(btn.classList.contains('active'))selectedTemas.add(t);
+      else selectedTemas.delete(t);
+      // update All button
+      allBtn.classList.toggle('active',selectedTemas.size===temas.size);
+    };
+    row.appendChild(btn);
+  });
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function startStudy(){
+  deck=shuffle(allCards.filter(c=>selectedTemas.has(c.t)).map(c=>({...c,box:0})));
+  if(deck.length===0){alert('Selecciona al menos un tema');return}
+  totalCards=deck.length;
+  known=[];learning=[];
+  currentIdx=0;studying=true;
+  showCard();
+}
+
+function showCard(){
+  if(currentIdx>=deck.length){
+    if(learning.length>0){
+      deck=shuffle([...learning]);
+      learning=[];
+      currentIdx=0;
+    } else {
+      endStudy();return;
+    }
+  }
+  currentCard=deck[currentIdx];
+  isFlipped=false;
+  updateStats();
+  const container=document.getElementById('cardContainer');
+  container.innerHTML=`
+    <div class="card" id="theCard" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-label">PREGUNTA</div>
+        <div class="card-tema">${currentCard.t}</div>
+        <div class="card-text">${currentCard.q}</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label" style="color:#4caf50">RESPUESTA</div>
+        <div class="card-tema">${currentCard.t}</div>
+        <div class="card-text">${currentCard.a}</div>
+      </div>
+    </div>`;
+  document.getElementById('rateRow').classList.add('hidden');
+  document.getElementById('flipHint').textContent='Toca la tarjeta para ver la respuesta (Espacio)';
+}
+
+function flipCard(){
+  if(isFlipped)return;
+  isFlipped=true;
+  document.getElementById('theCard').classList.add('flipped');
+  document.getElementById('rateRow').classList.remove('hidden');
+  document.getElementById('flipHint').textContent='Valora tu conocimiento (1, 2, 3)';
+}
+
+function rate(level){
+  if(!isFlipped)return;
+  if(level===1){
+    // repeat soon (add back to deck nearby)
+    const insertAt=Math.min(currentIdx+3,deck.length);
+    deck.splice(insertAt,0,{...currentCard,box:0});
+  } else if(level===2){
+    learning.push({...currentCard,box:1});
+  } else {
+    known.push(currentCard);
+  }
+  currentIdx++;
+  showCard();
+}
+
+function updateStats(){
+  const remaining=deck.length-currentIdx+learning.length;
+  document.getElementById('sRem').textContent='Pendientes: '+remaining;
+  document.getElementById('sLearn').textContent='Aprendiendo: '+learning.length;
+  document.getElementById('sKnown').textContent='Sabidas: '+known.length;
+  const pct=totalCards>0?Math.round(known.length/totalCards*100):0;
+  document.getElementById('progFill').style.width=pct+'%';
+}
+
+function endStudy(){
+  studying=false;
+  const ov=document.getElementById('endOverlay');
+  ov.classList.remove('hidden');
+  document.getElementById('endMsg').innerHTML=
+    `Has completado todas las tarjetas.<br><br>
+     <span style="color:#4caf50">Sabidas: ${known.length}</span><br>
+     Total estudiadas: ${totalCards}`;
+}
+
+document.addEventListener('keydown',e=>{
+  if(!studying)return;
+  if(e.code==='Space'){e.preventDefault();if(!isFlipped)flipCard()}
+  if(e.key==='1'&&isFlipped)rate(1);
+  if(e.key==='2'&&isFlipped)rate(2);
+  if(e.key==='3'&&isFlipped)rate(3);
+});
+
+buildFilters();
+</script>
+</body>
+</html>
