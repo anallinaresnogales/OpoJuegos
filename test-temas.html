@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Test por Temas - OpoJuegos TCAE</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100vh;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 16px;
+}
+.btn-home {
+  background: rgba(155,89,182,0.25);
+  border: 1px solid rgba(155,89,182,0.5);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+.btn-home:hover, .btn-home:active { background: rgba(155,89,182,0.45); }
+h1 {
+  font-size: 22px;
+  text-align: center;
+  flex: 1;
+}
+h1 span { color: #9b59b6; }
+
+/* Theme Selection */
+#screen-temas { display: block; }
+#screen-quiz, #screen-results { display: none; }
+.subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+.temas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.tema-btn {
+  background: rgba(155,89,182,0.15);
+  border: 1px solid rgba(155,89,182,0.35);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tema-btn:hover, .tema-btn:active {
+  background: rgba(155,89,182,0.35);
+  border-color: #9b59b6;
+  transform: scale(1.01);
+}
+.tema-num {
+  background: #9b59b6;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.tema-name { flex: 1; line-height: 1.3; }
+
+/* Quiz Screen */
+.quiz-header {
+  margin-bottom: 20px;
+}
+.quiz-tema-title {
+  font-size: 16px;
+  color: #9b59b6;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.progress-bar-container {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, #9b59b6, #c39bd3);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+}
+.question-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+}
+.question-number {
+  color: #9b59b6;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.question-text {
+  font-size: 17px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.option-btn {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  min-height: 48px;
+  line-height: 1.4;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.option-btn:hover:not(.disabled) {
+  background: rgba(155,89,182,0.2);
+  border-color: rgba(155,89,182,0.5);
+}
+.option-btn.selected {
+  background: rgba(155,89,182,0.3);
+  border-color: #9b59b6;
+}
+.option-btn.correct {
+  background: rgba(46,204,113,0.25);
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+.option-btn.incorrect {
+  background: rgba(231,76,60,0.25);
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+.option-btn.disabled { pointer-events: none; }
+.explanation-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: rgba(155,89,182,0.15);
+  border-left: 4px solid #9b59b6;
+  border-radius: 0 10px 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.9);
+  display: none;
+}
+.btn-next {
+  display: none;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  background: #9b59b6;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 50px;
+  transition: background 0.2s;
+}
+.btn-next:hover, .btn-next:active { background: #8e44ad; }
+
+/* Results Screen */
+.results-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 6px solid #9b59b6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.score-number {
+  font-size: 42px;
+  font-weight: 700;
+  color: #9b59b6;
+}
+.score-total {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+.score-percent {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.score-message {
+  color: rgba(255,255,255,0.7);
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+.results-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.results-buttons button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 50px;
+  transition: background 0.2s;
+}
+.btn-retry {
+  background: #9b59b6;
+  color: #fff;
+}
+.btn-retry:hover { background: #8e44ad; }
+.btn-back-temas {
+  background: rgba(155,89,182,0.2);
+  border: 1px solid rgba(155,89,182,0.5) !important;
+  color: #fff;
+}
+.btn-back-temas:hover { background: rgba(155,89,182,0.35); }
+
+.review-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: left;
+  color: #9b59b6;
+}
+.review-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.review-item.review-correct { border-left: 4px solid #2ecc71; }
+.review-item.review-wrong { border-left: 4px solid #e74c3c; }
+.review-q {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.review-answer {
+  font-size: 14px;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.review-answer.user-wrong { color: #e74c3c; }
+.review-answer.correct-ans { color: #2ecc71; }
+.review-explanation {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <a href="index.html" class="btn-home">&#127968; Menu</a>
+    <h1>Test por <span>Temas</span></h1>
+    <div style="width:90px"></div>
+  </header>
+
+  <!-- SCREEN 1: Theme Selection -->
+  <div id="screen-temas">
+    <p class="subtitle">Elige un tema para practicar 20 preguntas tipo test</p>
+    <div class="temas-grid" id="temas-grid"></div>
+  </div>
+
+  <!-- SCREEN 2: Quiz -->
+  <div id="screen-quiz">
+    <div class="quiz-header">
+      <div class="quiz-tema-title" id="quiz-tema-title"></div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Pregunta 1 de 20</div>
+    </div>
+    <div class="question-card">
+      <div class="question-number" id="question-number"></div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options-list" id="options-list"></div>
+      <div class="explanation-box" id="explanation-box"></div>
+      <button class="btn-next" id="btn-next">Siguiente pregunta</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: Results -->
+  <div id="screen-results">
+    <div class="results-card">
+      <div class="score-circle">
+        <div class="score-number" id="score-number">0</div>
+        <div class="score-total">/ 20</div>
+      </div>
+      <div class="score-percent" id="score-percent">0%</div>
+      <div class="score-message" id="score-message"></div>
+    </div>
+    <div class="results-buttons">
+      <button class="btn-retry" id="btn-retry">Repetir tema</button>
+      <button class="btn-back-temas" id="btn-back-temas">Elegir otro tema</button>
+    </div>
+    <div class="review-title">Repaso de respuestas</div>
+    <div id="review-list"></div>
+  </div>
+</div>
+
+<script>
+const temas = [
+  {
+    id: 1,
+    nombre: "Sistema Nacional de Salud y SES",
+    preguntas: [
+      { q: "La atención hospitalaria se ve caracterizada por:", a: ["Una amplia gama de pacientes","Una edad media de sus usuarios cada vez mayor","Un amplio equipo de especialistas","Una amplia gama de recursos"], c: 1, e: "Geriatrización de la medicina = edad media cada vez mayor." },
+      { q: "En la actualidad, se tiende a mantener a los ancianos:", a: ["En su entorno habitual","En residencias especializadas","En unidades aisladas","En trabajos mantenidos"], c: 0, e: "Principio clave: mantener al anciano en su entorno." },
+      { q: "Entre los objetivos de la Ayuda a Domicilio NO se encuentra:", a: ["Mejorar la calidad de vida","Prevenir deterioro personal y social","Potenciar el INGRESO en centros residenciales","Apoyar a grupos familiares"], c: 2, e: "Es POTENCIAR ALTERNATIVAS al ingreso, no potenciar el ingreso." },
+      { q: "¿Cuál es una obligación (no derecho) del usuario de Ayuda a Domicilio?", a: ["Recibir la prestación adecuadamente","Corresponsabilizarse en el coste","Exigir más horas de servicio","Elegir al profesional"], c: 1, e: "Contribuir al coste es obligación. Recibir el servicio es derecho." },
+      { q: "La Convivencia e Inserción Social tiene por objeto la prestación de alojamiento:", a: ["Definitivo","Temporal","Solo para mayores de 65 años","Solo hospitalario"], c: 1, e: "TEMPORAL, no definitivo. Trampa clásica de examen." },
+      { q: "La provisión de cuidados a ancianos en domicilio se realiza desde:", a: ["Autocuidados, cuidado informal y cuidado formal","Cuidado formal e informal solamente","Autocuidados y cuidado formal","Cuidados hospitalarios y domiciliarios"], c: 0, e: "Son 3 enfoques: autocuidados + informal + formal." },
+      { q: "Para implementar educación para la salud en el anciano debemos considerar:", a: ["Las prioridades de la sociedad","El nivel sociocultural de la población","La institución de nuevos métodos","Todas son ciertas"], c: 1, e: "El nivel sociocultural exige acomodación de contenidos y método." },
+      { q: "La visita domiciliaria se dirige especialmente a:", a: ["Mayores de 80 años","Jubilados","Personas que viven lejos del centro","Todas son ciertas"], c: 0, e: "Mayores de 80 años, solos, enfermos graves, alta reciente, terminales." },
+      { q: "Las dos vacunas básicas que se aplican al anciano son:", a: ["Tétanos y gripe","Varicela y gripe","Triple vírica y tétanos","VIH y tétanos"], c: 0, e: "Tétanos y gripe son las básicas del anciano." },
+      { q: "¿Cuál NO es una dificultad para la atención integral al anciano en AP?", a: ["Sobrecarga asistencial","Insuficiente formación en gerontología","La falta de recursos","Dificultad en coordinación AP-especializada"], c: 2, e: "La falta de recursos NO aparece en la lista del temario." },
+      { q: "El SEPAD fue creado mediante:", a: ["Ley 39/2006","Ley 1/2008, de 22 de mayo","Decreto 12/1997","Decreto 93/2012"], c: 1, e: "Ley 1/2008. La 39/2006 es la Ley de Dependencia estatal." },
+      { q: "Los CADEX están ubicados en:", a: ["Todas las capitales de comarca","Cáceres y Badajoz","Solo en Mérida","Cáceres, Badajoz y Mérida"], c: 1, e: "Ámbito provincial: uno en Cáceres y otro en Badajoz." },
+      { q: "Los CADEX atienden a personas desde:", a: ["Los 18 años","Los 65 años","Los 0 años","Los 3 años"], c: 2, e: "Cualquier edad, desde los 0 años en adelante." },
+      { q: "Del examen de salud al anciano se deriva fundamentalmente:", a: ["La detección precoz","Métodos de aprendizaje","El tratamiento a instaurar","La asignación de facultativo"], c: 2, e: "De los hallazgos del examen se deriva el tratamiento." },
+      { q: "¿Qué función tienen los Servicios Sociales de Atención Social Básica?", a: ["Ofrecer atención sanitaria primaria","Brindar información, valoración y orientación sobre recursos sociales","Proporcionar atención médica a dependientes","Gestionar ayudas económicas directamente"], c: 1, e: "Su función es informar, valorar y orientar sobre recursos sociales." },
+      { q: "El límite de tiempo de la Ayuda a Domicilio es:", a: ["3 horas diarias o 60 horas mensuales","2 horas diarias o 52 horas mensuales","4 horas diarias o 80 horas mensuales","No tiene límite"], c: 1, e: "Máximo 2 horas/día o 52 horas/mes." },
+      { q: "En 2010 la OMS lanzó su iniciativa global para el cuidado del anciano que consiste en:", a: ["Equipos multidisciplinares de atención geriátrica","Ciudades que favorezcan a las personas mayores","Integración del anciano en el mercado laboral","Nuevas residencias de ancianos"], c: 1, e: "Ciudades amigables con los mayores (Age-friendly cities)." },
+      { q: "La Unidad de Coordinación de Violencia sobre la Mujer se encarga de:", a: ["Atención sanitaria primaria","Protección y apoyo a mujeres víctimas de violencia de género","Gestión del SAAD","Servicios sociales básicos"], c: 1, e: "Asesoramiento jurídico, social y psicológico + protección." },
+      { q: "¿Cuál es una actuación de la prestación de Ayuda a Domicilio?", a: ["Cirugías menores en domicilio","Acompañamiento fuera del hogar para gestiones","Atención hospitalaria especializada","Servicios educativos para menores"], c: 1, e: "El acompañamiento fuera del hogar es ayuda de carácter personal." },
+      { q: "El enfermero comunitario de enlace prioriza especialmente a:", a: ["Jóvenes con enfermedades agudas","Personas de edad avanzada, con déficit de movilidad y procesos crónicos/terminales","Niños con enfermedades congénitas","Mujeres embarazadas de riesgo"], c: 1, e: "Ancianos + déficit movilidad + crónicos/terminales." }
+    ]
+  },
+  {
+    id: 2,
+    nombre: "Derechos del paciente y voluntades anticipadas",
+    preguntas: [
+      { q: "La vejez propiamente dicha se denomina también:", a: ["Madurez precoz","Decrepitud","Madurez tardía","Caquexia senil"], c: 2, e: "Vejez = madurez tardía. Decrepitud/caquexia senil es otra etapa." },
+      { q: "¿Qué edad expresa la capacidad de mantener roles personales e integración social?", a: ["Cronológica","Biológica","Psicológica","Funcional"], c: 3, e: "La edad FUNCIONAL mide integración social y capacidades físicas." },
+      { q: "El coeficiente de renovación se calcula dividiendo:", a: [">65 años / 0-14 años","0-14 años / >65 años","15-50 / >50 años",">50 / 15-50 años"], c: 0, e: "Población >65 entre población 0-14 años." },
+      { q: "El anciano frágil tiene generalmente edad superior a:", a: ["60 años","65 años","75 años","80 años"], c: 3, e: ">80 años es una de las características del anciano frágil." },
+      { q: "¿Qué modificación de la piel del anciano es INCORRECTA?", a: ["Se vuelve descolorida","Se vuelve más húmeda y sudorosa","Se vuelve delgada","Aparecen arrugas"], c: 1, e: "La piel se vuelve SECA, no húmeda. Trampa clásica." },
+      { q: "En el envejecimiento se pierde antes la capacidad de detectar sabores:", a: ["Dulces","Salados","Ácidos","Amargos"], c: 1, e: "Se pierde el SALADO antes que el dulce." },
+      { q: "¿Cuántos ítems tiene el índice de Barthel?", a: ["5","10","15","20"], c: 1, e: "10 ítems. Máxima independencia 100, máxima dependencia 0." },
+      { q: "En la Escala de Tinetti, ¿cuál es la puntuación máxima del equilibrio?", a: ["6","12","16","28"], c: 2, e: "Equilibrio: max 16. Marcha: max 12. Total: 28." },
+      { q: "¿Qué escala es la más recomendable para screening de depresión en ancianos?", a: ["Pfeiffer","Yesavage (GDS)","Hamilton","Goldberg"], c: 1, e: "GDS de Yesavage: 30 ítems, <11 normal. La más recomendable." },
+      { q: "En el test de Pfeiffer se considera patológico a partir de:", a: ["3 errores","4 errores","5 errores","7 errores"], c: 2, e: "≥5 errores = patológico. +1 error permitido sin estudios primarios." },
+      { q: "El dispositivo geriátrico de 2º nivel es:", a: ["Centro de Salud","Hospital de Día geriátrico","Hospital de cuidados continuados","Residencia gerontológica"], c: 1, e: "2º nivel = Hospital de Día. 1º = AP/Centro Salud. 3º = Hospital cuidados continuados." },
+      { q: "El Grado II de dependencia (Ley 39/2006) es:", a: ["Dependencia moderada","Dependencia severa","Gran dependencia","Dependencia leve"], c: 1, e: "Grado I: moderada. Grado II: severa. Grado III: gran dependencia." },
+      { q: "El MMSE de Folstein indica deterioro cognitivo cuando la puntuación es inferior a:", a: ["20 puntos","24 puntos","26 puntos","30 puntos"], c: 1, e: "<24 puntos = deterioro cognitivo. Puntuación máxima: 30." },
+      { q: "Si un paciente obtiene 70 puntos en el Barthel, indica:", a: ["Independencia","Dependencia leve","Dependencia moderada","Dependencia severa"], c: 1, e: ">60: dependencia leve o independencia. 40-55: moderada. 20-40: severa. <20: total." },
+      { q: "La osteoporosis se acelera en los primeros 5 años de la menopausia por déficit de:", a: ["Progesterona","Estrógenos","Testosterona","Calcio"], c: 1, e: "Déficit de ESTRÓGENOS acelera la pérdida de calcio óseo." },
+      { q: "¿Quién inició los primeros estudios sobre valoración geriátrica?", a: ["Florence Nightingale","Marjory Warren","Virginia Henderson","Dorothea Orem"], c: 1, e: "Marjory Warren, enfermera y doctora, desde Unidad de Larga Estancia en Reino Unido." },
+      { q: "El déficit mineral más frecuente en el anciano es:", a: ["Hierro","Calcio","Potasio","Magnesio"], c: 1, e: "El CALCIO es el déficit mineral más frecuente en el anciano." },
+      { q: "El PAI del PCC en Extremadura es gestionado por:", a: ["Ministerio de Sanidad","SES","INSS","OMS"], c: 1, e: "Servicio Extremeño de Salud (SES)." },
+      { q: "¿Cuál es correcta sobre el PAI del PCC?", a: ["Es un modelo rígido e inmutable","No se adapta a cada área sanitaria","Debe evaluarse periódicamente y modificarse según resultados","Solo aplica a cardiovasculares"], c: 2, e: "Evaluable, modificable, adaptable. No rígido." },
+      { q: "La hostilidad en el anciano se manifiesta normalmente en forma de:", a: ["Agresiones físicas","Agresiones verbales","Llanto","Silencio"], c: 1, e: "Hostilidad = agresiones VERBALES. El miedo se manifiesta con rechazo al cuidador." }
+    ]
+  },
+  {
+    id: 3,
+    nombre: "Documentación sanitaria e historias clínicas",
+    preguntas: [
+      { q: "La definición de salud mental de la OMS incluye aspectos de tipo:", a: ["Psicológico, afectivo y ambiental","Psicológico, afectivo y social","Afectivo, social y ambiental","Físico, psicológico y social"], c: 3, e: "Bienestar FÍSICO, psicológico y social." },
+      { q: "¿Qué edición del DSM es la vigente?", a: ["Segunda","Tercera","Cuarta","Quinta"], c: 3, e: "DSM-5 = quinta edición." },
+      { q: "¿Cuántas categorías de trastornos mentales incluye el DSM-5?", a: ["18","22","30","35"], c: 1, e: "22 categorías." },
+      { q: "¿Qué clasificación de trastornos mentales recomienda la OMS?", a: ["DSM-5","CIE-10","DMS-III","ASLO-V"], c: 1, e: "CIE-10 es la recomendada por la OMS." },
+      { q: "La ansiedad es un trastorno de tipo:", a: ["Psicótico","Neurótico","Sociopatía","Asociado a toxicomanías"], c: 1, e: "Trastorno NEURÓTICO." },
+      { q: "El nivel de ansiedad MODERADO se caracteriza por:", a: ["Campo perceptivo amplio","Atención selectiva y campo disminuido","Incapacidad total","Ausencia de síntomas"], c: 1, e: "Atención selectiva + campo perceptivo disminuido." },
+      { q: "El miedo irracional a los espacios abiertos es:", a: ["Claustrofobia","Dismorfofobia","Agorafobia","Eritrofobia"], c: 2, e: "AGORAFOBIA = espacios abiertos." },
+      { q: "Los contenidos psíquicos que se imponen a pesar del individuo son:", a: ["Neurosis","Fobia","Obsesión","Ilusión"], c: 2, e: "OBSESIÓN = se impone a pesar suyo." },
+      { q: "Los flashbacks son típicos del:", a: ["TOC","Trastorno de estrés traumático","Trastorno fóbico","Ansiedad generalizada"], c: 1, e: "Flashbacks = estrés traumático." },
+      { q: "Los trastornos depresivos según DSM incluyen:", a: ["Fobias y bipolares","Depresivo mayor, maniaco y mixto","Depresivo mayor y distímico","Bipolares y ciclotímicos"], c: 2, e: "Trastornos depresivos = Depresivo Mayor + Distímico." },
+      { q: "Otro nombre de los trastornos bipolares:", a: ["Ciclotimia","Psicosis afectiva no polar","Psicosis falsotímica","Todos"], c: 0, e: "Ciclotimia = trastorno bipolar." },
+      { q: "Mayor riesgo de suicidio en bipolar:", a: ["Inicio fase maniaca","Durante fase depresiva","Al recuperarse de fase depresiva","Al recuperarse de maniaca"], c: 2, e: "Al RECUPERARSE de la depresiva, no durante." },
+      { q: "Edad más frecuente de la esquizofrenia:", a: ["Adolescencia y adulto joven","Primera infancia","Segunda infancia","Adulto >45 años"], c: 0, e: "Adolescencia y adulto joven." },
+      { q: "La lentitud del pensamiento se denomina:", a: ["Taquipsiquia","Bradifemia","Bradipsiquia","Verborrea"], c: 2, e: "BRADIPSIQUIA = lentitud pensamiento." },
+      { q: "La teoría que explica la latencia del Alzheimer hasta la senectud:", a: ["Monoclonal","Buenas causas","Apoptosis o muerte celular programada","Policlonal"], c: 2, e: "APOPTOSIS = muerte celular programada." },
+      { q: "¿Qué neurotransmisor está disminuido en Alzheimer?", a: ["Solo acetilcolina","Solo noradrenalina","Solo histamina","Todos los anteriores"], c: 3, e: "Acetilcolina, noradrenalina, dopamina, serotonina, histamina." },
+      { q: "El Alzheimer es una demencia cortical de tipo:", a: ["Secundario","Primario","Subcortical","Mixto"], c: 1, e: "Cortical PRIMARIA." },
+      { q: "El Parkinson es una demencia de tipo:", a: ["Cortical primaria","Cortical secundaria","Subcortical","No es demencia"], c: 2, e: "SUBCORTICAL." },
+      { q: "El concepto de interacción en salud mental implica:", a: ["Contacto entre profesionales","Relación afecto-emociones con repercusiones somáticas","Normalización de conductas","Aversión a estímulos"], c: 1, e: "Emociones con repercusiones somáticas (cefaleas, náuseas...)." },
+      { q: "Creutzfeldt-Jakob es una demencia:", a: ["Cortical primaria","Cortical secundaria","Subcortical","Funcional"], c: 1, e: "Cortical SECUNDARIA (priones)." }
+    ]
+  },
+  {
+    id: 4,
+    nombre: "Salud laboral y prevención de riesgos",
+    preguntas: [
+      { q: "El diagnóstico de diabetes se puede realizar por:", a: ["Glucemia basal","Glucemia al azar","SOG","Todas son ciertas"], c: 3, e: "Los tres métodos son válidos." },
+      { q: "NO es criterio diagnóstico de diabetes según ADA:", a: ["HbA1c <5%","Glucemia basal ≥126","SOG 2h 140-200","Glucemia azar ≥200"], c: 0, e: "HbA1c <5% no es criterio. El criterio es ≥6,5%." },
+      { q: "Causa desencadenante de cetoacidosis que NO corresponde:", a: ["Infecciones","Cirugía","Estrés","Anemia"], c: 3, e: "La anemia NO es causa de cetoacidosis." },
+      { q: "La artropatía de Charcot se caracteriza por:", a: ["Ser el grado inicial","Ser severa osteoartrosis sin dolor intenso","Presentar úlceras MUY dolorosas","No estar ligada a infecciones"], c: 1, e: "Grado más avanzado. Las úlceras NO son muy dolorosas (neuropatía)." },
+      { q: "Dosis inicial de insulina en DM2:", a: ["1 U/kg/día","0,1 U/kg/día","0,2 U/kg/día","3 U/kg/día"], c: 2, e: "0,2 U/kg/día." },
+      { q: "Sobre la dieta del diabético es FALSO:", a: ["Limitar alcohol y sodio","6 tomas diarias","Restringir hidratos a la mitad","Comida ligera si glucemia <110"], c: 2, e: "NO se restringen a la mitad." },
+      { q: "¿Qué indicador mide el control glucémico de los últimos 3 meses?", a: ["Glucosa en ayunas","HbA1c","Péptido C","Perfil glucémico"], c: 1, e: "HbA1c = hemoglobina glicosilada = 3 meses." },
+      { q: "La insulina Lispro tiene inicio de acción en:", a: ["30-60 min","1-2 horas","10-20 minutos","4 horas"], c: 2, e: "Lispro = ultrarrápida = 10-20 minutos." },
+      { q: "El test de O'Sullivan consiste en:", a: ["75g glucosa, medir 2h","50g glucosa, medir 1h","Glucemia basal y postprandial","HbA1c"], c: 1, e: "50g glucosa, medir A LA HORA." },
+      { q: "El tipo de diabetes más frecuente es:", a: ["DM1","DMG","DM2","LADA"], c: 2, e: "DM2 = 90-95% de los casos." },
+      { q: "El fenómeno del alba se caracteriza por:", a: ["Hipoglucemia nocturna","Elevación glucosa matutina","Insulinorresistencia nocturna","Hipoglucemia reactiva"], c: 1, e: "Elevación glucosa MATUTINA." },
+      { q: "Evaluación integral del diabético hospitalizado:", a: ["A su llegada","En las primeras 24h","En las primeras 48h","Depende de la zona"], c: 1, e: "Primeras 24 HORAS." },
+      { q: "La ET en niños diabéticos se realiza:", a: ["Solo en niños","Solo en familiares","En niños y familiares","Se retrasa hasta edad apropiada"], c: 2, e: "Tanto en NIÑOS como FAMILIARES." },
+      { q: "Objetivo principal del PIDIA:", a: ["Hospitalizar a todos","Frenar diabetes y mejorar calidad de vida","Eliminar diabetes con vacunas","Solo atención hospitalaria"], c: 1, e: "Frenar aumento + mejorar calidad vida." },
+      { q: "% población extremeña >15 años con diabetes (2017):", a: ["5,2%","9,19%","12,4%","15,6%"], c: 1, e: "9,19%." },
+      { q: "NO es área de intervención del PIDIA:", a: ["Promoción estilos saludables","Detección precoz","Hospitalización obligatoria","Atención sanitaria integral"], c: 2, e: "La hospitalización obligatoria NO forma parte." },
+      { q: "Prevención DM2 en Extremadura:", a: ["Alimentación saludable y actividad física","Antidiabéticos a toda la población","Eliminar hidratos","Aumentar azúcares naturales"], c: 0, e: "Alimentación saludable + actividad física." },
+      { q: "La insulina Glargina es de tipo:", a: ["Ultrarrápida","Rápida","Intermedia","Prolongada"], c: 3, e: "Glargina = acción prolongada (24h)." },
+      { q: "Control de HbA1c se hace cada:", a: ["Mes","3 meses","6 meses","Año"], c: 2, e: "Semestral (cada 6 meses)." },
+      { q: "El déficit mineral más frecuente en anciano diabético:", a: ["Hierro","Calcio","Potasio","Magnesio"], c: 1, e: "El calcio es el déficit mineral más frecuente." }
+    ]
+  },
+  {
+    id: 5,
+    nombre: "Higiene de manos y aislamiento",
+    preguntas: [
+      { q: "Factor que NO propicia incontinencia en el anciano:", a: ["Transformaciones aparato locomotor","Polifarmacología","Hidratación excesiva","Transformaciones genitourinarias"], c: 2, e: "La hidratación excesiva NO es un factor listado." },
+      { q: "Fármacos que aumentan frecuencia y volumen de orina:", a: ["Sedantes","Betabloqueantes","Anticolinérgicos","Diuréticos"], c: 3, e: "DIURÉTICOS." },
+      { q: "Incontinencia <4 semanas sin alteración estructural:", a: ["De esfuerzo","Por rebosamiento","Transitoria o aguda","Crónica"], c: 2, e: "Transitoria/aguda = <4 semanas, funcional." },
+      { q: "Pequeñas cantidades de orina, presión vejiga > uretra:", a: ["Rebosamiento","Funcional","Esfuerzo","Urgencia"], c: 0, e: "REBOSAMIENTO." },
+      { q: "Falta completa de control sobre la micción:", a: ["Esfuerzo","Total","Rebosamiento","Funcional"], c: 1, e: "Incontinencia TOTAL." },
+      { q: "La uretra cavernosa se encuentra en:", a: ["Próstata","Membrana","Pene","No existe"], c: 2, e: "Uretra cavernosa = en el PENE." },
+      { q: "Litros filtrados al día en los riñones:", a: ["90","180","280","800"], c: 1, e: "~180 litros/día." },
+      { q: "Hormona que reduce cantidad de orina:", a: ["Aldosterona","ADH","Renina","DHA"], c: 1, e: "ADH = antidiurética." },
+      { q: "El volumen de orina diario se denomina:", a: ["Poliuria","Voliuria","Enuresis","Diuresis"], c: 3, e: "DIURESIS." },
+      { q: "Emisión <500 ml/día:", a: ["Poliuria","Anuria","Polaquiuria","Oliguria"], c: 3, e: "OLIGURIA." },
+      { q: "Orinar muchas veces al día:", a: ["Poliuria","Disuria","Enuresis","Polaquiuria"], c: 3, e: "POLAQUIURIA." },
+      { q: "Orina oscura en hepatitis:", a: ["Amarillo oscuro","Coluria","Amarillo pálido","Hematuria"], c: 1, e: "COLURIA." },
+      { q: "Hemofiltración indicada en:", a: ["IRA oligúrica","Colitis ulcerosa","IRA poliúrica","Crohn"], c: 0, e: "IRA OLIGÚRICA." },
+      { q: "Incontinencia más frecuente:", a: ["De esfuerzo","De urgencia","Neurológica","Paradójica"], c: 0, e: "De ESFUERZO/estrés." },
+      { q: "Cálculos renales más frecuentes:", a: ["Cistina","Uratos","Oxalatos","Xantina"], c: 2, e: "OXALATOS." },
+      { q: "2ª fase de la IRA:", a: ["Oligúrica","Anúrica","Diurética","Recuperación"], c: 2, e: "DIURÉTICA." },
+      { q: "Orina residual es:", a: ["Diuresis diaria","Orina almacenada","Volumen tras evacuar","Orina retenida por obstrucción"], c: 2, e: "Volumen que queda en vejiga DESPUÉS de evacuar." },
+      { q: "Sondas de lavado continuo:", a: ["Malecot","Pezzer","Foley","Robinson"], c: 2, e: "FOLEY." },
+      { q: "Calibres de sondas vesicales van de:", a: ["4 a 22","6 a 16","6 a 24","12 a 28"], c: 2, e: "De 6 a 24, de dos en dos." },
+      { q: "Las sondas de Foley son:", a: ["Blandas","Duras","Rígidas","Semirrígidas"], c: 0, e: "BLANDAS." }
+    ]
+  },
+  {
+    id: 6,
+    nombre: "Infección nosocomial y esterilización",
+    preguntas: [
+      { q: "Factor NO relacionado con estreñimiento en anciano:", a: ["Dieta baja en fibra","Consumo elevado de líquidos","Sedentarismo","Medicamentos"], c: 1, e: "El consumo elevado de líquidos PREVIENE, no causa." },
+      { q: "Principal estrategia no farmacológica contra estreñimiento:", a: ["Fibra + líquidos + actividad física","Laxantes habituales sin supervisión","Reducir líquidos","Evitar cereales y frutas"], c: 0, e: "Fibra + líquidos + ejercicio." },
+      { q: "Complicación NO asociada al estreñimiento crónico:", a: ["Enfermedad diverticular","Hemorroides","Hipoglucemia","Fisuras anales"], c: 2, e: "La hipoglucemia NO es complicación." },
+      { q: "En ancianos institucionalizados, la clave es:", a: ["Reeducación intestinal y horario regular","Laxantes sin control","Limitar líquidos","Evitar ejercicio"], c: 0, e: "Reeducación intestinal + horario regular." },
+      { q: "Circunstancia NO frecuente en embarazo:", a: ["Pirosis","Diarreas","Hemorroides","Estreñimiento"], c: 1, e: "DIARREAS no son frecuentes." },
+      { q: "Proteínas recomendadas en gestante:", a: ["0,5 g/kg","1 g/kg","1,5 g/kg","2,5 g/kg"], c: 2, e: "1,5 g por kg de peso." },
+      { q: "Hierro total en todo el embarazo:", a: ["300 mg","500 mg","800 mg","2500 mg"], c: 2, e: "~800 mg." },
+      { q: "El yodo previene:", a: ["Hipertiroidismo","Graves-Basedow","Bocio","Ninguno"], c: 2, e: "BOCIO." },
+      { q: "Parto a término ocurre en semana:", a: ["35","37","40","42"], c: 1, e: "Semana 37." },
+      { q: "Aborto si finaliza gestación antes de semana:", a: ["12","35","22","25"], c: 2, e: "Semana 22." },
+      { q: "Fases del parto:", a: ["5","4","3","2"], c: 2, e: "3 fases: dilatación, expulsivo, alumbramiento." },
+      { q: "El borramiento del cuello produce:", a: ["Final dilatación","Formación canal del parto","Inicio alumbramiento","Nada"], c: 1, e: "CANAL DEL PARTO." },
+      { q: "Dilatación completa en cm:", a: ["5-6","7-8","10-12","20-36"], c: 2, e: "10-12 cm." },
+      { q: "El alumbramiento expulsa:", a: ["Recién nacido","Líquido amniótico + bebé","Placenta y anejos","Todo lo anterior"], c: 2, e: "PLACENTA y anejos." },
+      { q: "Pérdidas genitales en puerperio:", a: ["Menorragias","Dismenorreas","Loquios","Entuertos"], c: 2, e: "LOQUIOS." },
+      { q: "Contracciones dolorosas del puerperio:", a: ["De bruja","Dismenorreas","Loquios","Entuertos"], c: 3, e: "ENTUERTOS." },
+      { q: "Amamantar en cada pecho:", a: ["Más de 30 min","20-30 min","15-20 min","10-15 min"], c: 3, e: "10-15 minutos." },
+      { q: "Baño recomendado en gestante:", a: ["1 vez/día","Cada 2 días","Cada 3 días","1 vez/semana"], c: 0, e: "1 vez al DÍA." },
+      { q: "Posición para administrar enema:", a: ["Decúbito supino","Fowler","Sims izquierdo","Trendelenburg"], c: 2, e: "SIMS IZQUIERDO." },
+      { q: "Ecografía de crecimiento fetal en semanas:", a: ["8-10","12-16","16-22","32-34"], c: 3, e: "Semanas 32-34." }
+    ]
+  },
+  {
+    id: 7,
+    nombre: "Residuos sanitarios",
+    preguntas: [
+      { q: "El hueso con peñascos es:", a: ["Frontal","Occipital","Parietales","Temporales"], c: 3, e: "TEMPORALES poseen los peñascos." },
+      { q: "Hueso sin articulación con ningún otro:", a: ["Atlas","Axis","Hioides","Vómer"], c: 2, e: "HIOIDES." },
+      { q: "Vértebras dorsales:", a: ["7","5","12","9"], c: 2, e: "12 dorsales." },
+      { q: "Huesecillos del carpo:", a: ["5","2","10","8"], c: 3, e: "8 huesecillos." },
+      { q: "Articulaciones en silla de montar:", a: ["Enartrosis","Artrodiales","Encaje recíproco","Condileas"], c: 2, e: "ENCAJE RECÍPROCO." },
+      { q: "Músculos se insertan en huesos por:", a: ["Ligamentos","Fascias","Aponeurosis","Tendones"], c: 3, e: "TENDONES." },
+      { q: "Músculos cutáneos más frecuentes en:", a: ["Cabeza","Cuello","Miembro superior","Miembro inferior"], c: 0, e: "CABEZA." },
+      { q: "NO pertenece al cuádriceps:", a: ["Recto interno","Vasto externo","Vasto interno","Crural"], c: 0, e: "RECTO INTERNO no es del cuádriceps." },
+      { q: "Síntomas de artrosis:", a: ["Solo dolor","Solo rigidez","Solo inflamación","Dolor + rigidez + limitación + crepitación + inflamación"], c: 3, e: "TODOS." },
+      { q: "Enfermedad con autoanticuerpos:", a: ["Artritis gotosa","Osteosarcoma","Artrosis","Lupus eritematoso sistémico"], c: 3, e: "LUPUS = autoanticuerpos." },
+      { q: "Posición antiTrendelenburg también se llama:", a: ["Litotomía","Morestin","Roser","Sims"], c: 1, e: "MORESTIN." },
+      { q: "La posición mahometana es:", a: ["Litotomía","Fowler","Morestin","Genupectoral"], c: 3, e: "GENUPECTORAL." },
+      { q: "Posición quirúrgica de las siguientes:", a: ["Fowler","Decúbito supino","Morestin","Decúbito prono"], c: 2, e: "MORESTIN es quirúrgica." },
+      { q: "Kraske se emplea en:", a: ["Reflujo gastroesofágico","Problemas cardíacos","Cirugía coxigea","Posición antishock"], c: 2, e: "CIRUGÍA COXIGEA." },
+      { q: "Laminectomía se emplea en:", a: ["Exploración rectal","Hernias discales lumbar/torácico","Cirugía colon","Vesícula biliar"], c: 1, e: "HERNIAS DISCALES lumbar/torácico." },
+      { q: "Craneotomía se emplea en:", a: ["Cirugía mama","Cirugía tórax","Rotura ósea de cráneo","Hernias discales"], c: 2, e: "ROTURA ÓSEA de cráneo." },
+      { q: "La cavidad peritoneal está en:", a: ["Cavidad pélvica","Cavidad abdominal","Cavidad torácica","Cavidad mediastínica"], c: 1, e: "CAVIDAD ABDOMINAL." },
+      { q: "Movimiento de alejamiento del plano medio:", a: ["Flexión","Eversión","Abducción","Rotación"], c: 2, e: "ABDUCCIÓN." },
+      { q: "Cambios posturales en encamado cada:", a: ["1 hora","2-3 horas","4-5 horas","6 horas"], c: 1, e: "Cada 2-3 HORAS." },
+      { q: "Trendelenburg se usa para:", a: ["Problemas respiratorios","Shock/lipotimias","Exploración rectal","Cirugía coxigea"], c: 1, e: "SHOCK, lipotimias, retorno venoso." }
+    ]
+  },
+  {
+    id: 8,
+    nombre: "Limpieza y desinfección hospitalaria",
+    preguntas: [
+      { q: "Con 2 auxiliares, en deambulación:", a: ["Ambos a los lados","Uno delante y otro detrás","Ambos detrás","Uno sentado"], c: 1, e: "Uno DELANTE y otro DETRÁS." },
+      { q: "El bastón se lleva en el lado:", a: ["Afecto","Contrario al afecto (sano)","Indiferente","Derecho siempre"], c: 1, e: "Lado CONTRARIO (SANO)." },
+      { q: "Para subir escaleras, primero:", a: ["Pierna afecta","Ambas a la vez","Pierna sana","El bastón solo"], c: 2, e: "Pierna SANA sube primero." },
+      { q: "Para bajar escaleras, primero:", a: ["Pierna sana","Ambas a la vez","Pierna afecta + bastón","El bastón solo"], c: 2, e: "Pierna AFECTA + bastón bajan primero." },
+      { q: "Dispositivo con máxima estabilidad:", a: ["Bastón","Muleta axilar","Andador","Muleta canadiense"], c: 2, e: "ANDADOR = máxima estabilidad." },
+      { q: "La muleta Lofstrand es:", a: ["Axilar","De antebrazo (canadiense)","De mano","De hombro"], c: 1, e: "ANTEBRAZO (canadiense)." },
+      { q: "Marcha en 4 tiempos:", a: ["Ambas muletas + pies juntos","Muleta izq→pie dcho→muleta dcha→pie izq","Balanceo completo","Muleta+pie simultáneo"], c: 1, e: "Secuencia alternante de 4 pasos." },
+      { q: "En transferencia cama→sillón, la silla se coloca:", a: ["Lado afecto","Lado sano","A los pies de la cama","Donde haya espacio"], c: 1, e: "Lado SANO del paciente." },
+      { q: "Al transferir, la silla de ruedas debe estar:", a: ["Con ruedas libres","Frenada","En movimiento","Sin reposapiés ni frenos"], c: 1, e: "Siempre FRENADA." },
+      { q: "Para subir rampa con silla de ruedas:", a: ["De espaldas","De lado","De frente","Arrastrándola"], c: 2, e: "De FRENTE." },
+      { q: "Para bajar rampa con silla de ruedas:", a: ["De frente","De lado","De espaldas","Empujando rápido"], c: 2, e: "De ESPALDAS (marcha atrás)." },
+      { q: "Camilla en ascensor, entra primero:", a: ["Los pies","La cabeza","El lateral","Da igual"], c: 1, e: "La CABEZA." },
+      { q: "Camilla en ascensor, sale primero:", a: ["La cabeza","Los pies","El lateral","Da igual"], c: 1, e: "Los PIES." },
+      { q: "Grúa se usa en pacientes con:", a: ["Buena movilidad","Colaboración parcial","Nula colaboración o gran peso","Problemas visuales"], c: 2, e: "NULA colaboración o gran peso." },
+      { q: "Con 1 auxiliar en deambulación, se coloca:", a: ["Delante del paciente","Detrás o lado afecto","En el lado sano","Sentado"], c: 1, e: "DETRÁS o LADO AFECTO." },
+      { q: "Para mover al paciente hacia la cabecera con sábana:", a: ["1 auxiliar","Sábana entremetida con 2 auxiliares","El paciente solo","Se usa grúa"], c: 1, e: "SÁBANA ENTREMETIDA con 2 auxiliares." },
+      { q: "El disco giratorio se usa para:", a: ["Transferencia sin ponerse de pie","Transferencia con giro de pie","Movilización en cama","Deambulación"], c: 1, e: "Giro de pie sobre el disco." },
+      { q: "Silla de ruedas en ascensor, se entra:", a: ["De frente","De lado","De espaldas","Plegada"], c: 2, e: "De ESPALDAS (auxiliar entra primero)." },
+      { q: "La marcha en balanceo se usa en:", a: ["Ancianos con bastón","Paraplejia","Esguince leve","Fractura de muñeca"], c: 1, e: "PARAPLEJIA." },
+      { q: "Al girar a decúbito lateral, el auxiliar se coloca:", a: ["En el lado contrario al giro","En el lado hacia el que se gira","A los pies","A la cabecera"], c: 1, e: "En el lado HACIA el que se gira." }
+    ]
+  },
+  {
+    id: 9,
+    nombre: "Muestras biológicas",
+    preguntas: [
+      { q: "El baño se realiza de:", a: ["Lo sucio a lo limpio","Lo proximal a lo distal","Lo limpio a lo sucio, de distal a proximal","De arriba a abajo sin orden"], c: 2, e: "De lo LIMPIO a lo SUCIO, de DISTAL a PROXIMAL." },
+      { q: "Temperatura del agua del baño:", a: ["30-35ºC","37-40ºC","42-45ºC","Indiferente"], c: 1, e: "37-40ºC." },
+      { q: "En el baño en cama, lo último que se lava:", a: ["Cara","Espalda","Tórax","Genitales"], c: 3, e: "GENITALES siempre lo último." },
+      { q: "Ojos se lavan del ángulo:", a: ["Externo al interno","Interno al externo","Superior al inferior","Indiferente"], c: 1, e: "Del INTERNO al EXTERNO." },
+      { q: "Genitales femeninos se lavan:", a: ["De atrás a delante","De delante a atrás","Movimientos circulares","Indiferente"], c: 1, e: "De DELANTE a ATRÁS." },
+      { q: "Genitales masculinos, hay que:", a: ["Retraer prepucio y limpiar glande","Limpiar sin retraer nada","Solo enjuagar con agua","Aplicar antiséptico"], c: 0, e: "Retraer PREPUCIO, limpiar GLANDE." },
+      { q: "Lavado de cabello en encamado:", a: ["Posición Fowler","Posición Roser","Posición Sims","Posición Trendelenburg"], c: 1, e: "Posición de ROSER." },
+      { q: "Exploración ginecológica, posición:", a: ["Sims","Genupectoral","Litotomía","Trendelenburg"], c: 2, e: "LITOTOMÍA." },
+      { q: "Exploración rectal, posición:", a: ["Litotomía","Fowler","Sims o genupectoral","Trendelenburg"], c: 2, e: "SIMS o GENUPECTORAL." },
+      { q: "Orina de 24h, la primera micción se:", a: ["Recoge","Desecha","Analiza aparte","Envía inmediatamente"], c: 1, e: "Se DESECHA la primera micción." },
+      { q: "Urocultivo, se recoge el chorro:", a: ["Inicial","Medio","Final","Completo"], c: 1, e: "Chorro MEDIO." },
+      { q: "Esputo se recoge mejor:", a: ["Después de comer","Por la noche","Por la mañana al despertar","Indiferente"], c: 2, e: "POR LA MAÑANA al despertar." },
+      { q: "Rasurado prequirúrgico, dirección:", a: ["Contra el vello","En dirección del crecimiento","Circular","Indiferente"], c: 1, e: "En DIRECCIÓN del crecimiento del vello." },
+      { q: "Sangre oculta en heces, dieta previa:", a: ["Sin lácteos","Sin carnes rojas ni hierro","Sin gluten","Normal"], c: 1, e: "Sin CARNES ROJAS ni HIERRO." },
+      { q: "Abdomen se lava con movimientos:", a: ["De arriba a abajo","Circulares sentido agujas reloj","De izquierda a derecha","Indiferente"], c: 1, e: "CIRCULARES sentido agujas del reloj." },
+      { q: "En el baño, los pliegues cutáneos deben:", a: ["Dejarse húmedos","Secarse minuciosamente","Aplicar talco abundante","No tocarlos"], c: 1, e: "SECAR MINUCIOSAMENTE." },
+      { q: "Parásitos en heces, se recogen:", a: ["1 muestra","2 muestras consecutivas","3 muestras en días alternos","5 muestras diarias"], c: 2, e: "3 muestras en DÍAS ALTERNOS." },
+      { q: "Antes de entrar paciente en ducha:", a: ["Comprobar temperatura del agua","Abrir grifo de agua fría solo","No hace falta comprobar","Llenar bañera completa"], c: 0, e: "COMPROBAR temperatura del agua." },
+      { q: "Lavado de manos del paciente encamado:", a: ["Se mojan con esponja","Se sumergen en palangana","Se lavan con toallitas","No se lavan"], c: 1, e: "Se SUMERGEN en palangana." },
+      { q: "Para el urocultivo es necesario:", a: ["Higiene genital previa","Ayuno de 12h","Recogida de orina completa","Nada especial"], c: 0, e: "HIGIENE GENITAL previa." }
+    ]
+  },
+  {
+    id: 10,
+    nombre: "Constantes vitales",
+    preguntas: [
+      { q: "Enfermedad terminal, pronóstico de vida:", a: ["< 1 mes","< 3 meses","< 6 meses","< 12 meses"], c: 2, e: "< 6 MESES." },
+      { q: "Los cuidados paliativos:", a: ["Curan la enfermedad","Prolongan la vida","Alivian síntomas y mejoran calidad de vida","Aceleran la muerte"], c: 2, e: "ALIVIAN síntomas y mejoran CALIDAD DE VIDA." },
+      { q: "1er escalón de la escalera OMS:", a: ["Morfina","Codeína","Paracetamol/AINEs","Fentanilo"], c: 2, e: "NO opioides: paracetamol/AINEs." },
+      { q: "Opioide fuerte (3er escalón):", a: ["Tramadol","Paracetamol","Codeína","Morfina"], c: 3, e: "MORFINA = 3er escalón." },
+      { q: "Síntoma más frecuente en terminal:", a: ["Disnea","Dolor","Estreñimiento","Fiebre"], c: 1, e: "DOLOR." },
+      { q: "2º síntoma más frecuente en terminal:", a: ["Vómitos","Estreñimiento","Disnea","Fiebre"], c: 2, e: "DISNEA." },
+      { q: "Fases del duelo según Kübler-Ross, en orden:", a: ["Ira-Negación-Depresión-Negociación-Aceptación","Negación-Ira-Negociación-Depresión-Aceptación","Aceptación-Negación-Ira-Depresión-Negociación","Depresión-Ira-Negociación-Negación-Aceptación"], c: 1, e: "Negación-Ira-Negociación-Depresión-Aceptación." },
+      { q: "La primera fase del duelo es:", a: ["Ira","Depresión","Negación","Aceptación"], c: 2, e: "NEGACIÓN." },
+      { q: "Claudicación familiar es:", a: ["El paciente rechaza tratamiento","Agotamiento del cuidador/familia","Fase del duelo","Tipo de dolor"], c: 1, e: "AGOTAMIENTO del cuidador/familia." },
+      { q: "Conspiración de silencio:", a: ["El paciente no habla","La familia oculta información al paciente","El médico no documenta","El TCAE guarda secretos"], c: 1, e: "La familia OCULTA información al paciente." },
+      { q: "Los estertores premortem se producen por:", a: ["Dolor intenso","Acumulación de secreciones bronquiales","Deshidratación","Fiebre alta"], c: 1, e: "Acumulación de SECRECIONES." },
+      { q: "Escala EVA mide:", a: ["Temperatura","Nivel de conciencia","Intensidad del dolor (0-10)","Frecuencia cardíaca"], c: 2, e: "Intensidad del DOLOR (0-10)." },
+      { q: "En cuidados paliativos, la alimentación debe ser:", a: ["Abundante y caliente","Pequeñas cantidades, sin forzar","Solo líquidos","Nula"], c: 1, e: "Pequeñas cantidades, SIN FORZAR." },
+      { q: "Codeína pertenece al escalón:", a: ["1º","2º","3º","4º"], c: 1, e: "2º escalón (opioide DÉBIL)." },
+      { q: "Cuidados paliativos según la OMS:", a: ["Prolongan la vida","Aceleran la muerte","No prolongan ni acortan la vida","Solo tratan el dolor"], c: 2, e: "NO prolongan ni acortan la vida." },
+      { q: "Dolor total incluye dimensión:", a: ["Solo física","Física y emocional","Física, emocional, social y espiritual","Solo espiritual"], c: 2, e: "Física + emocional + social + espiritual." },
+      { q: "El estreñimiento en terminales es frecuente por:", a: ["Exceso de fibra","Uso de opioides","Exceso de líquidos","Movilidad excesiva"], c: 1, e: "Uso de OPIOIDES." },
+      { q: "La fase de ira del duelo se caracteriza por:", a: ["Paz interior","Pactos con Dios","Rabia y enfado","Tristeza profunda"], c: 2, e: "RABIA y ENFADO." },
+      { q: "Síndrome del cuidador también se llama:", a: ["Síndrome de Estocolmo","Burnout del cuidador","Síndrome de Down","Claudicación emocional"], c: 1, e: "BURNOUT del cuidador." },
+      { q: "En paciente con disnea terminal, posición recomendada:", a: ["Decúbito prono","Trendelenburg","Fowler","Genupectoral"], c: 2, e: "FOWLER (semisentado)." }
+    ]
+  },
+  {
+    id: 11,
+    nombre: "Movilización y mecánica corporal",
+    preguntas: [
+      { q: "Kcal por gramo de hidratos de carbono:", a: ["2","4","7","9"], c: 1, e: "4 kcal/g." },
+      { q: "Kcal por gramo de grasas:", a: ["4","7","9","12"], c: 2, e: "9 kcal/g." },
+      { q: "Vitaminas liposolubles:", a: ["C y grupo B","A, D, E, K","Solo la A","Todas son hidrosolubles"], c: 1, e: "A, D, E, K." },
+      { q: "Vitamina esencial para la coagulación:", a: ["A","C","D","K"], c: 3, e: "Vitamina K." },
+      { q: "Déficit de vitamina C produce:", a: ["Raquitismo","Escorbuto","Beriberi","Pelagra"], c: 1, e: "ESCORBUTO." },
+      { q: "IMC de 27 corresponde a:", a: ["Bajo peso","Normopeso","Sobrepeso","Obesidad"], c: 2, e: "SOBREPESO (25-29,9)." },
+      { q: "Dieta hiposódica es baja en:", a: ["Grasa","Azúcar","Sal (sodio)","Proteínas"], c: 2, e: "SAL (sodio)." },
+      { q: "Dieta astringente es para:", a: ["Estreñimiento","Diarrea","Obesidad","Diabetes"], c: 1, e: "DIARREA." },
+      { q: "Dieta hiperproteica indicada en:", a: ["Obesidad","UPP y quemados","Diabetes","HTA"], c: 1, e: "UPP y QUEMADOS." },
+      { q: "SNG se comprueba auscultando:", a: ["Hipocondrio derecho","Epigastrio","Mesogastrio","Fosa ilíaca"], c: 1, e: "EPIGASTRIO." },
+      { q: "Posición durante nutrición por SNG:", a: ["Decúbito supino","Trendelenburg","Fowler","Decúbito lateral"], c: 2, e: "FOWLER." },
+      { q: "NPT se administra por vía:", a: ["Periférica","Central","Oral","Intramuscular"], c: 1, e: "Vía venosa CENTRAL." },
+      { q: "Nutrición parenteral NO usa:", a: ["Vía intravenosa","Vía central","Tubo digestivo","Catéter"], c: 2, e: "NO usa TUBO DIGESTIVO." },
+      { q: "Función principal de las proteínas:", a: ["Energética","Plástica","Reguladora","Reserva"], c: 1, e: "PLÁSTICA (construcción/reparación)." },
+      { q: "Kcal del alcohol por gramo:", a: ["4","5","7","9"], c: 2, e: "7 kcal/g." },
+      { q: "Disfagia es:", a: ["Dificultad para respirar","Dificultad para tragar","Dificultad para hablar","Dificultad para ver"], c: 1, e: "Dificultad para TRAGAR." },
+      { q: "En disfagia, los líquidos se toman con:", a: ["Pajita","Espesantes","Mucho hielo","Sin modificar"], c: 1, e: "ESPESANTES." },
+      { q: "Gastrostomía tipo PEG es:", a: ["Vía parenteral","Sonda directa al estómago por pared abdominal","SNG especial","Vía rectal"], c: 1, e: "Sonda directa al ESTÓMAGO por pared abdominal." },
+      { q: "Dieta blanda consiste en alimentos:", a: ["Crudos","De fácil masticación y digestión","Solo líquidos","Sin sal"], c: 1, e: "De fácil MASTICACIÓN y DIGESTIÓN." },
+      { q: "Tras alimentación por SNG, mantener Fowler:", a: ["5 min","15 min","30-60 min","No es necesario"], c: 2, e: "30-60 MINUTOS." }
+    ]
+  },
+  {
+    id: 12,
+    nombre: "Alimentación y nutrición",
+    preguntas: [
+      { q: "Orden correcto del procesamiento:", a: ["Desinfección-Limpieza-Esterilización","Esterilización-Limpieza-Desinfección","Limpieza-Desinfección-Esterilización","Limpieza-Esterilización-Desinfección"], c: 2, e: "Limpieza, Desinfección, Esterilización." },
+      { q: "La esterilización elimina:", a: ["Solo bacterias","Bacterias y virus","Todo EXCEPTO esporas","TODOS los microorganismos INCLUIDAS esporas"], c: 3, e: "TODOS incluidas ESPORAS." },
+      { q: "Antisepsia se aplica sobre:", a: ["Objetos inanimados","Superficies","Tejidos vivos","Instrumentos"], c: 2, e: "TEJIDOS VIVOS." },
+      { q: "El autoclave funciona con:", a: ["Calor seco","Vapor saturado a presión","Gas óxido de etileno","Radiación gamma"], c: 1, e: "VAPOR SATURADO a presión." },
+      { q: "Parámetros del autoclave:", a: ["170ºC/60 min","100ºC/30 min","121ºC/1 atm/20 min","37ºC/24 h"], c: 2, e: "121ºC / 1 atm / 20 min." },
+      { q: "Material crítico (Spaulding) requiere:", a: ["Desinfección bajo nivel","Desinfección alto nivel","Esterilización","Solo limpieza"], c: 2, e: "ESTERILIZACIÓN." },
+      { q: "Ejemplo de material semicrítico:", a: ["Bisturí","Fonendoscopio","Endoscopio","Catéter IV"], c: 2, e: "ENDOSCOPIO (contacto mucosas)." },
+      { q: "Glutaraldehído 2% esteriliza en:", a: ["30 min","2 h","10 h","24 h"], c: 2, e: "10 HORAS." },
+      { q: "Óxido de etileno requiere:", a: ["Altas temperaturas","Aireación prolongada","Inmersión en agua","Secado al sol"], c: 1, e: "AIREACIÓN prolongada (tóxico)." },
+      { q: "Control de esterilización más fiable:", a: ["Físico","Químico","Biológico","Visual"], c: 2, e: "BIOLÓGICO." },
+      { q: "Bacillus stearothermophilus se usa para controlar:", a: ["ETO","Calor seco","Autoclave (vapor)","Radiación"], c: 2, e: "AUTOCLAVE (vapor)." },
+      { q: "Residuos grupo III van en bolsa:", a: ["Negra","Verde","Roja","Blanca"], c: 2, e: "ROJA." },
+      { q: "Agujas usadas se depositan en:", a: ["Bolsa negra","Bolsa verde","Contenedor rígido","Papelera"], c: 2, e: "CONTENEDOR RÍGIDO." },
+      { q: "NUNCA se debe hacer con una aguja usada:", a: ["Desecharla","Reencapsularla","Ponerla en contenedor","Comunicar pinchazo"], c: 1, e: "REENCAPSULAR." },
+      { q: "Calor seco (Poupinel):", a: ["121ºC/20 min","170ºC/60 min","100ºC/10 min","37ºC/24 h"], c: 1, e: "170ºC / 60 min." },
+      { q: "Pasteurización es un método de:", a: ["Esterilización","Desinfección","Antisepsia","Limpieza"], c: 1, e: "DESINFECCIÓN." },
+      { q: "Clorhexidina es un:", a: ["Desinfectante","Antiséptico","Esterilizante","Detergente"], c: 1, e: "ANTISÉPTICO (tejidos vivos)." },
+      { q: "Residuos grupo I van en bolsa:", a: ["Roja","Verde","Negra","Amarilla"], c: 2, e: "NEGRA." },
+      { q: "Material no crítico (Spaulding) requiere:", a: ["Esterilización","Desinfección alto nivel","Desinfección bajo nivel","Nada"], c: 2, e: "Desinfección BAJO NIVEL." },
+      { q: "Plasma de H2O2 se usa para material:", a: ["Termorresistente","Termosensible","Solo vidrio","Solo metal"], c: 1, e: "TERMOSENSIBLE." }
+    ]
+  },
+  {
+    id: 13,
+    nombre: "Dietas terapéuticas",
+    preguntas: [
+      { q: "Causa principal de UPP:", a: ["Fricción","Humedad","Presión","Infección"], c: 2, e: "PRESIÓN." },
+      { q: "Estadio I de UPP:", a: ["Ampolla","Eritema que no palidece, piel intacta","Necrosis muscular","Tejido subcutáneo expuesto"], c: 1, e: "Eritema que NO PALIDECE, piel intacta." },
+      { q: "Estadio II se presenta como:", a: ["Necrosis ósea","Ampolla o abrasión superficial","Cavitación profunda","Eritema que palidece"], c: 1, e: "AMPOLLA o abrasión superficial." },
+      { q: "Estadio IV afecta a:", a: ["Solo epidermis","Epidermis y dermis","Tejido subcutáneo","Músculo, hueso, tendones"], c: 3, e: "MÚSCULO, HUESO, tendones." },
+      { q: "Localización más frecuente de UPP:", a: ["Trocánter","Talón","Sacro","Isquion"], c: 2, e: "SACRO." },
+      { q: "2ª localización más frecuente:", a: ["Codo","Sacro","Talones","Occipital"], c: 2, e: "TALONES." },
+      { q: "Escala de Norton valora:", a: ["4 parámetros","5 parámetros","6 parámetros","7 parámetros"], c: 1, e: "5 parámetros." },
+      { q: "Riesgo en Norton con puntuación:", a: ["< 14","< 18","< 20","> 14"], c: 0, e: "< 14 puntos." },
+      { q: "Escala de Braden incluye:", a: ["Percepción sensorial, humedad, actividad, movilidad, nutrición, fricción","Estado físico, mental, actividad, movilidad, incontinencia","Solo movilidad y nutrición","Edad, peso, talla"], c: 0, e: "6 parámetros de Braden." },
+      { q: "Cambios posturales cada:", a: ["1 hora","2-3 horas","4-5 horas","6 horas"], c: 1, e: "Cada 2-3 HORAS." },
+      { q: "Sobre prominencias óseas enrojecidas:", a: ["Masajear vigorosamente","Aplicar calor","NUNCA masajear","Frotar con alcohol"], c: 2, e: "NUNCA masajear." },
+      { q: "Los AGHO se usan para:", a: ["Tratar UPP grado IV","Prevenir UPP en zonas de riesgo","Desbridar tejido","Analgesia"], c: 1, e: "PREVENIR UPP en zonas de riesgo." },
+      { q: "Las rosquillas/flotadores:", a: ["Son recomendables","Están CONTRAINDICADAS","Solo en estadio I","Solo en sacro"], c: 1, e: "Están CONTRAINDICADAS." },
+      { q: "SEMP significa:", a: ["Sistema Especial de Monitorización","Superficies Especiales Manejo Presión","Soporte Externo Médico Postural","Sistema de Evaluación Médica"], c: 1, e: "Superficies Especiales Manejo Presión." },
+      { q: "Cizallamiento es:", a: ["Fuerza perpendicular","Combinación de presión y fricción","Solo humedad","Infección"], c: 1, e: "Combinación de PRESIÓN y FRICCIÓN." },
+      { q: "Dieta recomendada en UPP:", a: ["Hiposódica","Hipocalórica","Hiperproteica e hipercalórica","Astringente"], c: 2, e: "HIPERPROTEICA e hipercalórica." },
+      { q: "Estadio III afecta hasta:", a: ["Epidermis","Dermis","Tejido subcutáneo","Músculo"], c: 2, e: "TEJIDO SUBCUTÁNEO." },
+      { q: "Medida preventiva más importante:", a: ["Nutrición","Higiene","Cambios posturales","Colchón antiescaras"], c: 2, e: "CAMBIOS POSTURALES." },
+      { q: "En decúbito lateral, zona de riesgo:", a: ["Sacro","Talones","Trocánter mayor","Isquion"], c: 2, e: "TROCÁNTER MAYOR." },
+      { q: "Cura húmeda favorece:", a: ["Desecación","Cicatrización en ambiente húmedo óptimo","Infección","Necrosis"], c: 1, e: "CICATRIZACIÓN en ambiente húmedo óptimo." }
+    ]
+  },
+  {
+    id: 14,
+    nombre: "Aparato digestivo y eliminación",
+    preguntas: [
+      { q: "Temperatura axilar normal:", a: ["34-36ºC","36-37ºC","37-38ºC","38-39ºC"], c: 1, e: "36-37ºC." },
+      { q: "Hiperpirexia:", a: ["< 35ºC","37-38ºC","> 38ºC","> 41ºC"], c: 3, e: "> 41ºC." },
+      { q: "Tª rectal respecto a axilar es:", a: ["Igual","0,5ºC más","1ºC más","0,5ºC menos"], c: 1, e: "0,5ºC MÁS." },
+      { q: "Bradicardia es:", a: ["< 60 lpm","> 100 lpm","< 100 lpm","> 60 lpm"], c: 0, e: "< 60 lpm." },
+      { q: "Pulso se mide habitualmente en:", a: ["Carótida","Femoral","Radial","Braquial"], c: 2, e: "RADIAL." },
+      { q: "Frecuencia respiratoria normal adulto:", a: ["6-10 rpm","12-20 rpm","20-30 rpm","30-40 rpm"], c: 1, e: "12-20 rpm." },
+      { q: "Respiración de Kussmaul se asocia a:", a: ["Ansiedad","Cetoacidosis diabética","Asma","EPOC"], c: 1, e: "CETOACIDOSIS DIABÉTICA." },
+      { q: "HTA se define como:", a: ["TA > 130/85","≥ 140/90","> 120/80","> 160/100"], c: 1, e: "≥ 140/90 mmHg." },
+      { q: "SatO2 normal:", a: ["> 80%","> 85%","≥ 90%","≥ 95%"], c: 3, e: "≥ 95%." },
+      { q: "Gafas nasales administran FiO2 de:", a: ["24-40%","50-60%","80-100%","21%"], c: 0, e: "24-40%." },
+      { q: "Para FiO2 precisa se usa:", a: ["Gafas nasales","Mascarilla simple","Mascarilla Venturi","Reservorio"], c: 2, e: "Mascarilla VENTURI." },
+      { q: "Mascarilla con reservorio en:", a: ["Uso habitual","EPOC","Emergencias","Bajo flujo"], c: 2, e: "EMERGENCIAS." },
+      { q: "Balance hídrico positivo indica:", a: ["Deshidratación","Retención de líquidos","Equilibrio","Pérdida excesiva"], c: 1, e: "RETENCIÓN de líquidos." },
+      { q: "La respiración se mide:", a: ["Avisando al paciente","Sin que el paciente lo sepa","Con espirómetro","Con pulsioxímetro"], c: 1, e: "SIN que el paciente lo sepa." },
+      { q: "Ortopnea es:", a: ["Disnea en decúbito, mejora sentado","Respiración rápida","Ausencia respiración","Respiración lenta"], c: 0, e: "Disnea en decúbito, mejora sentado." },
+      { q: "Apnea es:", a: ["Respiración rápida","Ausencia de respiración","Respiración profunda","Dificultad al respirar"], c: 1, e: "AUSENCIA de respiración." },
+      { q: "Humidificación obligatoria si flujo >:", a: ["1 L/min","2 L/min","4 L/min","10 L/min"], c: 2, e: "> 4 L/min." },
+      { q: "TA NO se mide en brazo con:", a: ["Reloj","Vía IV o fístula AV","Pulsera","Vendaje elástico"], c: 1, e: "VÍA IV o FÍSTULA AV." },
+      { q: "Cheyne-Stokes indica:", a: ["Normalidad","Mal pronóstico","Ansiedad","Ejercicio"], c: 1, e: "MAL PRONÓSTICO." },
+      { q: "En EPOC, el O2:", a: ["Se da al máximo","A concentraciones bajas controladas","No se administra nunca","Solo por mascarilla"], c: 1, e: "A concentraciones BAJAS controladas." }
+    ]
+  },
+  {
+    id: 15,
+    nombre: "Oxigenoterapia y aparato respiratorio",
+    preguntas: [
+      { q: "Rigor mortis comienza a las:", a: ["0-1 h","2-4 h","12-24 h","48 h"], c: 1, e: "2-4 HORAS post-mortem." },
+      { q: "Livideces cadavéricas son:", a: ["Rigidez muscular","Manchas rojo-violáceas en zonas declives","Enfriamiento","Descomposición"], c: 1, e: "Manchas rojo-violáceas en ZONAS DECLIVES." },
+      { q: "En amortajamiento, las sondas se retiran:", a: ["Siempre","Nunca","Salvo orden judicial/autopsia","Solo las urinarias"], c: 2, e: "SALVO orden judicial/autopsia." },
+      { q: "La muerte la certifica:", a: ["El TCAE","El enfermero","El médico","La familia"], c: 2, e: "El MÉDICO." },
+      { q: "'Primum non nocere' corresponde a:", a: ["Autonomía","Beneficencia","No maleficencia","Justicia"], c: 2, e: "NO MALEFICENCIA." },
+      { q: "Base del consentimiento informado:", a: ["Justicia","No maleficencia","Beneficencia","Autonomía"], c: 3, e: "AUTONOMÍA." },
+      { q: "Ley de Autonomía del Paciente:", a: ["Ley 31/1995","Ley 41/2002","Ley 39/2006","Ley 14/1986"], c: 1, e: "Ley 41/2002." },
+      { q: "Distanasia es:", a: ["Muerte digna","Encarnizamiento terapéutico","Sedación","Eutanasia activa"], c: 1, e: "ENCARNIZAMIENTO terapéutico." },
+      { q: "Sedación paliativa es:", a: ["Eutanasia","Reducir conciencia ante sufrimiento refractario","Suicidio asistido","Distanasia"], c: 1, e: "Reducir conciencia ante sufrimiento REFRACTARIO." },
+      { q: "Voluntades anticipadas son revocables:", a: ["Nunca","Solo ante notario","En cualquier momento","Solo por el representante"], c: 2, e: "En CUALQUIER MOMENTO." },
+      { q: "En España, criterio de donación:", a: ["Consentimiento explícito","Consentimiento presunto","Obligatorio","Solo por testamento"], c: 1, e: "CONSENTIMIENTO PRESUNTO." },
+      { q: "El consentimiento informado escrito es para:", a: ["Todo acto médico","Cirugía y procedimientos invasivos","Solo urgencias","Solo hospitalización"], c: 1, e: "Cirugía y procedimientos INVASIVOS." },
+      { q: "En el amortajamiento se coloca:", a: ["Solo sábana","Identificación del cadáver","Nada especial","Ropa del paciente"], c: 1, e: "IDENTIFICACIÓN del cadáver." },
+      { q: "Testamento vital es sinónimo de:", a: ["Testamento herencia","Voluntades anticipadas","Consentimiento informado","Orden judicial"], c: 1, e: "VOLUNTADES ANTICIPADAS." },
+      { q: "Principio más básico de bioética:", a: ["Autonomía","Beneficencia","No maleficencia","Justicia"], c: 2, e: "NO MALEFICENCIA." },
+      { q: "Algor mortis es:", a: ["Rigidez","Livideces","Enfriamiento","Descomposición"], c: 2, e: "ENFRIAMIENTO." },
+      { q: "Mancha verde abdominal indica:", a: ["Muerte reciente","Comienzo descomposición","Intoxicación","Enfriamiento"], c: 1, e: "Comienzo DESCOMPOSICIÓN." },
+      { q: "En urgencia vital, consentimiento informado:", a: ["Es obligatorio","Se puede prescindir","Lo firma la familia","No aplica"], c: 1, e: "Se puede PRESCINDIR." },
+      { q: "Justicia bioética se refiere a:", a: ["Hacer el bien","No dañar","Distribución equitativa de recursos","Respetar decisiones"], c: 2, e: "Distribución EQUITATIVA de recursos." },
+      { q: "ONT coordina:", a: ["Urgencias","Donación y trasplantes","Cuidados paliativos","Residencias"], c: 1, e: "DONACIÓN y TRASPLANTES." }
+    ]
+  },
+  {
+    id: 16,
+    nombre: "Termoterapia y crioterapia",
+    preguntas: [
+      { q: "Cama más habitual en hospital:", a: ["Electrocircular","Articulada","De Judet","Ortopédica"], c: 1, e: "ARTICULADA." },
+      { q: "Cama de Stryker indicada en:", a: ["Traumatismos vertebrales","Grandes quemados y politraumatizados","Tracciones","Neonatos"], c: 1, e: "GRANDES QUEMADOS y politraumatizados." },
+      { q: "Cama de Judet se usa en:", a: ["Quemados","Traumatismos vertebrales","Tracciones","Prematuros"], c: 1, e: "TRAUMATISMOS VERTEBRALES." },
+      { q: "Cama de Balkan incluye:", a: ["Giro 360º","Marcos y poleas para tracciones","Rotación continua","Control de temperatura"], c: 1, e: "Marcos y poleas para TRACCIONES." },
+      { q: "Sábana bajera se fija con:", a: ["Pinzas","Esquinas de mitra","Cinta adhesiva","Velcro"], c: 1, e: "Esquinas de MITRA." },
+      { q: "La entremetida (travesera) sirve para:", a: ["Cubrir al paciente","Movilizar al paciente","Proteger colchón","Decorar"], c: 1, e: "MOVILIZAR al paciente." },
+      { q: "Cama cerrada se prepara para:", a: ["Paciente quirúrgico","Paciente dado de alta o nuevo ingreso","Paciente encamado","Paciente terminal"], c: 1, e: "Paciente dado de ALTA o nuevo ingreso." },
+      { q: "Cama abierta, la ropa se dobla en:", a: ["Abanico a un lado","Acordeón a los pies","Estirada al cabecero","Sin doblar"], c: 1, e: "ACORDEÓN a los PIES." },
+      { q: "Cama quirúrgica se caracteriza por:", a: ["Con almohada","Sin almohada, ropa doblada a un lado","Colcha estirada","Paciente dentro"], c: 1, e: "SIN almohada, ropa a un LADO." },
+      { q: "La ropa sucia:", a: ["Se pone en el suelo","Se sacude antes","NUNCA en el suelo ni se sacude","Se lava en la habitación"], c: 2, e: "NUNCA en el suelo ni se sacude." },
+      { q: "Para hacer cama ocupada se necesitan:", a: ["1 auxiliar","2 auxiliares","3 auxiliares","Solo el enfermero"], c: 1, e: "2 AUXILIARES." },
+      { q: "El hule se coloca:", a: ["Sobre la encimera","Bajo la bajera","Sobre la bajera, zona central","Sobre la colcha"], c: 2, e: "SOBRE la bajera, zona CENTRAL." },
+      { q: "El arco de cama sirve para:", a: ["Sujetar al paciente","Evitar que la ropa contacte con el cuerpo","Elevar las piernas","Fijar la sábana"], c: 1, e: "Evitar que la ropa contacte con el cuerpo." },
+      { q: "La cama ocupada, el paciente se coloca en:", a: ["Decúbito supino siempre","Un lateral mientras se cambia cada mitad","Sentado","De pie con ayuda"], c: 1, e: "Un LATERAL mientras se cambia cada mitad." },
+      { q: "Evitar arrugas en la cama para prevenir:", a: ["Infección","UPP","Hipotermia","Caídas"], c: 1, e: "UPP." },
+      { q: "Colchón antiescaras de aire alternante es:", a: ["SEMP","Ropa de cama","Medicamento","Vendaje"], c: 0, e: "SEMP." },
+      { q: "Orden correcto de abajo a arriba:", a: ["Encimera-bajera-hule-entremetida","Bajera-hule-entremetida-encimera-manta-colcha","Colcha-manta-encimera-bajera","Hule-bajera-entremetida-encimera"], c: 1, e: "Bajera-hule-entremetida-encimera-manta-colcha." },
+      { q: "Tope de pies sirve para:", a: ["Elevar piernas","Evitar que el paciente se deslice","Fijar la sábana","Sujetar suero"], c: 1, e: "Evitar que el paciente se DESLICE." },
+      { q: "Cambio de ropa de cama:", a: ["Semanal","Cada 3 días","Diario y cuando esté mojada/sucia","Solo si hay olor"], c: 2, e: "DIARIO y cuando esté mojada/sucia." },
+      { q: "Barandillas laterales previenen:", a: ["UPP","Caídas","Infección","Deshidratación"], c: 1, e: "CAÍDAS." }
+    ]
+  },
+  {
+    id: 17,
+    nombre: "Úlceras por presión (UPP)",
+    preguntas: [
+      { q: "Vía de administración más utilizada:", a: ["Rectal","Parenteral","Oral","Tópica"], c: 2, e: "ORAL." },
+      { q: "Los 5 correctos NO incluyen:", a: ["Paciente correcto","Medicamento correcto","Color correcto","Hora correcta"], c: 2, e: "COLOR no es uno de los 5 correctos." },
+      { q: "Comprimido con cubierta entérica:", a: ["Se puede triturar","Se disuelve en estómago","NO se tritura, se disuelve en intestino","Se mastica"], c: 2, e: "NO se tritura, se disuelve en INTESTINO." },
+      { q: "Supositorio se introduce por:", a: ["La punta afilada","La parte roma","Indiferente","La zona más ancha"], c: 1, e: "La parte ROMA." },
+      { q: "Posición para administrar supositorio:", a: ["Fowler","Trendelenburg","Sims (lateral izquierdo)","Litotomía"], c: 2, e: "SIMS (lateral izquierdo)." },
+      { q: "Gotas óticas en adulto, tirar pabellón:", a: ["Arriba y atrás","Abajo y atrás","Arriba y adelante","No tirar"], c: 0, e: "ARRIBA y ATRÁS (adulto)." },
+      { q: "Gotas óticas en niño, tirar pabellón:", a: ["Arriba y atrás","Abajo y atrás","Arriba y adelante","Indiferente"], c: 1, e: "ABAJO y ATRÁS (niño)." },
+      { q: "Colirio se aplica en:", a: ["Córnea directamente","Saco conjuntival inferior","Párpado superior","Ángulo interno"], c: 1, e: "Saco CONJUNTIVAL inferior." },
+      { q: "Insulina se administra vía:", a: ["Intramuscular","Intravenosa","Subcutánea","Intradérmica"], c: 2, e: "SUBCUTÁNEA." },
+      { q: "Vía sublingual, ventaja principal:", a: ["Efecto lento","Absorción rápida, evita primer paso hepático","Sabor agradable","Económica"], c: 1, e: "Absorción RÁPIDA, evita primer paso hepático." },
+      { q: "Vía oral contraindicada si:", a: ["Paciente dormido","Vómitos o inconsciente","Dolor leve","Fiebre"], c: 1, e: "VÓMITOS o INCONSCIENTE." },
+      { q: "Suspensión oral, antes de usar:", a: ["Calentar","Agitar","Filtrar","Diluir en agua"], c: 1, e: "AGITAR." },
+      { q: "Inyección intradérmica, ángulo:", a: ["15º","45º","90º","0º"], c: 0, e: "15º." },
+      { q: "Inyección intramuscular, ángulo:", a: ["15º","45º","90º","60º"], c: 2, e: "90º." },
+      { q: "Tras inhalar corticoides se debe:", a: ["Beber agua","Enjuagar la boca","Comer algo","No hacer nada"], c: 1, e: "ENJUAGAR la boca (prevenir candidiasis)." },
+      { q: "Cápsulas de liberación retardada:", a: ["Se abren y mezclan","NO se abren ni mastican","Se trituran","Se disuelven"], c: 1, e: "NO se abren ni mastican." },
+      { q: "Insulina se conserva en:", a: ["Temperatura ambiente","Nevera (2-8ºC)","Congelador","Al sol"], c: 1, e: "NEVERA (2-8ºC)." },
+      { q: "Excipiente es:", a: ["Principio activo","Sustancia inactiva que da forma","Efecto secundario","Vía de administración"], c: 1, e: "Sustancia INACTIVA que da forma." },
+      { q: "Vía tópica vaginal, posición:", a: ["Sims","Litotomía o supino con rodillas flexionadas","Trendelenburg","Genupectoral"], c: 1, e: "LITOTOMÍA o supino con rodillas flexionadas." },
+      { q: "El TCAE puede:", a: ["Prescribir medicamentos","Modificar dosis","Administrar bajo prescripción médica","Decidir qué vía usar"], c: 2, e: "ADMINISTRAR bajo prescripción médica." }
+    ]
+  },
+  {
+    id: 18,
+    nombre: "Cuidados pre y postoperatorios",
+    preguntas: [
+      { q: "Accidente más frecuente en ancianos:", a: ["Intoxicación","Quemadura","Caída","Atragantamiento"], c: 2, e: "CAÍDA." },
+      { q: "Fractura más frecuente por caída:", a: ["Vértebra","Cadera","Colles","Húmero"], c: 1, e: "CADERA." },
+      { q: "Fractura de Colles afecta a:", a: ["Cadera","Muñeca (radio distal)","Clavícula","Tobillo"], c: 1, e: "MUÑECA (radio distal)." },
+      { q: "Factor intrínseco de caída:", a: ["Suelo mojado","Iluminación","Benzodiacepinas","Alfombras"], c: 2, e: "BENZODIACEPINAS (fármaco)." },
+      { q: "Factor extrínseco de caída:", a: ["Parkinson","Déficit visual","Alfombras sueltas","Hipotensión"], c: 2, e: "ALFOMBRAS sueltas." },
+      { q: "Síndrome postcaída es:", a: ["Fractura","Miedo a caer que restringe movilidad","Hematoma","Lesión cerebral"], c: 1, e: "MIEDO a caer que restringe movilidad." },
+      { q: "Escala de Downton valora:", a: ["Solo equilibrio","Riesgo de caídas","Riesgo de UPP","Estado nutricional"], c: 1, e: "Riesgo de CAÍDAS." },
+      { q: "Escala de Tinetti valora:", a: ["Nutrición","Equilibrio y marcha","UPP","Dolor"], c: 1, e: "EQUILIBRIO y MARCHA." },
+      { q: "Test TUG, alto riesgo si:", a: ["< 10 seg","> 15 seg","> 20 seg","> 30 seg"], c: 2, e: "> 20 SEGUNDOS." },
+      { q: "Hipotensión ortostática se previene:", a: ["Levantándose rápido","Levantándose lentamente","Tumbado siempre","Con medicación"], c: 1, e: "Levantándose LENTAMENTE." },
+      { q: "Calzado recomendado para prevenir caídas:", a: ["Zapatillas abiertas","Tacones","Cerrado, ajustado, suela antideslizante","Descalzo"], c: 2, e: "CERRADO, ajustado, suela antideslizante." },
+      { q: "Fármacos que más aumentan riesgo de caídas:", a: ["Antibióticos","Benzodiacepinas e hipotensores","Vitaminas","Antiinflamatorios"], c: 1, e: "BENZODIACEPINAS e hipotensores." },
+      { q: "Mayoría de caídas ocurren en:", a: ["Calle","Hospital","Domicilio","Transporte"], c: 2, e: "DOMICILIO." },
+      { q: "Mejor predictor de caída futura:", a: ["Edad","Sexo","Caídas previas","Medicación"], c: 2, e: "CAÍDAS PREVIAS." },
+      { q: "Consecuencia psicológica de caída:", a: ["Fractura","Síndrome postcaída","Hematoma","Infección"], c: 1, e: "SÍNDROME POSTCAÍDA." },
+      { q: "Para prevenir caídas en baño:", a: ["Alfombra de pelo","Bañera profunda","Barras de apoyo y suelo antideslizante","Nada especial"], c: 2, e: "BARRAS DE APOYO y suelo antideslizante." },
+      { q: "Iluminación nocturna recomendada:", a: ["Oscuridad total","Luces piloto/noche","Luces de techo potentes","Indiferente"], c: 1, e: "LUCES PILOTO/noche." },
+      { q: "Barandillas en cama previenen:", a: ["UPP","Infección","Caídas","Deshidratación"], c: 2, e: "CAÍDAS." },
+      { q: "Escala de Morse se usa en:", a: ["Domicilio","Hospital","Residencia","Ambulatorio"], c: 1, e: "HOSPITAL." },
+      { q: "Ejercicio físico en ancianos previene caídas porque:", a: ["Aumenta peso","Fortalece músculos y mejora equilibrio","Reduce apetito","Aumenta sueño"], c: 1, e: "Fortalece MÚSCULOS y mejora EQUILIBRIO." }
+    ]
+  },
+  {
+    id: 19,
+    nombre: "Cuidados del recién nacido",
+    preguntas: [
+      { q: "Conducta PAS, primer paso:", a: ["Socorrer","Avisar","Proteger","Reanimar"], c: 2, e: "PROTEGER." },
+      { q: "Número de emergencias:", a: ["061","112","091","092"], c: 1, e: "112." },
+      { q: "Relación compresiones:ventilaciones adulto:", a: ["15:2","30:2","5:1","15:1"], c: 1, e: "30:2." },
+      { q: "Frecuencia de compresiones:", a: ["60-80 cpm","80-100 cpm","100-120 cpm","120-140 cpm"], c: 2, e: "100-120 cpm." },
+      { q: "Profundidad compresiones adulto:", a: ["2-3 cm","3-4 cm","5-6 cm","7-8 cm"], c: 2, e: "5-6 cm." },
+      { q: "Punto de compresión:", a: ["Apéndice xifoides","Centro del pecho (mitad inferior esternón)","Lado izquierdo","Abdomen"], c: 1, e: "CENTRO del pecho." },
+      { q: "Maniobra frente-mentón sirve para:", a: ["Parar hemorragia","Abrir vía aérea","Reducir fractura","Colocar collar cervical"], c: 1, e: "ABRIR VÍA AÉREA." },
+      { q: "Heimlich se aplica en:", a: ["Inconsciente sin respiración","Consciente con OVACE completa","Paciente con hemorragia","Fractura de costilla"], c: 1, e: "Consciente con OVACE COMPLETA." },
+      { q: "PLS es para paciente:", a: ["Consciente con dolor","Inconsciente que respira","En parada cardiaca","Con fractura de fémur"], c: 1, e: "INCONSCIENTE que RESPIRA." },
+      { q: "DEA puede usarlo:", a: ["Solo médicos","Solo enfermeros","Solo sanitarios","Cualquier persona"], c: 3, e: "CUALQUIER persona." },
+      { q: "RCP pediátrica comienza con:", a: ["30 compresiones","5 ventilaciones de rescate","Llamar al 112","Colocar DEA"], c: 1, e: "5 VENTILACIONES de rescate." },
+      { q: "Compresiones en lactante con:", a: ["2 manos","1 mano","2 dedos","Puño"], c: 2, e: "2 DEDOS." },
+      { q: "En embarazada con OVACE:", a: ["Heimlich abdominal","Compresiones torácicas","Golpes lumbares","No hacer nada"], c: 1, e: "Compresiones TORÁCICAS." },
+      { q: "Obstrucción parcial, qué hacer:", a: ["Heimlich","Golpes en espalda","Animar a toser","RCP"], c: 2, e: "ANIMAR A TOSER." },
+      { q: "Si víctima inconsciente con OVACE:", a: ["Heimlich","PLS","Iniciar RCP","Solo ventilaciones"], c: 2, e: "Iniciar RCP." },
+      { q: "Comprobar respiración máximo:", a: ["5 segundos","10 segundos","15 segundos","20 segundos"], c: 1, e: "10 SEGUNDOS." },
+      { q: "Durante descarga del DEA:", a: ["Ventilar","Comprimir","NADIE toca al paciente","Dar golpes"], c: 2, e: "NADIE toca al paciente." },
+      { q: "En trauma cervical, vía aérea con:", a: ["Frente-mentón","Tracción mandibular","Hiperextensión","Extensión máxima"], c: 1, e: "TRACCIÓN MANDIBULAR." },
+      { q: "2º eslabón cadena supervivencia:", a: ["Llamar 112","RCP precoz","Desfibrilación","SVA"], c: 1, e: "RCP PRECOZ." },
+      { q: "Si no se puede ventilar, se realizan:", a: ["Solo ventilaciones","Nada","Solo compresiones continuas","Heimlich"], c: 2, e: "SOLO compresiones continuas." }
+    ]
+  },
+  {
+    id: 20,
+    nombre: "Salud mental",
+    preguntas: [
+      { q: "Hemorragia arterial se caracteriza por:", a: ["Sangre oscura, flujo continuo","Sangre roja brillante, a chorros","En sábana","No sangra"], c: 1, e: "Sangre ROJA BRILLANTE, a CHORROS." },
+      { q: "Primer paso ante hemorragia externa:", a: ["Torniquete","Elevación","Compresión directa","Compresión arterial"], c: 2, e: "COMPRESIÓN DIRECTA." },
+      { q: "Torniquete se usa como:", a: ["Primera opción","Segunda opción","Último recurso","Nunca"], c: 2, e: "ÚLTIMO recurso." },
+      { q: "Quemadura de 1er grado:", a: ["Ampollas","Escara","Eritema","Necrosis"], c: 2, e: "ERITEMA." },
+      { q: "Quemadura de 2º grado:", a: ["Eritema","Ampollas (flictenas)","Escara","Carbonización"], c: 1, e: "AMPOLLAS (flictenas)." },
+      { q: "Quemadura de 3er grado es:", a: ["Muy dolorosa","Dolorosa","Indolora","Moderadamente dolorosa"], c: 2, e: "INDOLORA." },
+      { q: "Regla de Wallace, cabeza:", a: ["18%","9%","1%","36%"], c: 1, e: "9%." },
+      { q: "Regla de Wallace, cada MMII:", a: ["9%","18%","27%","36%"], c: 1, e: "18%." },
+      { q: "Regla de Wallace, genitales:", a: ["9%","5%","1%","2%"], c: 2, e: "1%." },
+      { q: "Ante quemadura, enfriar con:", a: ["Hielo directo","Agua corriente 15-20 min","Pomada","Aceite"], c: 1, e: "AGUA corriente 15-20 min." },
+      { q: "Las ampollas de quemadura:", a: ["Se revientan","Se aspiran","NO se revientan","Se cortan"], c: 2, e: "NO se revientan." },
+      { q: "Fractura abierta:", a: ["Piel intacta","Hueso sale a través de la piel","Sin deformidad","Solo dolor"], c: 1, e: "Hueso sale a través de la piel." },
+      { q: "Inmovilizar fractura:", a: ["Solo la articulación superior","Solo la inferior","Articulación por encima y por debajo","Solo el foco"], c: 2, e: "Articulación por ENCIMA y por DEBAJO." },
+      { q: "Herida incisa tiene bordes:", a: ["Irregulares","Limpios y regulares","Arrancados","Punteados"], c: 1, e: "LIMPIOS y regulares." },
+      { q: "Limpieza de herida, dirección:", a: ["De fuera a dentro","De dentro hacia fuera","Circular","Indiferente"], c: 1, e: "De DENTRO hacia FUERA." },
+      { q: "Vendaje en espiga se usa en:", a: ["Muñones","Articulaciones","Cabeza","Abdomen"], c: 1, e: "ARTICULACIONES." },
+      { q: "Vendaje recurrente se usa en:", a: ["Articulaciones","Muñones, dedos, cabeza","Extremidades cilíndricas","Hombro"], c: 1, e: "MUÑONES, dedos, cabeza." },
+      { q: "Palma de la mano del paciente equivale a:", a: ["5%","1%","9%","0,5%"], c: 1, e: "1% de superficie corporal." },
+      { q: "Hemorragia capilar se llama:", a: ["Pulsátil","En chorro","En sábana","En cascada"], c: 2, e: "En SÁBANA." },
+      { q: "Vendaje de Velpeau inmoviliza:", a: ["Rodilla","Tobillo","Hombro y brazo","Muñeca"], c: 2, e: "HOMBRO y brazo." }
+    ]
+  },
+  {
+    id: 21,
+    nombre: "Urgencias y primeros auxilios",
+    preguntas: [
+      { q: "La contención mecánica es:", a: ["Primera opción","Medida excepcional y de último recurso","Rutinaria","Para comodidad del personal"], c: 1, e: "EXCEPCIONAL y de último recurso." },
+      { q: "Requiere prescripción de:", a: ["TCAE","Enfermero","Médico","Familiar"], c: 2, e: "MÉDICO." },
+      { q: "En emergencia sin prescripción:", a: ["No se aplica","Se aplica y se comunica después al médico","Se espera al médico","Se pide permiso a la familia"], c: 1, e: "Se aplica y se COMUNICA DESPUÉS." },
+      { q: "Primera medida ante agitación:", a: ["Contención mecánica","Contención farmacológica","Contención verbal","Aislamiento"], c: 2, e: "Contención VERBAL." },
+      { q: "Entre sujeción y piel deben caber:", a: ["No debe haber espacio","1-2 dedos","5 dedos","Un puño"], c: 1, e: "1-2 DEDOS." },
+      { q: "Vigilancia durante contención:", a: ["Cada 2 horas","Cada 15-30 minutos","Una vez al día","No necesaria"], c: 1, e: "Cada 15-30 MINUTOS." },
+      { q: "Posición preferente del paciente contenido:", a: ["Decúbito prono","Decúbito supino","Lateral","Sentado"], c: 1, e: "DECÚBITO SUPINO." },
+      { q: "NUNCA se usa contención como:", a: ["Prevención de autolesiones","Castigo","Prevención de arrancamiento de vías","Agitación severa"], c: 1, e: "CASTIGO." },
+      { q: "Valorar retirada de contención cada:", a: ["30 min","1 hora","2-4 horas","24 horas"], c: 2, e: "2-4 HORAS." },
+      { q: "Derecho fundamental afectado:", a: ["Salud","Libertad","Trabajo","Educación"], c: 1, e: "LIBERTAD." },
+      { q: "Las manoplas impiden:", a: ["Caminar","Agarrar o arrancarse dispositivos","Hablar","Comer"], c: 1, e: "AGARRAR o arrancarse dispositivos." },
+      { q: "En caso de incapaz, se necesita:", a: ["Nada especial","Autorización judicial o representante legal","Solo el médico decide","Consentimiento del TCAE"], c: 1, e: "Autorización JUDICIAL o representante legal." },
+      { q: "Complicación de contención:", a: ["Mejora del humor","Lesión cutánea y compromiso neurovascular","Aumento de movilidad","Ninguna"], c: 1, e: "LESIÓN CUTÁNEA y compromiso neurovascular." },
+      { q: "Se debe registrar:", a: ["Solo hora de inicio","Motivo, hora inicio/fin, tipo, valoraciones, incidencias","Solo incidencias","Nada"], c: 1, e: "Motivo, hora, tipo, valoraciones, INCIDENCIAS." },
+      { q: "Cabecero elevado 30º si hay riesgo de:", a: ["Caídas","UPP","Aspiración","Hemorragia"], c: 2, e: "ASPIRACIÓN." },
+      { q: "El cinturón abdominal sujeta:", a: ["MMSS","MMII","Tronco a cama/silla","Cabeza"], c: 2, e: "TRONCO a cama/silla." },
+      { q: "Medida ambiental ante agitación:", a: ["Atar al paciente","Reducir estímulos, habitación tranquila","Aumentar iluminación","Poner música alta"], c: 1, e: "Reducir estímulos, habitación TRANQUILA." },
+      { q: "Artículo 17 de la CE protege:", a: ["Derecho a la salud","Derecho a la libertad","Derecho a la educación","Derecho al trabajo"], c: 1, e: "Derecho a la LIBERTAD." },
+      { q: "Se vigila circulación distal comprobando:", a: ["Solo pulso","Color, temperatura, sensibilidad, pulso","Solo color","Solo temperatura"], c: 1, e: "Color, temperatura, sensibilidad, PULSO." },
+      { q: "En urgencia, comunicar al juez en:", a: ["6 horas","12 horas","24 horas","48 horas"], c: 2, e: "24 HORAS." }
+    ]
+  },
+  {
+    id: 22,
+    nombre: "Farmacología básica",
+    preguntas: [
+      { q: "El Convenio aplica a personal:", a: ["Funcionario","Laboral del SEPAD","Estatutario","Eventual"], c: 1, e: "LABORAL del SEPAD." },
+      { q: "TCAE se encuadra en el grupo:", a: ["II","III","IV","V"], c: 2, e: "Grupo IV." },
+      { q: "Jornada semanal:", a: ["37,5 horas","40 horas","35 horas","38 horas"], c: 2, e: "35 HORAS." },
+      { q: "Jornada anual:", a: ["1.600 horas","1.554 horas","1.750 horas","1.400 horas"], c: 1, e: "1.554 HORAS." },
+      { q: "Vacaciones anuales:", a: ["30 días naturales","22 días hábiles","20 días hábiles","15 días"], c: 1, e: "22 DÍAS HÁBILES." },
+      { q: "Permiso por matrimonio:", a: ["7 días","10 días","15 días naturales","20 días"], c: 2, e: "15 DÍAS NATURALES." },
+      { q: "Permiso por nacimiento:", a: ["8 semanas","12 semanas","16 semanas","20 semanas"], c: 2, e: "16 SEMANAS." },
+      { q: "Fallecimiento familiar 1er grado:", a: ["1-2 días","3-5 días","5-7 días","7-10 días"], c: 1, e: "3-5 DÍAS." },
+      { q: "Días de libre disposición:", a: ["4 + 2","6 + 2","8 + 2","3 + 2"], c: 1, e: "6 + 2." },
+      { q: "Excedencia voluntaria, duración mínima:", a: ["1 mes","2 meses","4 meses","6 meses"], c: 2, e: "4 MESES." },
+      { q: "Excedencia cuidado hijo, máximo:", a: ["1 año","2 años","3 años","5 años"], c: 2, e: "3 AÑOS." },
+      { q: "Período de prueba grupo IV:", a: ["15 días","1 mes","3 meses","6 meses"], c: 1, e: "1 MES." },
+      { q: "Período de prueba grupo I y II:", a: ["1 mes","2 meses","3 meses","6 meses"], c: 2, e: "3 MESES." },
+      { q: "Descanso mínimo entre jornadas:", a: ["8 horas","10 horas","12 horas","16 horas"], c: 2, e: "12 HORAS." },
+      { q: "Parentesco 1er grado:", a: ["Hermanos","Padres e hijos","Abuelos","Primos"], c: 1, e: "PADRES e HIJOS." },
+      { q: "Parentesco 2º grado:", a: ["Padres","Hijos","Hermanos y abuelos","Cónyuge"], c: 2, e: "HERMANOS y abuelos." },
+      { q: "Excedencia forzosa, reserva de puesto:", a: ["No","Sí","Solo categoría","Según antigüedad"], c: 1, e: "SÍ." },
+      { q: "Excedencia voluntaria requiere servicio previo de:", a: ["6 meses","1 año","2 años","3 años"], c: 1, e: "1 AÑO." },
+      { q: "Enfermero/a pertenece al grupo:", a: ["I","II","III","IV"], c: 1, e: "Grupo II." },
+      { q: "Jornada nocturna es de:", a: ["20:00 a 6:00","22:00 a 7:00","21:00 a 8:00","23:00 a 7:00"], c: 1, e: "22:00 a 7:00." }
+    ]
+  },
+  {
+    id: 23,
+    nombre: "Atención al paciente terminal y cuidados paliativos",
+    preguntas: [
+      { q: "Falta leve prescribe a los:", a: ["5 días","10 días","20 días","60 días"], c: 1, e: "10 DÍAS." },
+      { q: "Falta grave prescribe a los:", a: ["10 días","15 días","20 días","30 días"], c: 2, e: "20 DÍAS." },
+      { q: "Falta muy grave prescribe a los:", a: ["20 días","30 días","60 días","90 días"], c: 2, e: "60 DÍAS." },
+      { q: "Acoso laboral es falta:", a: ["Leve","Grave","Muy grave","No es falta"], c: 2, e: "MUY GRAVE." },
+      { q: "Abandono del puesto sin justificación:", a: ["Falta leve","Falta grave","Falta muy grave","No es falta"], c: 2, e: "MUY GRAVE." },
+      { q: "3 faltas de puntualidad en 1 mes:", a: ["Falta leve","Falta grave","Falta muy grave","Amonestación"], c: 1, e: "Falta GRAVE." },
+      { q: "Sanción máxima por falta muy grave:", a: ["Suspensión 15 días","Suspensión 30 días","Despido","Amonestación"], c: 2, e: "DESPIDO." },
+      { q: "Sanción por falta leve:", a: ["Suspensión 15 días","Despido","Amonestación o suspensión hasta 2 días","Traslado"], c: 2, e: "Amonestación o suspensión hasta 2 DÍAS." },
+      { q: "Sanción falta grave:", a: ["Amonestación","Suspensión 3-15 días","Despido","Solo verbal"], c: 1, e: "Suspensión 3-15 DÍAS." },
+      { q: "Secreto profesional es:", a: ["Un derecho","Un deber","Una sanción","Un permiso"], c: 1, e: "Un DEBER." },
+      { q: "Falta de asistencia 1 día injustificado:", a: ["Falta grave","Falta muy grave","Falta leve","No es falta"], c: 2, e: "Falta LEVE." },
+      { q: "Falta de asistencia 3 días injustificados en 1 mes:", a: ["Falta leve","Falta grave","Falta muy grave","No es falta"], c: 1, e: "Falta GRAVE." },
+      { q: "Derecho de huelga es:", a: ["Un deber","Un derecho","Una falta","Una sanción"], c: 1, e: "Un DERECHO." },
+      { q: "EPI los proporciona:", a: ["El trabajador","La empresa","El sindicato","El médico"], c: 1, e: "La EMPRESA." },
+      { q: "Buena fe laboral significa:", a: ["Trabajar horas extra","Actuar con lealtad y honestidad","Obedecer siempre","No faltar"], c: 1, e: "Actuar con LEALTAD y honestidad." },
+      { q: "Malos tratos a residentes es falta:", a: ["Leve","Grave","Muy grave","No tipificada"], c: 2, e: "MUY GRAVE." },
+      { q: "Embriaguez habitual que afecta al trabajo:", a: ["Falta leve","Falta grave","Falta muy grave","No es falta"], c: 2, e: "MUY GRAVE." },
+      { q: "Reincidencia en 3 faltas leves en 1 mes:", a: ["Sigue siendo leve","Falta grave","Falta muy grave","Despido directo"], c: 1, e: "Falta GRAVE." },
+      { q: "La formación continua es:", a: ["Solo obligación","Un derecho del trabajador","Un castigo","Opcional para la empresa"], c: 1, e: "Un DERECHO del trabajador." },
+      { q: "Diligencia como deber significa:", a: ["Ser puntual","Realizar el trabajo con cuidado y esmero","Obedecer siempre","Guardar secreto"], c: 1, e: "Realizar trabajo con CUIDADO y esmero." }
+    ]
+  },
+  {
+    id: 24,
+    nombre: "Geriatría y atención al anciano",
+    preguntas: [
+      { q: "Ley de PRL:", a: ["Ley 41/2002","Ley 31/1995","Ley 39/2006","Ley 14/1986"], c: 1, e: "Ley 31/1995." },
+      { q: "Primer principio preventivo:", a: ["Evaluar riesgos","Combatir en el origen","Evitar los riesgos","Planificar"], c: 2, e: "EVITAR los riesgos." },
+      { q: "Protección colectiva vs individual:", a: ["Individual primero","Colectiva primero","Son iguales","Solo individual"], c: 1, e: "COLECTIVA primero." },
+      { q: "Ante pinchazo accidental:", a: ["Exprimir la herida","Succionar","Lavar con agua y jabón, NO exprimir","Aplicar alcohol"], c: 2, e: "Lavar, NO exprimir." },
+      { q: "Medida más importante contra infecciones:", a: ["Guantes","Mascarilla","Lavado de manos","Bata"], c: 2, e: "LAVADO DE MANOS." },
+      { q: "Mecánica corporal, espalda debe estar:", a: ["Doblada","Recta","Inclinada","Torsionada"], c: 1, e: "RECTA." },
+      { q: "Al levantar peso, flexionar:", a: ["Espalda","Brazos","Rodillas","Cuello"], c: 2, e: "RODILLAS." },
+      { q: "Peso máximo recomendado:", a: ["15 kg","20 kg","25 kg","30 kg"], c: 2, e: "25 KG." },
+      { q: "Burnout se compone de:", a: ["Solo estrés","Agotamiento + despersonalización + baja realización","Solo cansancio","Depresión"], c: 1, e: "Agotamiento + despersonalización + baja realización." },
+      { q: "EPI los proporciona:", a: ["El trabajador","La empresa","El sindicato","Cada uno se los compra"], c: 1, e: "La EMPRESA." },
+      { q: "Comité de Seguridad y Salud en empresas de:", a: ["10+ trabajadores","25+ trabajadores","50+ trabajadores","100+ trabajadores"], c: 2, e: "50+ TRABAJADORES." },
+      { q: "El Comité de Seguridad y Salud es:", a: ["Solo empresarial","Solo trabajadores","Paritario","Externo"], c: 2, e: "PARITARIO." },
+      { q: "Obligación del trabajador en PRL:", a: ["Comprar EPI","Evaluar riesgos","Usar correctamente los EPI","Hacer la evaluación"], c: 2, e: "USAR correctamente los EPI." },
+      { q: "La carga debe llevarse:", a: ["Separada del cuerpo","Pegada al cuerpo","Por encima de la cabeza","Con una mano"], c: 1, e: "PEGADA al cuerpo." },
+      { q: "Ante pinchazo, además de lavar hay que:", a: ["No hacer nada más","Comunicar al servicio de prevención","Ocultarlo","Ir a casa"], c: 1, e: "COMUNICAR al servicio de prevención." },
+      { q: "Riesgo biológico incluye:", a: ["Caída de objetos","Contacto con sangre y fluidos","Ruido","Iluminación"], c: 1, e: "Contacto con SANGRE y fluidos." },
+      { q: "Precauciones estándar incluyen:", a: ["Solo guantes","Guantes, bata, mascarilla, gafas según procedimiento","Solo lavado de manos","Nada"], c: 1, e: "Guantes, bata, mascarilla, gafas según procedimiento." },
+      { q: "Vigilancia de la salud es:", a: ["Obligación del trabajador","Derecho del trabajador","No existe","Solo voluntaria"], c: 1, e: "DERECHO del trabajador." },
+      { q: "Riesgos del trabajo a turnos son:", a: ["Ergonómicos","Biológicos","Psicosociales","Químicos"], c: 2, e: "PSICOSOCIALES." },
+      { q: "Combatir riesgos en el ORIGEN es principio:", a: ["1º","2º","3º","4º"], c: 2, e: "3º principio preventivo." }
+    ]
+  },
+  {
+    id: 25,
+    nombre: "Comunicación y relación de ayuda",
+    preguntas: [
+      { q: "Ley de Igualdad Efectiva:", a: ["LO 1/2004","LO 3/2007","Ley 31/1995","Ley 41/2002"], c: 1, e: "LO 3/2007." },
+      { q: "Artículo de la CE que establece igualdad ante la ley:", a: ["Art. 9","Art. 14","Art. 27","Art. 43"], c: 1, e: "Art. 14." },
+      { q: "Discriminación directa es:", a: ["Norma neutra con efecto desproporcionado","Tratar peor a alguien por razón de sexo","Acción positiva","Acoso sexual"], c: 1, e: "Tratar PEOR por razón de sexo." },
+      { q: "Discriminación indirecta es:", a: ["Trato expreso peor","Norma aparentemente neutra con efecto desproporcionado","Acoso","Despido"], c: 1, e: "Norma neutra con efecto DESPROPORCIONADO." },
+      { q: "Acción positiva es:", a: ["Discriminación","Medidas para corregir desigualdades de hecho","Acoso","Despido improcedente"], c: 1, e: "Medidas para CORREGIR desigualdades." },
+      { q: "Planes de igualdad obligatorios en empresas de:", a: ["10+ trabajadores","25+ trabajadores","50+ trabajadores","100+ trabajadores"], c: 2, e: "50+ TRABAJADORES." },
+      { q: "Acoso sexual es:", a: ["Comportamiento de naturaleza sexual no deseado","Insulto","Falta leve","Broma"], c: 0, e: "Comportamiento sexual NO DESEADO." },
+      { q: "Transversalidad significa:", a: ["Igualdad solo en empleo","Integrar igualdad en TODAS las políticas","Solo en educación","Solo en sanidad"], c: 1, e: "Integrar igualdad en TODAS las políticas." },
+      { q: "LO 1/2004 trata sobre:", a: ["Igualdad efectiva","Violencia de género","PRL","Autonomía del paciente"], c: 1, e: "VIOLENCIA DE GÉNERO." },
+      { q: "Violencia de género es la ejercida por:", a: ["Cualquier persona","Solo desconocidos","Pareja o expareja sobre la mujer","Solo familiares"], c: 2, e: "PAREJA o EXPAREJA sobre la mujer." },
+      { q: "Representación equilibrada en órganos:", a: ["50-50","Máximo 60% - mínimo 40% de cada sexo","70-30","Sin límite"], c: 1, e: "Máximo 60% - mínimo 40%." },
+      { q: "Art. 9.2 CE promueve igualdad:", a: ["Formal","Real y efectiva","Solo económica","Solo laboral"], c: 1, e: "REAL Y EFECTIVA." },
+      { q: "Acoso sexual en régimen disciplinario es falta:", a: ["Leve","Grave","Muy grave","No tipificada"], c: 2, e: "MUY GRAVE." },
+      { q: "Discriminación por embarazo es discriminación:", a: ["Indirecta","Directa por razón de sexo","No es discriminación","Leve"], c: 1, e: "DIRECTA por razón de sexo." },
+      { q: "Chantaje sexual es:", a: ["Broma","Condicionar un derecho a aceptar acoso","Discriminación indirecta","Acción positiva"], c: 1, e: "Condicionar un derecho a ACEPTAR acoso." },
+      { q: "Víctima de VG tiene derecho a:", a: ["Nada especial","Asistencia jurídica gratuita y derechos laborales","Solo denuncia","Solo alejamiento"], c: 1, e: "Asistencia jurídica GRATUITA y derechos laborales." },
+      { q: "Violencia de género incluye violencia:", a: ["Solo física","Solo psicológica","Física, psicológica, sexual y económica","Solo sexual"], c: 2, e: "Física, psicológica, sexual y ECONÓMICA." },
+      { q: "Excedencia por cuidado de hijo máximo:", a: ["1 año","2 años","3 años","5 años"], c: 2, e: "3 AÑOS." },
+      { q: "Lenguaje no sexista se usa en:", a: ["Solo publicidad","Documentos administrativos","Solo educación","Solo sanidad"], c: 1, e: "DOCUMENTOS ADMINISTRATIVOS." },
+      { q: "La LO 3/2007 busca eliminar:", a: ["Solo brecha salarial","Discriminación de la mujer en todos los ámbitos","Solo acoso","Solo violencia"], c: 1, e: "Discriminación de la mujer en TODOS los ámbitos." }
+    ]
+  }
+];
+
+// Game state
+let currentTema = null;
+let currentQuestion = 0;
+let score = 0;
+let userAnswers = [];
+
+// DOM refs
+const screenTemas = document.getElementById('screen-temas');
+const screenQuiz = document.getElementById('screen-quiz');
+const screenResults = document.getElementById('screen-results');
+const temasGrid = document.getElementById('temas-grid');
+const quizTemaTitle = document.getElementById('quiz-tema-title');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const questionNumber = document.getElementById('question-number');
+const questionText = document.getElementById('question-text');
+const optionsList = document.getElementById('options-list');
+const explanationBox = document.getElementById('explanation-box');
+const btnNext = document.getElementById('btn-next');
+const scoreNumber = document.getElementById('score-number');
+const scorePercent = document.getElementById('score-percent');
+const scoreMessage = document.getElementById('score-message');
+const reviewList = document.getElementById('review-list');
+
+// Build theme grid
+temas.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'tema-btn';
+  btn.innerHTML = `<span class="tema-num">${t.id}</span><span class="tema-name">${t.nombre}</span>`;
+  btn.addEventListener('click', () => startQuiz(t.id));
+  temasGrid.appendChild(btn);
+});
+
+function startQuiz(temaId) {
+  currentTema = temas.find(t => t.id === temaId);
+  currentQuestion = 0;
+  score = 0;
+  userAnswers = [];
+  screenTemas.style.display = 'none';
+  screenResults.style.display = 'none';
+  screenQuiz.style.display = 'block';
+  quizTemaTitle.textContent = `Tema ${currentTema.id}: ${currentTema.nombre}`;
+  showQuestion();
+  window.scrollTo(0, 0);
+}
+
+function showQuestion() {
+  const q = currentTema.preguntas[currentQuestion];
+  const total = currentTema.preguntas.length;
+  progressFill.style.width = ((currentQuestion / total) * 100) + '%';
+  progressText.textContent = `Pregunta ${currentQuestion + 1} de ${total}`;
+  questionNumber.textContent = `Pregunta ${currentQuestion + 1}`;
+  questionText.textContent = q.q;
+  optionsList.innerHTML = '';
+  explanationBox.style.display = 'none';
+  btnNext.style.display = 'none';
+
+  const letters = ['a)', 'b)', 'c)', 'd)'];
+  q.a.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = `${letters[i]} ${opt}`;
+    btn.addEventListener('click', () => selectAnswer(i));
+    optionsList.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  const q = currentTema.preguntas[currentQuestion];
+  const buttons = optionsList.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.classList.add('disabled'));
+
+  userAnswers.push(idx);
+
+  if (idx === q.c) {
+    buttons[idx].classList.add('correct');
+    score++;
+  } else {
+    buttons[idx].classList.add('incorrect');
+    buttons[q.c].classList.add('correct');
+  }
+
+  explanationBox.textContent = q.e;
+  explanationBox.style.display = 'block';
+
+  if (currentQuestion < currentTema.preguntas.length - 1) {
+    btnNext.textContent = 'Siguiente pregunta';
+  } else {
+    btnNext.textContent = 'Ver resultados';
+  }
+  btnNext.style.display = 'block';
+}
+
+btnNext.addEventListener('click', () => {
+  currentQuestion++;
+  if (currentQuestion < currentTema.preguntas.length) {
+    showQuestion();
+    window.scrollTo(0, 0);
+  } else {
+    showResults();
+  }
+});
+
+function showResults() {
+  screenQuiz.style.display = 'none';
+  screenResults.style.display = 'block';
+  window.scrollTo(0, 0);
+
+  const total = currentTema.preguntas.length;
+  const pct = Math.round((score / total) * 100);
+  scoreNumber.textContent = score;
+  scorePercent.textContent = pct + '%';
+
+  if (pct >= 90) scoreMessage.textContent = 'Excelente! Dominas este tema.';
+  else if (pct >= 70) scoreMessage.textContent = 'Muy bien! Sigue repasando.';
+  else if (pct >= 50) scoreMessage.textContent = 'Aprobado, pero puedes mejorar.';
+  else scoreMessage.textContent = 'Necesitas repasar este tema.';
+
+  progressFill.style.width = '100%';
+
+  // Review
+  reviewList.innerHTML = '';
+  const letters = ['a)', 'b)', 'c)', 'd)'];
+  currentTema.preguntas.forEach((q, i) => {
+    const isCorrect = userAnswers[i] === q.c;
+    const div = document.createElement('div');
+    div.className = 'review-item ' + (isCorrect ? 'review-correct' : 'review-wrong');
+
+    let html = `<div class="review-q">${i + 1}. ${q.q}</div>`;
+    if (!isCorrect) {
+      html += `<div class="review-answer user-wrong">Tu respuesta: ${letters[userAnswers[i]]} ${q.a[userAnswers[i]]}</div>`;
+    }
+    html += `<div class="review-answer correct-ans">Correcta: ${letters[q.c]} ${q.a[q.c]}</div>`;
+    html += `<div class="review-explanation">${q.e}</div>`;
+    div.innerHTML = html;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('btn-retry').addEventListener('click', () => startQuiz(currentTema.id));
+document.getElementById('btn-back-temas').addEventListener('click', () => {
+  screenResults.style.display = 'none';
+  screenQuiz.style.display = 'none';
+  screenTemas.style.display = 'block';
+  window.scrollTo(0, 0);
+});
+</script>
+</body>
+</html>
