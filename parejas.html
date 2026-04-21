@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Parejas - OpoJuegos TCAE</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:12px;-webkit-tap-highlight-color:transparent;user-select:none}
+a{text-decoration:none;color:#fff}
+.back-btn{align-self:flex-start;background:rgba(255,255,255,.08);border:1px solid #333;border-radius:12px;padding:8px 16px;font-size:.9em;margin-bottom:8px;transition:all .2s}
+.back-btn:active{background:rgba(255,255,255,.15)}
+h1{font-size:1.6em;text-align:center;margin-bottom:4px;background:linear-gradient(90deg,#2ecc71,#27ae60);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{color:#aaa;font-size:.85em;margin-bottom:16px;text-align:center}
+
+/* Screens */
+.screen{display:none;width:100%;max-width:600px;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+
+/* Menu */
+.menu-section{width:100%;margin-bottom:16px}
+.menu-section h2{font-size:1em;color:#2ecc71;margin-bottom:10px;text-align:center}
+.options-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%}
+.opt-btn{background:rgba(46,204,113,.08);border:2px solid #2ecc7144;border-radius:14px;padding:14px 8px;text-align:center;font-size:.85em;font-weight:600;color:#fff;cursor:pointer;transition:all .2s;min-height:48px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.opt-btn:active,.opt-btn.selected{background:rgba(46,204,113,.25);border-color:#2ecc71;transform:scale(.96)}
+.opt-btn.selected{box-shadow:0 0 12px #2ecc7133}
+.cat-grid{grid-template-columns:1fr 1fr}
+.play-btn{background:linear-gradient(135deg,#2ecc71,#27ae60);border:none;border-radius:16px;padding:16px 40px;font-size:1.1em;font-weight:700;color:#fff;cursor:pointer;margin-top:16px;transition:all .2s;font-family:inherit;width:100%;max-width:300px}
+.play-btn:active{transform:scale(.95);filter:brightness(1.1)}
+.play-btn:disabled{opacity:.4;transform:none}
+
+/* Stats bar */
+.stats-bar{display:flex;justify-content:space-around;width:100%;background:rgba(0,0,0,.25);border-radius:14px;padding:10px 4px;margin-bottom:12px;gap:4px}
+.stat{display:flex;flex-direction:column;align-items:center;font-size:.75em;color:#aaa}
+.stat .val{font-size:1.4em;font-weight:700;color:#fff}
+
+/* Card grid */
+.card-grid{display:grid;gap:8px;width:100%;max-width:600px;padding:0 2px}
+.card-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.card-grid.cols-5{grid-template-columns:repeat(5,1fr)}
+
+/* Card */
+.card-container{perspective:800px;cursor:pointer}
+.card{position:relative;width:100%;padding-bottom:120%;transform-style:preserve-3d;transition:transform .45s ease;border-radius:12px}
+.card.flipped{transform:rotateY(180deg)}
+.card.matched{pointer-events:none}
+.card-face{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center;font-size:.72em;line-height:1.25;font-weight:600;overflow:hidden;word-break:break-word}
+.card-back{background:linear-gradient(135deg,#1e3a5f,#16213e);border:2px solid #2ecc7166;color:#2ecc71;font-size:2em}
+.card-back::before{content:"?";font-size:1em}
+.card-front{transform:rotateY(180deg);border:2px solid #444}
+.card-front.concept{background:linear-gradient(135deg,#1a3a2e,#0f2e1e);border-color:#2ecc71;color:#a8f0c8}
+.card-front.definition{background:linear-gradient(135deg,#1e2a4e,#162040);border-color:#3498db;color:#a8d4f0}
+
+/* Match animation */
+@keyframes matchGlow{
+0%{box-shadow:0 0 0 0 #2ecc7100}
+30%{box-shadow:0 0 20px 6px #2ecc7188}
+100%{box-shadow:0 0 0 0 #2ecc7100}
+}
+.card.matched .card-face{opacity:.7}
+.card.match-anim{animation:matchGlow .8s ease-out}
+
+/* No-match shake */
+@keyframes shake{0%,100%{transform:rotateY(180deg)}25%{transform:rotateY(180deg) translateX(-4px)}75%{transform:rotateY(180deg) translateX(4px)}}
+.card.no-match{animation:shake .35s ease}
+
+/* Results */
+.results-box{background:rgba(0,0,0,.3);border:2px solid #2ecc71;border-radius:20px;padding:28px 20px;text-align:center;width:100%;max-width:400px;margin-top:20px}
+.results-box .stars{font-size:2.8em;margin:12px 0}
+.results-box h2{font-size:1.4em;margin-bottom:16px;color:#2ecc71}
+.results-box .detail{font-size:1em;color:#ccc;margin:6px 0}
+.results-box .detail span{color:#fff;font-weight:700}
+.btn-row{display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap}
+.btn-row button{background:linear-gradient(135deg,#2ecc71,#27ae60);border:none;border-radius:14px;padding:14px 24px;font-size:1em;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-row button:active{transform:scale(.95)}
+.btn-row .secondary{background:rgba(255,255,255,.08);border:1px solid #444}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">🏠 Menu</a>
+<h1>🃏 Parejas TCAE</h1>
+<p class="subtitle">Encuentra los pares concepto-definicion</p>
+
+<!-- MENU SCREEN -->
+<div class="screen active" id="menuScreen">
+  <div class="menu-section">
+    <h2>Dificultad</h2>
+    <div class="options-grid">
+      <button class="opt-btn" data-diff="6" onclick="selectDiff(this)">Facil<br><small>6 parejas</small></button>
+      <button class="opt-btn selected" data-diff="10" onclick="selectDiff(this)">Normal<br><small>10 parejas</small></button>
+      <button class="opt-btn" data-diff="15" onclick="selectDiff(this)">Dificil<br><small>15 parejas</small></button>
+    </div>
+  </div>
+  <div class="menu-section">
+    <h2>Categoria</h2>
+    <div class="options-grid cat-grid">
+      <button class="opt-btn selected" data-cat="todas" onclick="selectCat(this)">Todas</button>
+      <button class="opt-btn" data-cat="escalas" onclick="selectCat(this)">Escalas</button>
+      <button class="opt-btn" data-cat="posiciones" onclick="selectCat(this)">Posiciones</button>
+      <button class="opt-btn" data-cat="legislacion" onclick="selectCat(this)">Legislacion</button>
+      <button class="opt-btn" data-cat="temperaturas" onclick="selectCat(this)">Temperaturas</button>
+      <button class="opt-btn" data-cat="anatomia" onclick="selectCat(this)">Anatomia</button>
+      <button class="opt-btn" data-cat="constantes" onclick="selectCat(this)">Constantes</button>
+      <button class="opt-btn" data-cat="tecnicas" onclick="selectCat(this)">Tecnicas</button>
+      <button class="opt-btn" data-cat="farmaco" onclick="selectCat(this)">Farmacologia</button>
+      <button class="opt-btn" data-cat="patologias" onclick="selectCat(this)">Patologias</button>
+    </div>
+  </div>
+  <button class="play-btn" onclick="startGame()">Jugar</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen">
+  <div class="stats-bar">
+    <div class="stat"><span class="val" id="movesVal">0</span>Movimientos</div>
+    <div class="stat"><span class="val" id="timerVal">0:00</span>Tiempo</div>
+    <div class="stat"><span class="val" id="pairsVal">0/0</span>Parejas</div>
+  </div>
+  <div class="card-grid" id="cardGrid"></div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen" id="resultsScreen">
+  <div class="results-box">
+    <h2>Partida completada</h2>
+    <div class="stars" id="starsDisplay"></div>
+    <div class="detail">Movimientos: <span id="resMoves"></span></div>
+    <div class="detail">Tiempo: <span id="resTime"></span></div>
+    <div class="detail">Parejas: <span id="resPairs"></span></div>
+    <div class="btn-row">
+      <button onclick="startGame()">Jugar de nuevo</button>
+      <button class="secondary" onclick="showScreen('menuScreen')">Cambiar opciones</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA: 80+ pairs extracted from TCAE SEPAD 2026 study materials
+// ============================================================
+const parejas = [
+  // ESCALAS
+  { concept: "Escala Norton", definition: "Riesgo UPP: <14 = riesgo (5 items)", category: "escalas" },
+  { concept: "Escala Braden", definition: "Riesgo UPP: <13 = alto riesgo (6 items)", category: "escalas" },
+  { concept: "Barthel", definition: "ABVD: 0-100 puntos (10 items)", category: "escalas" },
+  { concept: "Lawton-Brody", definition: "AIVD instrumentales: 0-8 puntos", category: "escalas" },
+  { concept: "Glasgow", definition: "Nivel consciencia: 3-15 (<8 = coma)", category: "escalas" },
+  { concept: "EVA (dolor)", definition: "Escala Visual Analogica: 0-10", category: "escalas" },
+  { concept: "Pfeiffer (SPMSQ)", definition: "Deterioro cognitivo: >=5 errores", category: "escalas" },
+  { concept: "Downton", definition: "Riesgo de caidas: >=3 alto riesgo", category: "escalas" },
+  { concept: "Tinetti", definition: "Equilibrio y marcha: <19 alto riesgo", category: "escalas" },
+  { concept: "MMSE (Minimental)", definition: "Estado cognitivo: 0-30 (<24 deterioro)", category: "escalas" },
+  { concept: "GDS-Reisberg", definition: "7 fases deterioro cognitivo Alzheimer", category: "escalas" },
+  { concept: "Yesavage (GDS)", definition: "Screening depresion en ancianos", category: "escalas" },
+  { concept: "Escala Zarit", definition: "Sobrecarga cuidador: >=47 sobrecarga", category: "escalas" },
+  { concept: "Katz", definition: "ABVD: bano, vestido, WC, movilidad, continencia, alimentacion", category: "escalas" },
+  { concept: "Escala OARS", definition: "Valoracion recursos sociales del anciano", category: "escalas" },
+  { concept: "Escala Morse", definition: "Riesgo de caidas hospitalario", category: "escalas" },
+
+  // POSICIONES
+  { concept: "Fowler", definition: "Semisentado cabecero 45: comer, disnea", category: "posiciones" },
+  { concept: "Semi-Fowler", definition: "Cabecero a 30 grados: disnea leve", category: "posiciones" },
+  { concept: "Fowler alta", definition: "Cabecero a 90 grados: disnea severa", category: "posiciones" },
+  { concept: "Trendelenburg", definition: "Pies elevados 15-30, cabeza baja: shock", category: "posiciones" },
+  { concept: "Anti-Trendelenburg", definition: "Cabeza elevada 15-30: cirugia abdominal", category: "posiciones" },
+  { concept: "Sims", definition: "Lateral izq + pierna flexionada: enemas", category: "posiciones" },
+  { concept: "Litotomia", definition: "Supino + estribos: sondaje mujer, ginecologia", category: "posiciones" },
+  { concept: "Roser / Proetz", definition: "Cabeza colgando: intubacion, lavado cabello", category: "posiciones" },
+  { concept: "Genupectoral", definition: "= Mahometana: exploracion rectal", category: "posiciones" },
+  { concept: "Kraske (navaja)", definition: "Cirugia de la zona coxigea", category: "posiciones" },
+  { concept: "Decubito supino", definition: "Boca arriba: exploracion abdominal", category: "posiciones" },
+
+  // LEGISLACION
+  { concept: "Ley 41/2002", definition: "Autonomia del paciente, consentimiento informado", category: "legislacion" },
+  { concept: "Ley 39/2006", definition: "Dependencia: SAAD, grados, prestaciones", category: "legislacion" },
+  { concept: "Ley 14/1986", definition: "Ley General de Sanidad", category: "legislacion" },
+  { concept: "Ley 31/1995", definition: "Prevencion de Riesgos Laborales (PRL)", category: "legislacion" },
+  { concept: "Ley 55/2003", definition: "Estatuto Marco del personal sanitario", category: "legislacion" },
+  { concept: "Ley 16/2003", definition: "Cohesion y calidad del SNS", category: "legislacion" },
+  { concept: "Ley 10/2001", definition: "Salud de Extremadura: crea el SES", category: "legislacion" },
+  { concept: "Ley 1/2008", definition: "Creacion del SEPAD", category: "legislacion" },
+  { concept: "Art. 43 CE", definition: "Derecho a la proteccion de la salud", category: "legislacion" },
+  { concept: "Ley 33/2011", definition: "Ley General de Salud Publica", category: "legislacion" },
+  { concept: "Virginia Henderson", definition: "Modelo de 14 necesidades fundamentales", category: "legislacion" },
+  { concept: "Piramide de Maslow", definition: "5 niveles: fisiologicas a autorrealizacion", category: "legislacion" },
+
+  // TEMPERATURAS
+  { concept: "Hipotermia", definition: "Temperatura corporal < 35 C", category: "temperaturas" },
+  { concept: "Febricula", definition: "Temperatura entre 37-38 C (no es fiebre)", category: "temperaturas" },
+  { concept: "Fiebre", definition: "Temperatura >= 38 C", category: "temperaturas" },
+  { concept: "Hiperpirexia", definition: "Temperatura > 41 C: emergencia medica", category: "temperaturas" },
+  { concept: "Autoclave 121 C", definition: "Esterilizacion vapor 20 min / 1 atm", category: "temperaturas" },
+  { concept: "Autoclave 134 C", definition: "Esterilizacion flash: priones (18 min)", category: "temperaturas" },
+  { concept: "Calor seco (Poupinel)", definition: "160-180 C durante 1-2 horas", category: "temperaturas" },
+  { concept: "Nevera medicamentos", definition: "Conservar a 2-8 C (insulina, vacunas)", category: "temperaturas" },
+  { concept: "Bano encamado", definition: "Agua a 37-40 C (temperatura corporal)", category: "temperaturas" },
+  { concept: "Enema limpieza", definition: "Solucion a 35-37 C (temperatura corporal)", category: "temperaturas" },
+
+  // ANATOMIA
+  { concept: "Hueso hioides", definition: "Unico hueso que no articula con ningun otro", category: "anatomia" },
+  { concept: "Columna vertebral", definition: "7C + 12D + 5L + 5S + 4-5 coxis", category: "anatomia" },
+  { concept: "Carpo (muneca)", definition: "Formado por 8 huesecillos", category: "anatomia" },
+  { concept: "Cuadriceps", definition: "Recto anterior + vasto ext + vasto int + crural", category: "anatomia" },
+  { concept: "Abduccion", definition: "Alejamiento del plano medio corporal", category: "anatomia" },
+  { concept: "Aduccion", definition: "Acercamiento al plano medio corporal", category: "anatomia" },
+  { concept: "Acetilcolina", definition: "Neurotransmisor disminuido en Alzheimer", category: "anatomia" },
+  { concept: "Celulas beta pancreaticas", definition: "Producen insulina, destruidas en DM1", category: "anatomia" },
+
+  // CONSTANTES VITALES
+  { concept: "Frecuencia cardiaca normal", definition: "60-100 lpm (<60 bradi / >100 taqui)", category: "constantes" },
+  { concept: "Frecuencia respiratoria", definition: "12-20 rpm (medir sin que lo sepa)", category: "constantes" },
+  { concept: "TA normal", definition: "120/80 mmHg (>=140/90 hipertension)", category: "constantes" },
+  { concept: "SpO2 normal", definition: "95-100% (<90% hipoxemia grave)", category: "constantes" },
+  { concept: "Glucemia basal normal", definition: "70-110 mg/dL (<70 hipo / >126 DM)", category: "constantes" },
+  { concept: "Diuresis normal", definition: "1.500-2.000 mL/dia (1 mL/kg/h)", category: "constantes" },
+  { concept: "Oliguria", definition: "Diuresis < 400 mL/dia", category: "constantes" },
+  { concept: "Anuria", definition: "Diuresis < 100 mL/dia", category: "constantes" },
+  { concept: "IMC normal", definition: "18,5-24,9 (<18,5 bajo / >30 obesidad)", category: "constantes" },
+
+  // TECNICAS Y PROCEDIMIENTOS
+  { concept: "Lavado manos social", definition: "40-60 segundos con jabon normal", category: "tecnicas" },
+  { concept: "Lavado manos quirurgico", definition: "3-5 minutos con cepillo y antiseptico", category: "tecnicas" },
+  { concept: "Friccion alcoholica", definition: "20-30 segundos con solucion hidroalcoholica", category: "tecnicas" },
+  { concept: "Cambios posturales", definition: "Cada 2-3 horas para prevenir UPP", category: "tecnicas" },
+  { concept: "RCP compresiones", definition: "100-120/min, profundidad 5-6 cm", category: "tecnicas" },
+  { concept: "Aspirar secreciones", definition: "Maximo 10-15 segundos cada pasada", category: "tecnicas" },
+  { concept: "Sonda Foley", definition: "La mas usada: con balon de retencion permanente", category: "tecnicas" },
+  { concept: "Calibre French (Ch)", definition: "A mayor numero = mayor diametro de sonda", category: "tecnicas" },
+  { concept: "Comprobar SNG", definition: "Aspirar contenido + pH < 5 = gastrico", category: "tecnicas" },
+  { concept: "Orina 24 horas", definition: "Desechar 1a miccion, recoger todas las demas", category: "tecnicas" },
+  { concept: "Urocultivo", definition: "Chorro medio, previa higiene genital", category: "tecnicas" },
+  { concept: "Esputo", definition: "Recoger por la manana al despertar, en ayunas", category: "tecnicas" },
+  { concept: "Regla 5 correctos", definition: "Paciente, medicamento, dosis, via y hora", category: "tecnicas" },
+  { concept: "Esquinas de mitra", definition: "Tecnica para fijar sabana bajera a la cama", category: "tecnicas" },
+
+  // FARMACOLOGIA / VIAS
+  { concept: "Via intradermica (ID)", definition: "Angulo 15 grados, bisel arriba", category: "farmaco" },
+  { concept: "Via subcutanea (SC)", definition: "Angulo 45 grados con pellizco", category: "farmaco" },
+  { concept: "Via intramuscular (IM)", definition: "Angulo 90 grados, aguja 21-23G", category: "farmaco" },
+  { concept: "Insulina via SC", definition: "45 grados, NUNCA intramuscular, rotar zona", category: "farmaco" },
+  { concept: "Via sublingual", definition: "Absorcion rapida, evita 1er paso hepatico", category: "farmaco" },
+  { concept: "Supositorio rectal", definition: "Parte roma primero, posicion de Sims", category: "farmaco" },
+  { concept: "Gotas oticas adulto", definition: "Tirar pabellon arriba y atras", category: "farmaco" },
+  { concept: "Gotas oticas nino", definition: "Tirar pabellon abajo y atras", category: "farmaco" },
+  { concept: "Gafas nasales O2", definition: "FiO2 24-40%, bajo flujo 1-4 L/min", category: "farmaco" },
+  { concept: "Mascarilla Venturi", definition: "FiO2 precisa 24-50%, colores segun %", category: "farmaco" },
+
+  // PATOLOGIAS
+  { concept: "Alzheimer", definition: "Demencia mas frecuente: progresiva e irreversible", category: "patologias" },
+  { concept: "Delirium", definition: "Sindrome confusional AGUDO, fluctuante, reversible", category: "patologias" },
+  { concept: "Pseudodemencia depresiva", definition: "Parece demencia pero es depresion (reversible)", category: "patologias" },
+  { concept: "Hipoglucemia (<70)", definition: "Sudor, temblor, taquicardia: dar azucar rapido", category: "patologias" },
+  { concept: "Cetoacidosis diabetica", definition: "Complicacion DM1: aliento a manzana cetonico", category: "patologias" },
+  { concept: "Pie diabetico", definition: "Neuropatia + vasculopatia periferica", category: "patologias" },
+  { concept: "UPP Estadio I", definition: "Eritema que NO palidece, piel intacta", category: "patologias" },
+  { concept: "UPP Estadio IV", definition: "Afecta musculo, hueso, tendones: necrosis", category: "patologias" },
+  { concept: "Fases duelo (Kubler-Ross)", definition: "Negacion, ira, negociacion, depresion, aceptacion", category: "patologias" },
+  { concept: "Anciano fragil", definition: ">80 anos, vive solo, polifarmacia, caidas", category: "patologias" },
+  { concept: "Spaulding: Critico", definition: "Bisturi, cateter IV: requiere ESTERILIZAR", category: "patologias" },
+  { concept: "Residuos Grupo III", definition: "Biosanitarios especiales: bolsa ROJA", category: "patologias" },
+  { concept: "Cama Stryker", definition: "Giro 360: grandes quemados, politraumatizados", category: "patologias" },
+  { concept: "Ejercicios de Kegel", definition: "Fortalecen suelo pelvico (incont. esfuerzo)", category: "patologias" },
+  { concept: "Resp. Cheyne-Stokes", definition: "Ciclos apnea-hiperpnea: mal pronostico", category: "patologias" },
+  { concept: "Resp. Kussmaul", definition: "Rapida y profunda: cetoacidosis diabetica", category: "patologias" }
+];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let selectedDiff = 10;
+let selectedCat = "todas";
+let moves = 0;
+let matchedPairs = 0;
+let totalPairs = 0;
+let timerInterval = null;
+let seconds = 0;
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function selectDiff(btn) {
+  document.querySelectorAll('[data-diff]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDiff = parseInt(btn.dataset.diff);
+}
+
+function selectCat(btn) {
+  document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCat = btn.dataset.cat;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startGame() {
+  // Reset
+  moves = 0;
+  matchedPairs = 0;
+  seconds = 0;
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
+  if (timerInterval) clearInterval(timerInterval);
+
+  // Filter pairs
+  let pool = selectedCat === "todas" ? [...parejas] : parejas.filter(p => p.category === selectedCat);
+  shuffle(pool);
+
+  // If not enough pairs, fill from all
+  if (pool.length < selectedDiff) {
+    const extra = parejas.filter(p => !pool.includes(p));
+    shuffle(extra);
+    pool = pool.concat(extra.slice(0, selectedDiff - pool.length));
+  }
+
+  const chosen = pool.slice(0, selectedDiff);
+  totalPairs = chosen.length;
+
+  // Create card data (concept + definition for each pair)
+  let cards = [];
+  chosen.forEach((pair, idx) => {
+    cards.push({ id: idx, type: "concept", text: pair.concept, pairId: idx });
+    cards.push({ id: idx, type: "definition", text: pair.definition, pairId: idx });
+  });
+  shuffle(cards);
+
+  // Determine grid columns
+  const total = cards.length;
+  const grid = document.getElementById('cardGrid');
+  grid.className = 'card-grid';
+  if (total <= 12) grid.classList.add('cols-3');
+  else if (total <= 20) grid.classList.add('cols-4');
+  else grid.classList.add('cols-5');
+
+  // Render cards
+  grid.innerHTML = '';
+  cards.forEach((c, i) => {
+    const container = document.createElement('div');
+    container.className = 'card-container';
+    container.innerHTML = `
+      <div class="card" data-pair="${c.pairId}" data-type="${c.type}" data-index="${i}">
+        <div class="card-face card-back"></div>
+        <div class="card-face card-front ${c.type}">${c.text}</div>
+      </div>`;
+    container.addEventListener('click', () => flipCard(container.querySelector('.card')));
+    grid.appendChild(container);
+  });
+
+  // Update UI
+  document.getElementById('movesVal').textContent = '0';
+  document.getElementById('timerVal').textContent = '0:00';
+  document.getElementById('pairsVal').textContent = '0/' + totalPairs;
+
+  showScreen('gameScreen');
+
+  // Start timer
+  timerInterval = setInterval(() => {
+    seconds++;
+    document.getElementById('timerVal').textContent = formatTime(seconds);
+  }, 1000);
+}
+
+function flipCard(card) {
+  if (lockBoard) return;
+  if (card.classList.contains('flipped')) return;
+  if (card.classList.contains('matched')) return;
+
+  card.classList.add('flipped');
+
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+
+  secondCard = card;
+  lockBoard = true;
+  moves++;
+  document.getElementById('movesVal').textContent = moves;
+
+  checkMatch();
+}
+
+function checkMatch() {
+  const isMatch = firstCard.dataset.pair === secondCard.dataset.pair &&
+                  firstCard.dataset.type !== secondCard.dataset.type;
+
+  if (isMatch) {
+    firstCard.classList.add('matched', 'match-anim');
+    secondCard.classList.add('matched', 'match-anim');
+    matchedPairs++;
+    document.getElementById('pairsVal').textContent = matchedPairs + '/' + totalPairs;
+    resetBoard();
+
+    if (matchedPairs === totalPairs) {
+      clearInterval(timerInterval);
+      setTimeout(showResults, 600);
+    }
+  } else {
+    firstCard.classList.add('no-match');
+    secondCard.classList.add('no-match');
+    setTimeout(() => {
+      firstCard.classList.remove('flipped', 'no-match');
+      secondCard.classList.remove('flipped', 'no-match');
+      resetBoard();
+    }, 900);
+  }
+}
+
+function resetBoard() {
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
+}
+
+function showResults() {
+  const perfect = totalPairs;
+  const ratio = moves / perfect;
+  let stars = 3;
+  if (ratio > 2.5) stars = 1;
+  else if (ratio > 1.6) stars = 2;
+
+  const starStr = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+
+  document.getElementById('starsDisplay').textContent = starStr;
+  document.getElementById('resMoves').textContent = moves;
+  document.getElementById('resTime').textContent = formatTime(seconds);
+  document.getElementById('resPairs').textContent = totalPairs;
+
+  showScreen('resultsScreen');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Contrarreloj - OpoJuegos TCAE</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.3);
+}
+
+.header a {
+  color: #e67e22;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(230,126,34,0.15);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 1.1rem;
+  color: #e67e22;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* START SCREEN */
+.screen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; min-height: calc(100vh - 56px); }
+.screen.active { display: flex; }
+
+.start-screen .icon { font-size: 4rem; margin-bottom: 16px; animation: pulse 1.5s infinite; }
+.start-screen h2 { font-size: 1.8rem; margin-bottom: 12px; text-align: center; }
+.start-screen .subtitle { font-size: 1.1rem; color: #aaa; text-align: center; margin-bottom: 8px; }
+.start-screen .challenge { font-size: 1.2rem; color: #e67e22; text-align: center; margin-bottom: 30px; font-weight: 600; }
+
+.start-screen .rules {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  max-width: 360px;
+  width: 100%;
+}
+.start-screen .rules p { font-size: 0.95rem; color: #ccc; margin-bottom: 8px; line-height: 1.5; }
+.start-screen .rules .bonus { color: #2ecc71; }
+.start-screen .rules .penalty { color: #e74c3c; }
+
+.btn-start {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  color: #fff;
+  border: none;
+  padding: 18px 60px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  min-height: 56px;
+  animation: glow 2s infinite;
+  transition: transform 0.15s;
+}
+.btn-start:active { transform: scale(0.95); }
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(230,126,34,0.4); }
+  50% { box-shadow: 0 0 40px rgba(230,126,34,0.8); }
+}
+
+/* GAME SCREEN */
+.game-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.4);
+  width: 100%;
+}
+
+.timer-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.timer-value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #e67e22;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.timer-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+.timer-box.danger .timer-value {
+  color: #e74c3c;
+  animation: pulseDanger 0.5s infinite;
+}
+@keyframes pulseDanger {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.score-box { text-align: center; }
+.score-value { font-size: 2rem; font-weight: 800; color: #2ecc71; line-height: 1; }
+.score-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+.streak-box { text-align: center; }
+.streak-value { font-size: 1.4rem; font-weight: 700; color: #f39c12; line-height: 1; }
+.streak-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+.question-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.question-num { font-size: 0.8rem; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+.question-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  min-height: 50px;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+
+.option-btn {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 14px 16px;
+  font-size: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  min-height: 48px;
+  transition: background 0.1s, border-color 0.1s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.option-btn:active { transform: scale(0.98); }
+.option-btn .letter {
+  background: rgba(230,126,34,0.3);
+  color: #e67e22;
+  font-weight: 700;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.option-btn.correct {
+  background: rgba(46,204,113,0.3);
+  border-color: #2ecc71;
+}
+.option-btn.wrong {
+  background: rgba(231,76,60,0.3);
+  border-color: #e74c3c;
+}
+
+.time-bonus {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  font-weight: 800;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+}
+.time-bonus.show-bonus {
+  animation: floatUp 0.8s forwards;
+  color: #2ecc71;
+}
+.time-bonus.show-penalty {
+  animation: floatUp 0.8s forwards;
+  color: #e74c3c;
+}
+@keyframes floatUp {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -120%) scale(1.3); }
+}
+
+.flash-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 50;
+}
+.flash-overlay.flash-green { background: #2ecc71; animation: flash 0.25s; }
+.flash-overlay.flash-red { background: #e74c3c; animation: flash 0.25s; }
+@keyframes flash {
+  0% { opacity: 0.35; }
+  100% { opacity: 0; }
+}
+
+/* RESULTS SCREEN */
+.results-screen { text-align: center; }
+.results-screen .result-icon { font-size: 4rem; margin-bottom: 12px; }
+.results-screen h2 { font-size: 1.6rem; margin-bottom: 24px; color: #e67e22; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 360px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.stat-card .stat-num { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+.stat-card .stat-desc { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
+.stat-card.highlight { border: 2px solid #e67e22; }
+.stat-card .stat-num.green { color: #2ecc71; }
+.stat-card .stat-num.orange { color: #e67e22; }
+.stat-card .stat-num.red { color: #e74c3c; }
+.stat-card .stat-num.blue { color: #3498db; }
+
+.result-msg {
+  font-size: 1rem;
+  color: #ccc;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  max-width: 340px;
+}
+
+.btn-replay {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  color: #fff;
+  border: none;
+  padding: 16px 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  min-height: 52px;
+  margin-bottom: 12px;
+  transition: transform 0.15s;
+}
+.btn-replay:active { transform: scale(0.95); }
+
+.btn-home {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.2);
+  color: #aaa;
+  padding: 12px 40px;
+  font-size: 0.95rem;
+  border-radius: 50px;
+  cursor: pointer;
+  min-height: 48px;
+  transition: transform 0.15s;
+}
+.btn-home:active { transform: scale(0.95); }
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e74c3c, #e67e22, #2ecc71);
+  transition: width 0.3s;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html">&#x1F3E0; Menu</a>
+  <h1>Contrarreloj</h1>
+  <div style="width:80px"></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- START SCREEN -->
+<div class="screen start-screen active" id="startScreen">
+  <div class="icon">&#9201;</div>
+  <h2>Contrarreloj</h2>
+  <p class="subtitle">Quiz de velocidad TCAE</p>
+  <p class="challenge">60 segundos. &#191;Cuantas puedes acertar?</p>
+  <div class="rules">
+    <p>&#9889; Responde el maximo de preguntas en 60 segundos</p>
+    <p class="bonus">&#10004; Acierto: +1 punto y +2 segundos</p>
+    <p class="penalty">&#10008; Fallo: -3 segundos de penalizacion</p>
+    <p>&#x1F525; Mantener racha suma puntos extra</p>
+  </div>
+  <button class="btn-start" id="btnStart" onclick="startGame()">EMPEZAR</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="gameScreen" style="justify-content:flex-start;padding:0;">
+  <div class="game-hud">
+    <div class="timer-box" id="timerBox">
+      <div class="timer-value" id="timerValue">60</div>
+      <div class="timer-label">Segundos</div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-value" id="streakValue">0&#x1F525;</div>
+      <div class="streak-label">Racha</div>
+    </div>
+    <div class="score-box">
+      <div class="score-value" id="scoreValue">0</div>
+      <div class="score-label">Puntos</div>
+    </div>
+  </div>
+  <div class="question-area">
+    <div class="question-num" id="questionNum">Pregunta 1</div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen results-screen" id="resultsScreen">
+  <div class="result-icon" id="resultIcon">&#x1F3C6;</div>
+  <h2 id="resultTitle">&#161;Tiempo!</h2>
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card highlight">
+      <div class="stat-num orange" id="finalScore">0</div>
+      <div class="stat-desc">Puntos totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="finalCorrect">0</div>
+      <div class="stat-desc">Aciertos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num red" id="finalWrong">0</div>
+      <div class="stat-desc">Fallos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num blue" id="finalAccuracy">0%</div>
+      <div class="stat-desc">Precision</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num orange" id="finalStreak">0</div>
+      <div class="stat-desc">Mejor racha</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="finalTotal">0</div>
+      <div class="stat-desc">Respondidas</div>
+    </div>
+  </div>
+  <p class="result-msg" id="resultMsg"></p>
+  <button class="btn-replay" onclick="startGame()">&#x1F504; Jugar de nuevo</button>
+  <br>
+  <button class="btn-home" onclick="location.href='index.html'">&#x1F3E0; Volver al menu</button>
+</div>
+
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="time-bonus" id="timeBonus"></div>
+
+<script>
+const preguntas = [
+  // TEMA 1 - Centros residenciales, SEPAD
+  {q:"El SEPAD fue creado por la Ley...",a:["Ley 1/2008","Ley 39/2006","Ley 14/1986","Ley 41/2002"],c:0},
+  {q:"Los CADEX tienen ambito...",a:["Provincial","Nacional","Comarcal","Municipal"],c:0},
+  {q:"Objetivo de la Ayuda a Domicilio (SAD):",a:["Potenciar alternativas al ingreso residencial","Potenciar el ingreso residencial","Sustituir cuidados familiares","Eliminar servicios sociales"],c:0},
+  {q:"Las 2 vacunas basicas del anciano son:",a:["Tetanos y gripe","Gripe y neumococo","Tetanos y hepatitis","COVID y gripe"],c:0},
+  {q:"El cuidado informal es...",a:["No profesionalizado ni remunerado","Profesionalizado y remunerado","Solo de enfermeras","Siempre institucional"],c:0},
+  {q:"El SEPAD es un ente publico adscrito a la consejeria de...",a:["Servicios sociales","Sanidad","Educacion","Economia"],c:0},
+  {q:"La Ayuda a Domicilio incluye ayuda de caracter...",a:["Domestico, personal y educativo","Solo domestico","Solo personal","Domestico y sanitario"],c:0},
+
+  // TEMA 2 - Atencion al anciano
+  {q:"Anciano fragil: edad superior a...",a:[">80 anos",">65 anos",">70 anos",">90 anos"],c:0},
+  {q:"La Valoracion Geriatrica Integral fue iniciada por:",a:["Marjory Warren","Florence Nightingale","Virginia Henderson","Dorothea Orem"],c:0},
+  {q:"Quien mas se beneficia de la VGI:",a:["Anciano fragil","Anciano sano","Adulto joven","Ninos"],c:0},
+  {q:"La prevencion mas frecuente en ancianos es la:",a:["Secundaria","Primaria","Terciaria","Cuaternaria"],c:0},
+  {q:"Deficit nutricional mas frecuente en ancianos:",a:["Calcio","Hierro","Vitamina C","Potasio"],c:0},
+  {q:"La Escala de Zarit mide:",a:["Sobrecarga del cuidador","Riesgo de UPP","Dependencia en ABVD","Estado cognitivo"],c:0},
+  {q:"Zarit: sobrecarga si puntuacion >=",a:["47","30","20","60"],c:0},
+  {q:"Grado II de dependencia es:",a:["Severa","Moderada","Gran dependencia","Leve"],c:0},
+  {q:"Grado III de dependencia requiere apoyo:",a:["Indispensable y continuo","Intermitente","Limitado","Extenso"],c:0},
+  {q:"La Gerontologia estudia:",a:["Salud, psicologia e integracion social de la vejez","Solo enfermedades del anciano","Farmacologia geriatrica","Cirugia en mayores"],c:0},
+  {q:"Viejo-joven: rango de edad:",a:["65-74 anos","75-84 anos","85+ anos","60-65 anos"],c:0},
+
+  // TEMA 3 - Patologias psiquiatricas
+  {q:"La agorafobia es miedo a:",a:["Espacios abiertos","Espacios cerrados","Agua","Alturas"],c:0},
+  {q:"Neurotransmisor disminuido en Alzheimer:",a:["Acetilcolina","Adrenalina","GABA","Glutamato"],c:0},
+  {q:"La CIE-10 es la clasificacion recomendada por:",a:["La OMS","La APA","La FDA","El SNS"],c:0},
+  {q:"El DSM-5 tiene cuantas categorias de trastornos:",a:["22","18","30","15"],c:0},
+  {q:"La ansiedad es un trastorno de tipo:",a:["Neurotico","Psicotico","Somatico","Organico"],c:0},
+  {q:"Wernicke-Korsakoff se asocia a deficit de:",a:["Tiamina (B1)","Vitamina C","Vitamina D","Hierro"],c:0},
+  {q:"En Alzheimer fase 3 (grave) aparece:",a:["Dependencia total e incontinencia","Solo perdida de memoria reciente","Desorientacion leve","Dificultad para encontrar palabras"],c:0},
+  {q:"La dismorfofobia es miedo a:",a:["La propia imagen corporal","Espacios abiertos","Ruborizarse","Animales"],c:0},
+  {q:"La eritrofobia es miedo a:",a:["Ruborizarse","Espacios cerrados","La sangre","Los animales"],c:0},
+  {q:"El trastorno bipolar tambien se llama:",a:["Ciclotimia","Distimia","Esquizofrenia","TOC"],c:0},
+
+  // TEMA 4 - Diabetes
+  {q:"Tipo de diabetes mas frecuente:",a:["DM tipo 2 (90-95%)","DM tipo 1","DM gestacional","LADA"],c:0},
+  {q:"La HbA1c mide el control glucemico de:",a:["3 meses","1 mes","6 meses","1 semana"],c:0},
+  {q:"Hipoglucemia: glucemia menor de:",a:["70 mg/dl","100 mg/dl","126 mg/dl","60 mg/dl"],c:0},
+  {q:"Dieta del diabetico: cuantas tomas diarias:",a:["6","3","4","5"],c:0},
+  {q:"Artropatia de Charcot es el grado...",a:["Mas avanzado del pie diabetico","Inicial","Intermedio","No relacionado con diabetes"],c:0},
+  {q:"Dosis inicial de insulina en DM2:",a:["0,2 U/kg/dia","1 U/kg/dia","0,5 U/kg/dia","3 U/kg/dia"],c:0},
+  {q:"Test de O'Sullivan: administrar 50g glucosa y medir a:",a:["1 hora","2 horas","30 minutos","3 horas"],c:0},
+  {q:"NO es causa de cetoacidosis diabetica:",a:["Anemia","Infecciones","Cirugia","Estres"],c:0},
+
+  // TEMA 5 - Incontinencia urinaria
+  {q:"Filtracion renal diaria aproximada:",a:["180 litros","90 litros","50 litros","280 litros"],c:0},
+  {q:"La ADH produce:",a:["Menor cantidad de orina","Mayor cantidad de orina","Mas sodio en orina","Orina mas acida"],c:0},
+  {q:"Los diureticos aumentan:",a:["Frecuencia y volumen de orina","Solo el volumen","La retencion urinaria","El sodio en sangre"],c:0},
+  {q:"Oliguria: emision de orina inferior a:",a:["400-500 ml/dia","1000 ml/dia","100 ml/dia","2000 ml/dia"],c:0},
+  {q:"Polaquiuria significa:",a:["Orinar muchas veces al dia","Orinar mucho volumen","Dolor al orinar","Orina oscura"],c:0},
+  {q:"Calculos renales mas frecuentes:",a:["Oxalatos (calcicos)","Uratos","Fosfatos","Cistina"],c:0},
+  {q:"La bolsa colectora de la sonda debe estar:",a:["Por debajo de la vejiga","A la misma altura","Por encima de la vejiga","Da igual la posicion"],c:0},
+
+  // TEMA 6 - Estrenimiento y enemas
+  {q:"Posicion para administrar un enema:",a:["Sims izquierdo","Fowler","Decubito supino","Trendelenburg"],c:0},
+  {q:"Canula rectal en adultos: introducir...",a:["7-10 cm","3-5 cm","15-20 cm","1-2 cm"],c:0},
+  {q:"Estrenimiento: evacuacion inferior a...veces/semana:",a:["3","5","7","1"],c:0},
+  {q:"Complicacion del estrenimiento cronico:",a:["Fecaloma","Hipoglucemia","Hipertension","Taquicardia"],c:0},
+  {q:"Parto a termino se produce en la semana:",a:["37","40","42","34"],c:0},
+  {q:"Dilatacion completa del parto:",a:["10-12 cm","5-6 cm","8 cm","15 cm"],c:0},
+  {q:"Alumbramiento es la expulsion de:",a:["La placenta","El recien nacido","El cordon","El liquido amniotico"],c:0},
+  {q:"Proteinas recomendadas en gestante:",a:["1,5 g/kg/dia","0,5 g/kg/dia","2,5 g/kg/dia","1 g/kg/dia"],c:0},
+
+  // TEMA 7 - Paciente encamado
+  {q:"Hueso que NO articula con ningun otro:",a:["Hioides","Atlas","Axis","Vomer"],c:0},
+  {q:"Vertebras dorsales:",a:["12","7","5","9"],c:0},
+  {q:"Huesecillos del carpo:",a:["8","5","10","6"],c:0},
+  {q:"Los musculos se insertan en huesos mediante:",a:["Tendones","Ligamentos","Fascias","Cartilago"],c:0},
+  {q:"La abduccion es:",a:["Alejamiento del plano medio","Acercamiento al plano medio","Giro sobre eje","Flexion"],c:0},
+  {q:"Cambios posturales cada:",a:["2-3 horas","4-5 horas","1 hora","6 horas"],c:0},
+  {q:"UPP grado I se manifiesta con:",a:["Eritema que no palidece","Ampolla","Necrosis","Exposicion osea"],c:0},
+  {q:"Enfermedad con autoanticuerpos:",a:["Lupus eritematoso sistemico","Artrosis","Osteoporosis","Gota"],c:0},
+
+  // TEMA 8 - Deambulacion
+  {q:"Subir escaleras: primero pierna...",a:["Sana","Afecta","Indiferente","Derecha siempre"],c:0},
+  {q:"Bajar escaleras: primero pierna...",a:["Afecta + baston","Sana","Ambas a la vez","Derecha"],c:0},
+  {q:"El baston se lleva en el lado:",a:["Contrario al afecto (sano)","Del lado afecto","Indiferente","Derecho siempre"],c:0},
+  {q:"Dispositivo de maxima estabilidad para marcha:",a:["Andador","Baston","Muleta axilar","Muleta canadiense"],c:0},
+  {q:"La silla de ruedas baja rampas:",a:["De espaldas (marcha atras)","De frente","Lateral","Da igual"],c:0},
+  {q:"La camilla se desplaza con la cabeza hacia:",a:["Direccion del movimiento","Los pies del paciente","Atras","Lateral"],c:0},
+  {q:"Transferencia cama-sillon: silla en lado:",a:["Sano del paciente","Afecto del paciente","Indiferente","Izquierdo siempre"],c:0},
+
+  // TEMA 9 - Higiene
+  {q:"Temperatura del agua del bano:",a:["37-40 C","30-35 C","42-45 C","25-30 C"],c:0},
+  {q:"En el bano en cama, lo ultimo que se lava:",a:["Genitales","Cara","Espalda","Torax"],c:0},
+  {q:"Ojos se lavan del angulo:",a:["Interno al externo","Externo al interno","Superior al inferior","Da igual"],c:0},
+  {q:"Genitales femeninos se lavan:",a:["De delante hacia atras","De atras hacia delante","Circular","Da igual"],c:0},
+  {q:"Orina de 24h: se desecha la:",a:["Primera miccion del dia","Ultima miccion","Ninguna","La del mediodia"],c:0},
+  {q:"Urocultivo: recoger chorro:",a:["Medio","Inicial","Final","Completo"],c:0},
+  {q:"Esputo: recoger por la manana antes de:",a:["Comer","Dormir","Ducharse","Orinar"],c:0},
+  {q:"Rasurado prequirurgico: en direccion del:",a:["Crecimiento del vello","Contraria al vello","Circular","Da igual"],c:0},
+
+  // TEMA 10 - Cronico y terminal
+  {q:"Enfermedad terminal: pronostico inferior a:",a:["6 meses","1 mes","12 meses","3 meses"],c:0},
+  {q:"Sintoma mas frecuente en paciente terminal:",a:["Dolor","Disnea","Estrenimiento","Fiebre"],c:0},
+  {q:"Segundo sintoma mas frecuente en terminal:",a:["Disnea","Dolor","Vomitos","Fiebre"],c:0},
+  {q:"1er escalon analgesico OMS:",a:["Paracetamol/AINEs","Morfina","Codeina","Fentanilo"],c:0},
+  {q:"3er escalon analgesico OMS:",a:["Morfina","Paracetamol","Tramadol","Ibuprofeno"],c:0},
+  {q:"Fases del duelo (Kubler-Ross), primera fase:",a:["Negacion","Ira","Depresion","Aceptacion"],c:0},
+  {q:"Conspiración de silencio: ocultar al paciente su:",a:["Diagnostico/pronostico","Medicacion","Horario","Dieta"],c:0},
+  {q:"Claudicacion familiar es:",a:["Incapacidad de la familia para responder a las demandas","Muerte del familiar","Alta hospitalaria","Traslado del paciente"],c:0},
+
+  // TEMA 11 - Alimentacion
+  {q:"Kcal por gramo de grasas:",a:["9","4","7","12"],c:0},
+  {q:"Kcal por gramo de hidratos de carbono:",a:["4","9","7","2"],c:0},
+  {q:"Vitaminas liposolubles:",a:["A, D, E, K","C y grupo B","Solo A y D","B12 y acido folico"],c:0},
+  {q:"Vitamina esencial para la coagulacion:",a:["Vitamina K","Vitamina C","Vitamina A","Vitamina D"],c:0},
+  {q:"Deficit de vitamina C produce:",a:["Escorbuto","Raquitismo","Beriberi","Pelagra"],c:0},
+  {q:"Deficit de yodo produce:",a:["Bocio","Anemia","Escorbuto","Osteoporosis"],c:0},
+  {q:"Nutricion parenteral total se da por via:",a:["Venosa central","Venosa periferica","Oral","Sonda nasogastrica"],c:0},
+  {q:"Comprobacion de SNG: aspirar y medir pH que debe ser:",a:["<5","<7",">7",">10"],c:0},
+  {q:"Posicion durante nutricion enteral:",a:["Fowler","Decubito supino","Trendelenburg","Sims"],c:0},
+
+  // TEMA 12 - Esterilizacion
+  {q:"Orden correcto del procesamiento:",a:["Limpieza-Desinfeccion-Esterilizacion","Desinfeccion-Limpieza-Esterilizacion","Esterilizacion-Limpieza-Desinfeccion","Limpieza-Esterilizacion-Desinfeccion"],c:0},
+  {q:"La esterilizacion elimina:",a:["Todos los microorganismos incluidas esporas","Solo bacterias","Todo excepto esporas","Solo virus"],c:0},
+  {q:"Antisepsia se aplica sobre:",a:["Tejidos vivos","Objetos inanimados","Superficies","Instrumental"],c:0},
+  {q:"El autoclave funciona con:",a:["Vapor saturado a presion","Calor seco","Oxido de etileno","Radiacion gamma"],c:0},
+  {q:"Autoclave estandar: temperatura y tiempo:",a:["121 C / 20 min","134 C / 30 min","100 C / 20 min","160 C / 1 hora"],c:0},
+  {q:"Oxido de etileno requiere:",a:["Aireacion prolongada","Altas temperaturas","Inmersion en agua","Secado al sol"],c:0},
+  {q:"Control de esterilizacion mas fiable:",a:["Biologico","Quimico","Fisico","Visual"],c:0},
+  {q:"Glutaraldehido 2% esteriliza en:",a:["10 horas","30 minutos","2 horas","24 horas"],c:0},
+  {q:"Material critico (Spaulding) requiere:",a:["Esterilizacion","Desinfeccion alto nivel","Desinfeccion bajo nivel","Solo limpieza"],c:0},
+  {q:"Pasteurizacion: 63 C durante:",a:["30 minutos","15 segundos","1 hora","5 minutos"],c:0},
+
+  // TEMA 14 - Constantes vitales
+  {q:"Frecuencia cardiaca normal adulto:",a:["60-100 lpm","40-60 lpm","100-120 lpm","80-140 lpm"],c:0},
+  {q:"Bradicardia es frecuencia menor de:",a:["60 lpm","80 lpm","100 lpm","50 lpm"],c:0},
+  {q:"Taquicardia es frecuencia mayor de:",a:["100 lpm","120 lpm","80 lpm","60 lpm"],c:0},
+  {q:"Pulso se mide habitualmente en arteria:",a:["Radial","Carotida","Femoral","Braquial"],c:0},
+  {q:"Frecuencia respiratoria normal adulto:",a:["12-20 rpm","6-10 rpm","20-30 rpm","30-40 rpm"],c:0},
+  {q:"Hipertension arterial: TA >=",a:["140/90 mmHg","120/80 mmHg","160/100 mmHg","130/85 mmHg"],c:0},
+  {q:"SatO2 normal:",a:[">=95%",">=90%",">=85%",">=98%"],c:0},
+  {q:"Hiperpirexia: temperatura mayor de:",a:["41 C","39 C","40 C","38 C"],c:0},
+  {q:"Febricula: rango de temperatura:",a:["37-38 C","36-37 C","38-39 C","39-40 C"],c:0},
+  {q:"Temperatura rectal respecto a axilar es:",a:["0,5 C mas","Igual","0,5 C menos","1 C menos"],c:0},
+
+  // TEMA 15 - Post-mortem y bioetica
+  {q:"La muerte la certifica el:",a:["Medico","TCAE","Enfermero","Familiar"],c:0},
+  {q:"Rigor mortis comienza a las:",a:["2-4 horas","0-1 horas","12-24 horas","48 horas"],c:0},
+  {q:"'Primum non nocere' corresponde a:",a:["No maleficencia","Beneficencia","Autonomia","Justicia"],c:0},
+  {q:"Ley de Autonomia del Paciente:",a:["Ley 41/2002","Ley 14/1986","Ley 39/2006","Ley 31/1995"],c:0},
+  {q:"Distanasia es:",a:["Encarnizamiento terapeutico","Muerte digna","Sedacion paliativa","Eutanasia activa"],c:0},
+  {q:"En Espana la donacion de organos sigue criterio de:",a:["Consentimiento presunto","Consentimiento expreso","Obligatoriedad","Sorteo"],c:0},
+  {q:"El consentimiento informado se basa en el principio de:",a:["Autonomia","Justicia","Beneficencia","No maleficencia"],c:0},
+
+  // TEMA 16 - Cama hospitalaria
+  {q:"Cama mas habitual en hospital:",a:["Articulada","Electrocircular","De Judet","Ortopedica"],c:0},
+  {q:"Sabana bajera se fija con:",a:["Esquinas de mitra","Pinzas","Velcro","Cinta adhesiva"],c:0},
+  {q:"La entremetida (travesera) sirve para:",a:["Movilizar al paciente","Cubrir al paciente","Proteger el colchon","Abrigar"],c:0},
+  {q:"La ropa sucia NUNCA se deposita en:",a:["El suelo","La bolsa","El carro","La lavanderia"],c:0},
+  {q:"Cama de Stryker indicada en:",a:["Grandes quemados","Traumatismos vertebrales","Tracciones","Neonatos"],c:0},
+
+  // TEMA 18 - Caidas
+  {q:"Accidente mas frecuente en mayores de 65:",a:["Caida","Intoxicacion","Quemadura","Atragantamiento"],c:0},
+  {q:"Fractura mas frecuente por caida en ancianos:",a:["Cadera","Muneca","Vertebra","Humero"],c:0},
+  {q:"Fractura de Colles afecta a:",a:["Muneca (radio distal)","Cadera","Tobillo","Clavícula"],c:0},
+  {q:"Sindrome postcaida es:",a:["Miedo a caer que restringe movilidad","Fractura de cadera","Hematoma","Lesion cerebral"],c:0},
+  {q:"Escala de Downton valora riesgo de:",a:["Caidas","UPP","Desnutricion","Depresion"],c:0},
+  {q:"Factor predictor MAS importante de caidas:",a:["Caidas previas","Edad","Sexo","Medicacion"],c:0},
+
+  // TEMA 19 - RCP y primeros auxilios
+  {q:"Conducta PAS: primer paso:",a:["Proteger","Avisar","Socorrer","Reanimar"],c:0},
+  {q:"Relacion compresiones:ventilaciones en adulto:",a:["30:2","15:2","5:1","15:1"],c:0},
+  {q:"Frecuencia de compresiones RCP:",a:["100-120/min","60-80/min","80-100/min","120-150/min"],c:0},
+  {q:"Profundidad compresiones RCP adulto:",a:["5-6 cm","3-4 cm","7-8 cm","2-3 cm"],c:0},
+  {q:"RCP pediatrica: iniciar con:",a:["5 ventilaciones de rescate","30 compresiones","Desfibrilacion","Llamar al 112"],c:0},
+  {q:"OVACE parcial (tos eficaz): que hacer:",a:["Animar a toser","Heimlich","Golpes interescapulares","RCP"],c:0},
+  {q:"PLS se usa en paciente:",a:["Inconsciente que si respira","Consciente","En parada cardiaca","Con fractura"],c:0},
+  {q:"Numero de emergencias en Espana:",a:["112","061","091","092"],c:0},
+  {q:"Maniobra frente-menton abre la:",a:["Via aerea","Via venosa","Via urinaria","Via digestiva"],c:0},
+
+  // TEMA 20 - Traumatismos
+  {q:"Hemorragia arterial: sangre de color:",a:["Roja brillante, a chorros","Oscura, flujo continuo","En sabana","No sangra"],c:0},
+  {q:"Primer paso ante hemorragia externa:",a:["Compresion directa","Torniquete","Elevacion","Compresion arterial"],c:0},
+  {q:"Torniquete se usa como:",a:["Ultimo recurso","Primera opcion","Segunda opcion","Nunca"],c:0},
+  {q:"Quemadura de 1er grado:",a:["Eritema","Ampollas","Escara","Necrosis"],c:0},
+  {q:"Quemadura de 2o grado:",a:["Ampollas (flictenas)","Solo eritema","Escara","Carbonizacion"],c:0},
+  {q:"Quemadura de 3er grado es:",a:["Indolora","Muy dolorosa","Moderada","Leve"],c:0},
+  {q:"Regla de Wallace: cabeza =",a:["9%","18%","1%","36%"],c:0},
+  {q:"Regla de Wallace: cada miembro inferior =",a:["18%","9%","27%","36%"],c:0},
+  {q:"Regla de Wallace: genitales =",a:["1%","9%","5%","2%"],c:0},
+  {q:"Ante quemadura: enfriar con agua corriente durante:",a:["15-20 minutos","5 minutos","1 minuto","30 minutos"],c:0},
+  {q:"Ante fractura: inmovilizar articulacion por:",a:["Encima y debajo del foco","Solo encima","Solo debajo","No inmovilizar"],c:0},
+
+  // TEMA 21 - Contencion mecanica
+  {q:"La contencion mecanica es una medida:",a:["Excepcional y de ultimo recurso","De primera opcion","Rutinaria","Para comodidad del personal"],c:0},
+  {q:"La contencion mecanica requiere prescripcion de:",a:["Medico","TCAE","Enfermero","Familiar"],c:0},
+  {q:"Vigilar contencion cada:",a:["15-30 minutos","1 hora","4 horas","8 horas"],c:0},
+
+  // TEMA 22 - Convenio colectivo SEPAD
+  {q:"Jornada semanal del personal laboral SEPAD:",a:["35 horas","37,5 horas","40 horas","38 horas"],c:0},
+  {q:"Jornada anual SEPAD:",a:["1.554 horas","1.600 horas","1.750 horas","1.400 horas"],c:0},
+  {q:"Vacaciones anuales SEPAD:",a:["22 dias habiles","30 dias naturales","20 dias habiles","15 dias"],c:0},
+  {q:"Permiso por matrimonio:",a:["15 dias naturales","7 dias","10 dias","20 dias"],c:0},
+  {q:"Permiso por nacimiento:",a:["16 semanas","12 semanas","8 semanas","20 semanas"],c:0},
+  {q:"Jornada nocturna: de las...a las...",a:["22:00 a 7:00","23:00 a 6:00","21:00 a 8:00","20:00 a 7:00"],c:0},
+
+  // TEMA 25 - Igualdad
+  {q:"Ley de Igualdad Efectiva:",a:["LO 3/2007","LO 1/2004","Ley 31/1995","Ley 41/2002"],c:0},
+  {q:"Articulo CE de igualdad ante la ley:",a:["Art. 14","Art. 43","Art. 9","Art. 27"],c:0},
+  {q:"Planes de igualdad obligatorios en empresas de:",a:["50+ trabajadores","10+ trabajadores","100+ trabajadores","25+ trabajadores"],c:0},
+  {q:"LO 1/2004 trata sobre:",a:["Violencia de genero","Igualdad efectiva","PRL","Autonomia paciente"],c:0},
+  {q:"Transversalidad (mainstreaming) significa:",a:["Integrar igualdad en todas las politicas","Solo en empleo","Solo en educacion","Solo en sanidad"],c:0},
+
+  // CIFRAS CLAVE - Constantes y escalas
+  {q:"Glucemia basal normal:",a:["70-110 mg/dl","50-80 mg/dl","110-140 mg/dl","60-90 mg/dl"],c:0},
+  {q:"Diuresis normal diaria:",a:["1.500-2.000 ml","500-1.000 ml","3.000-4.000 ml","200-500 ml"],c:0},
+  {q:"Anuria: diuresis menor de:",a:["100 ml/dia","400 ml/dia","500 ml/dia","50 ml/dia"],c:0},
+  {q:"Poliuria: diuresis mayor de:",a:["3.000 ml/dia","2.000 ml/dia","1.500 ml/dia","4.000 ml/dia"],c:0},
+  {q:"Lavado de manos social dura:",a:["40-60 segundos","10-15 segundos","20-30 segundos","3-5 minutos"],c:0},
+  {q:"Lavado quirurgico dura:",a:["3-5 minutos","40-60 segundos","1 minuto","10 minutos"],c:0},
+  {q:"Friccion alcoholica dura:",a:["20-30 segundos","40-60 segundos","5 segundos","3 minutos"],c:0},
+  {q:"RCP: profundidad compresiones adulto:",a:["5-6 cm","3-4 cm","7-8 cm","2-3 cm"],c:0},
+  {q:"Angulo inyeccion intradermica:",a:["15 grados","45 grados","90 grados","30 grados"],c:0},
+  {q:"Angulo inyeccion subcutanea:",a:["45 grados","15 grados","90 grados","60 grados"],c:0},
+  {q:"Angulo inyeccion intramuscular:",a:["90 grados","45 grados","15 grados","60 grados"],c:0},
+  {q:"Posicion Fowler: cabecero a:",a:["45 grados","30 grados","90 grados","15 grados"],c:0},
+  {q:"Posicion Trendelenburg: pies elevados...",a:["15-30 grados","45 grados","90 grados","5 grados"],c:0},
+  {q:"Escala Norton: riesgo UPP si <=",a:["14","10","18","20"],c:0},
+  {q:"Escala Barthel mide:",a:["ABVD (0-100)","Riesgo UPP","Estado cognitivo","Riesgo caidas"],c:0},
+  {q:"Escala Glasgow: coma si <",a:["8","10","5","12"],c:0},
+  {q:"Escala EVA mide:",a:["Dolor (0-10)","Consciencia","UPP","Nutricion"],c:0},
+  {q:"Escala Pfeiffer: deterioro cognitivo si >=",a:["5 errores","3 errores","8 errores","10 errores"],c:0},
+  {q:"Escala Downton: alto riesgo caidas si >=",a:["3","5","2","7"],c:0},
+  {q:"IMC normal:",a:["18,5-24,9","15-20","25-30","20-30"],c:0},
+  {q:"Goteo IV estandar: 1 ml =",a:["20 gotas","60 gotas","10 gotas","40 gotas"],c:0},
+  {q:"Microgotero: 1 ml =",a:["60 microgotas","20 microgotas","100 microgotas","30 microgotas"],c:0},
+  {q:"Aspirar secreciones: maximo...por cada vez:",a:["10-15 segundos","30 segundos","1 minuto","5 segundos"],c:0},
+  {q:"Conservar historia clinica minimo:",a:["5 anos","3 anos","10 anos","1 ano"],c:0},
+  {q:"Calorias diarias adulto:",a:["2.000-2.500 kcal","1.000-1.500 kcal","3.000-3.500 kcal","500-1.000 kcal"],c:0},
+  {q:"Hidratos de carbono: porcentaje de la dieta:",a:["55-60%","10-15%","25-30%","40-45%"],c:0},
+  {q:"Grasas: porcentaje de la dieta:",a:["25-30%","55-60%","10-15%","40-50%"],c:0},
+  {q:"Proteinas: porcentaje de la dieta:",a:["10-15%","25-30%","55-60%","40-50%"],c:0},
+  {q:"Fibra diaria recomendada:",a:["25-30 g","5-10 g","50-60 g","100 g"],c:0},
+  {q:"Agua diaria recomendada:",a:["1,5-2 litros","0,5 litros","3-4 litros","500 ml"],c:0},
+
+  // LEGISLACION
+  {q:"Constitucion Espanola aprobada en referendum:",a:["6 diciembre 1978","6 diciembre 1976","27 diciembre 1978","1 enero 1979"],c:0},
+  {q:"Derecho a la salud: articulo de la CE:",a:["Art. 43","Art. 14","Art. 39","Art. 149"],c:0},
+  {q:"Ley General de Sanidad:",a:["Ley 14/1986","Ley 41/2002","Ley 31/1995","Ley 16/2003"],c:0},
+  {q:"Ley de Prevencion de Riesgos Laborales:",a:["Ley 31/1995","Ley 14/1986","Ley 41/2002","Ley 55/2003"],c:0},
+  {q:"Ley que crea el SES (Salud Extremadura):",a:["Ley 10/2001","Ley 14/1986","Ley 16/2003","Ley 1/2008"],c:0},
+  {q:"Ley de Dependencia:",a:["Ley 39/2006","Ley 41/2002","Ley 1/2008","Ley 14/1986"],c:0},
+  {q:"Estatuto Marco del personal sanitario:",a:["Ley 55/2003","Ley 31/1995","Ley 16/2003","Ley 33/2011"],c:0},
+  {q:"Ley de Cohesion del SNS:",a:["Ley 16/2003","Ley 14/1986","Ley 55/2003","Ley 41/2002"],c:0},
+  {q:"Nevera de medicamentos: temperatura:",a:["2-8 C","0-2 C","8-15 C","15-25 C"],c:0},
+  {q:"Capacidad vesical normal:",a:["300-500 ml","100-200 ml","500-800 ml","1.000 ml"],c:0},
+  {q:"Rigidez cadaverica maxima a las:",a:["12-24 horas","2-4 horas","48 horas","1 hora"],c:0}
+];
+
+// Shuffle array
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Shuffle answers for a question, returns {answers, correctIndex}
+function shuffleQuestion(q) {
+  const indices = [0, 1, 2, 3];
+  shuffle(indices);
+  const answers = indices.map(i => q.a[i]);
+  const correctIndex = indices.indexOf(q.c);
+  return { text: q.q, answers, correctIndex };
+}
+
+let timer, timeLeft, score, streak, bestStreak, correct, wrong, questionIndex;
+let questions, currentQ, canAnswer, gameActive;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  timeLeft = 60;
+  score = 0;
+  streak = 0;
+  bestStreak = 0;
+  correct = 0;
+  wrong = 0;
+  questionIndex = 0;
+  gameActive = true;
+  canAnswer = true;
+
+  questions = shuffle([...preguntas]);
+
+  updateHUD();
+  showScreen('gameScreen');
+  loadQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft -= 0.1;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(timer);
+      gameActive = false;
+      endGame();
+    }
+    updateTimerDisplay();
+  }, 100);
+}
+
+function updateTimerDisplay() {
+  const display = Math.ceil(timeLeft);
+  document.getElementById('timerValue').textContent = display;
+  const box = document.getElementById('timerBox');
+  if (display <= 10) {
+    box.classList.add('danger');
+  } else {
+    box.classList.remove('danger');
+  }
+  // Progress bar
+  const pct = Math.max(0, (timeLeft / 60) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function updateHUD() {
+  document.getElementById('scoreValue').textContent = score;
+  document.getElementById('streakValue').textContent = streak + '\uD83D\uDD25';
+}
+
+function loadQuestion() {
+  if (!gameActive) return;
+  canAnswer = true;
+
+  // Recycle questions if pool exhausted
+  if (questionIndex >= questions.length) {
+    questions = shuffle([...preguntas]);
+    questionIndex = 0;
+  }
+
+  currentQ = shuffleQuestion(questions[questionIndex]);
+  questionIndex++;
+
+  document.getElementById('questionNum').textContent = 'Pregunta ' + (correct + wrong + 1);
+  document.getElementById('questionText').textContent = currentQ.text;
+
+  const container = document.getElementById('optionsContainer');
+  const letters = ['A', 'B', 'C', 'D'];
+  container.innerHTML = '';
+
+  currentQ.answers.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + ans + '</span>';
+    btn.onclick = () => selectAnswer(i, btn);
+    container.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx, btn) {
+  if (!canAnswer || !gameActive) return;
+  canAnswer = false;
+
+  const flash = document.getElementById('flashOverlay');
+  const bonus = document.getElementById('timeBonus');
+
+  // Clear previous animations
+  flash.className = 'flash-overlay';
+  bonus.className = 'time-bonus';
+  void flash.offsetWidth; // force reflow
+
+  if (idx === currentQ.correctIndex) {
+    // CORRECT
+    correct++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+
+    // Score: base 1 + streak bonus
+    let points = 1 + Math.floor(streak / 5);
+    score += points;
+
+    // Time bonus
+    timeLeft = Math.min(timeLeft + 2, 99);
+
+    btn.classList.add('correct');
+    flash.classList.add('flash-green');
+    bonus.textContent = '+2s';
+    bonus.classList.add('show-bonus');
+  } else {
+    // WRONG
+    wrong++;
+    streak = 0;
+
+    // Time penalty
+    timeLeft = Math.max(timeLeft - 3, 0);
+
+    btn.classList.add('wrong');
+    // Show correct answer
+    const btns = document.querySelectorAll('.option-btn');
+    btns[currentQ.correctIndex].classList.add('correct');
+    flash.classList.add('flash-red');
+    bonus.textContent = '-3s';
+    bonus.classList.add('show-penalty');
+  }
+
+  updateHUD();
+  updateTimerDisplay();
+
+  // Quick transition to next question
+  setTimeout(() => {
+    if (gameActive) loadQuestion();
+  }, 350);
+}
+
+function endGame() {
+  showScreen('resultsScreen');
+
+  const total = correct + wrong;
+  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalCorrect').textContent = correct;
+  document.getElementById('finalWrong').textContent = wrong;
+  document.getElementById('finalAccuracy').textContent = accuracy + '%';
+  document.getElementById('finalStreak').textContent = bestStreak;
+  document.getElementById('finalTotal').textContent = total;
+
+  // Result message and icon
+  let icon, title, msg;
+  if (score >= 30) {
+    icon = '\uD83C\uDFC6'; title = '\u00A1Increible!';
+    msg = '\u00A1Eres una maquina! Dominas el temario a velocidad record.';
+  } else if (score >= 20) {
+    icon = '\uD83C\uDF1F'; title = '\u00A1Muy bien!';
+    msg = 'Gran rendimiento bajo presion. Sigue asi para el examen.';
+  } else if (score >= 10) {
+    icon = '\uD83D\uDCAA'; title = '\u00A1Bien hecho!';
+    msg = 'Buen nivel. Practica mas para mejorar velocidad y precision.';
+  } else {
+    icon = '\u23F1\uFE0F'; title = '\u00A1Sigue practicando!';
+    msg = 'La velocidad se entrena. Repasa los temas y vuelve a intentarlo.';
+  }
+
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultMsg').textContent = msg;
+}
+</script>
+</body>
+</html>

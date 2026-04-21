@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Cifras Clave - OpoJuegos TCAE SEPAD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:10px}
+a.back{position:fixed;top:12px;left:12px;color:#f39c12;text-decoration:none;font-size:1em;z-index:200;background:rgba(0,0,0,.4);padding:6px 14px;border-radius:10px}
+h1{font-size:1.4em;text-align:center;padding:12px 0 4px;background:linear-gradient(90deg,#f39c12,#e67e22);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{font-size:.85em;color:#aaa;text-align:center;margin-bottom:12px}
+.container{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px}
+
+/* Category buttons */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.cat-btn{padding:16px 10px;border:2px solid #f39c1255;border-radius:14px;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-size:.95em;cursor:pointer;transition:all .3s;min-height:52px;touch-action:manipulation;text-align:center;font-weight:600}
+.cat-btn:active{transform:scale(.96)}
+.cat-btn:hover{border-color:#f39c12;background:rgba(243,156,18,.1)}
+.cat-btn.todas{grid-column:1/-1;background:linear-gradient(135deg,#f39c12,#e67e22);color:#000;border-color:#f39c12;font-size:1.05em}
+.cat-icon{font-size:1.5em;display:block;margin-bottom:4px}
+
+/* Progress */
+.progress-wrap{width:100%;background:rgba(255,255,255,.1);border-radius:10px;height:10px;overflow:hidden;margin:4px 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,#f39c12,#e67e22);border-radius:10px;transition:width .4s}
+.stats{display:flex;justify-content:space-between;font-size:.85em;color:#bbb;padding:0 4px}
+
+/* Question */
+.q-box{background:linear-gradient(135deg,#16213e,#1a1a3e);border:2px solid #f39c12;border-radius:16px;padding:20px;text-align:center;margin:6px 0}
+.q-cat{font-size:.78em;color:#f39c12;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.q-text{font-size:1.1em;line-height:1.6;margin-bottom:6px}
+.q-num{font-size:.8em;color:#888;margin-bottom:10px}
+
+/* Answer options */
+.opts{display:flex;flex-direction:column;gap:10px;margin:8px 0}
+.opt-btn{padding:16px 18px;border:2px solid rgba(243,156,18,.3);border-radius:12px;background:linear-gradient(135deg,#16213e,#1a1a3e);color:#fff;font-size:1em;cursor:pointer;transition:all .3s;min-height:52px;touch-action:manipulation;text-align:left;display:flex;align-items:center;gap:10px}
+.opt-btn:active{transform:scale(.97)}
+.opt-btn .letter{color:#f39c12;font-weight:bold;font-size:1.1em;min-width:24px}
+.opt-btn.correct{background:linear-gradient(135deg,#1b5e20,#388e3c)!important;border-color:#66bb6a!important}
+.opt-btn.wrong{background:linear-gradient(135deg,#b71c1c,#d32f2f)!important;border-color:#ef5350!important}
+.opt-btn.reveal{border-color:#66bb6a!important}
+.opt-btn.disabled{pointer-events:none;opacity:.7}
+
+/* Explanation */
+.explanation{background:rgba(243,156,18,.12);border-left:4px solid #f39c12;border-radius:0 10px 10px 0;padding:14px 16px;margin:10px 0;font-size:.92em;line-height:1.5;text-align:left;display:none}
+.explanation strong{color:#f39c12}
+.btn-next{padding:14px 36px;border:none;border-radius:12px;font-size:1.05em;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#f39c12,#e67e22);color:#000;min-height:48px;touch-action:manipulation;margin-top:8px;display:none}
+.btn-next:active{transform:scale(.95)}
+
+/* Results */
+.results{text-align:center}
+.results h2{color:#f39c12;font-size:1.6em;margin-bottom:12px}
+.score-big{font-size:3em;font-weight:bold;color:#f39c12;margin:10px 0}
+.score-pct{font-size:1.3em;color:#ccc;margin-bottom:15px}
+.score-msg{font-size:1.05em;margin:10px 0 20px;line-height:1.5;color:#ddd}
+.btn-main{padding:16px 36px;border:none;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#f39c12,#e67e22);color:#000;min-height:48px;touch-action:manipulation;margin:6px}
+.btn-main:active{transform:scale(.95)}
+.btn-secondary{padding:14px 30px;border:2px solid #f39c12;border-radius:12px;font-size:1em;font-weight:600;cursor:pointer;background:transparent;color:#f39c12;min-height:48px;touch-action:manipulation;margin:6px}
+
+/* Wrong answers review */
+.review-section{margin-top:20px;text-align:left}
+.review-section h3{color:#f39c12;margin-bottom:10px;font-size:1.1em}
+.review-item{background:rgba(255,255,255,.05);border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid #e74c3c}
+.review-item .ri-q{font-weight:600;margin-bottom:6px;font-size:.95em}
+.review-item .ri-wrong{color:#e74c3c;font-size:.88em}
+.review-item .ri-correct{color:#66bb6a;font-size:.88em}
+.review-item .ri-exp{color:#aaa;font-size:.82em;margin-top:4px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">🏠 Menu</a>
+
+<h1>🔢 CIFRAS CLAVE</h1>
+<p class="subtitle">Numeros, temperaturas, escalas y constantes TCAE</p>
+
+<div class="container" id="container">
+  <!-- Start screen -->
+  <div id="startScreen">
+    <p style="text-align:center;color:#ccc;margin:8px 0;font-size:.95em">Elige una categoria para empezar:</p>
+    <div class="cat-grid">
+      <div class="cat-btn" onclick="startGame('temperaturas')"><span class="cat-icon">🌡️</span>Temperaturas</div>
+      <div class="cat-btn" onclick="startGame('constantes')"><span class="cat-icon">💓</span>Constantes Vitales</div>
+      <div class="cat-btn" onclick="startGame('volumenes')"><span class="cat-icon">💧</span>Volumenes</div>
+      <div class="cat-btn" onclick="startGame('tiempos')"><span class="cat-icon">⏱️</span>Tiempos/Plazos</div>
+      <div class="cat-btn" onclick="startGame('inyecciones')"><span class="cat-icon">💉</span>Inyecciones</div>
+      <div class="cat-btn" onclick="startGame('posiciones')"><span class="cat-icon">🛏️</span>Posiciones</div>
+      <div class="cat-btn" onclick="startGame('legislacion')"><span class="cat-icon">📜</span>Legislacion</div>
+      <div class="cat-btn" onclick="startGame('escalas')"><span class="cat-icon">📊</span>Escalas</div>
+      <div class="cat-btn" onclick="startGame('nutricion')"><span class="cat-icon">🍎</span>Nutricion</div>
+      <div class="cat-btn todas" onclick="startGame('todas')"><span class="cat-icon">⭐</span>TODAS LAS CATEGORIAS</div>
+    </div>
+  </div>
+
+  <!-- Quiz screen -->
+  <div id="quizScreen" class="hidden">
+    <div class="stats">
+      <span id="scoreLabel">Aciertos: 0/0</span>
+      <span id="qCounter">Pregunta 1/10</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    <div class="q-box">
+      <div class="q-cat" id="qCat"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="opts" id="optsContainer"></div>
+    <div class="explanation" id="explanation"></div>
+    <button class="btn-next hidden" id="btnNext" onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <!-- Results screen -->
+  <div id="resultsScreen" class="hidden"></div>
+</div>
+
+<script>
+const cifras = [
+  // ===== TEMPERATURAS =====
+  {q:"¿Por debajo de que temperatura se considera hipotermia?", a:["< 35°C","< 36°C","< 34°C","< 37°C"], c:0, e:"La hipotermia se define como temperatura corporal inferior a 35°C.", cat:"temperaturas"},
+  {q:"¿Cual es el rango de temperatura corporal normal?", a:["36 - 37°C","35 - 36°C","37 - 38°C","36,5 - 37,5°C"], c:0, e:"La temperatura corporal normal se situa entre 36 y 37°C.", cat:"temperaturas"},
+  {q:"¿Entre que valores de temperatura se considera febricula?", a:["37 - 38°C","36 - 37°C","38 - 39°C","37,5 - 38,5°C"], c:0, e:"La febricula se situa entre 37 y 38°C. No se considera fiebre.", cat:"temperaturas"},
+  {q:"¿A partir de que temperatura se considera fiebre?", a:["38°C","37°C","37,5°C","39°C"], c:0, e:"La fiebre se define a partir de 38°C (≥ 38°C).", cat:"temperaturas"},
+  {q:"¿A partir de que temperatura se habla de hiperpirexia?", a:["> 41°C","> 40°C","> 42°C","> 39°C"], c:0, e:"La hiperpirexia (> 41°C) es una emergencia medica.", cat:"temperaturas"},
+  {q:"¿A que temperatura debe estar el agua del bano del paciente encamado?", a:["37 - 40°C","35 - 37°C","40 - 42°C","32 - 35°C"], c:0, e:"El agua del bano encamado debe estar entre 37 y 40°C, similar a la temperatura corporal.", cat:"temperaturas"},
+  {q:"¿A que temperatura se administra el enema de limpieza?", a:["35 - 37°C","37 - 40°C","32 - 35°C","38 - 40°C"], c:0, e:"El enema de limpieza se administra a temperatura corporal: 35 - 37°C.", cat:"temperaturas"},
+  {q:"¿A que temperatura funciona el autoclave estandar?", a:["121°C","134°C","160°C","100°C"], c:0, e:"El autoclave estandar funciona a 121°C durante 20 minutos a 1 atm extra de presion.", cat:"temperaturas"},
+  {q:"¿A que temperatura funciona el autoclave flash (priones)?", a:["134°C","121°C","160°C","145°C"], c:0, e:"El autoclave flash funciona a 134°C durante 18 minutos. Se usa para priones.", cat:"temperaturas"},
+  {q:"¿Cual es la temperatura del calor seco (Poupinel)?", a:["160-180°C","121°C","134°C","200°C"], c:0, e:"La esterilizacion por calor seco (Poupinel) se realiza a 160-180°C durante 1-2 horas.", cat:"temperaturas"},
+  {q:"¿A que temperatura se conservan los medicamentos a temperatura ambiente?", a:["15-25°C","2-8°C","10-15°C","25-30°C"], c:0, e:"Los medicamentos se conservan a temperatura ambiente entre 15 y 25°C.", cat:"temperaturas"},
+  {q:"¿A que temperatura se conservan en nevera la insulina y las vacunas?", a:["2-8°C","0-4°C","8-12°C","15-25°C"], c:0, e:"La nevera de medicamentos se mantiene entre 2 y 8°C para conservar insulina, vacunas, etc.", cat:"temperaturas"},
+  {q:"¿Cuanto tiempo dura el ciclo de autoclave estandar a 121°C?", a:["20 minutos","15 minutos","30 minutos","10 minutos"], c:0, e:"El autoclave estandar funciona a 121°C durante 20 minutos.", cat:"temperaturas"},
+  {q:"¿Cuanto dura la esterilizacion por calor seco (Poupinel)?", a:["1-2 horas","30 minutos","20 minutos","3 horas"], c:0, e:"La esterilizacion por calor seco dura 1-2 horas a 160-180°C.", cat:"temperaturas"},
+
+  // ===== CONSTANTES VITALES =====
+  {q:"¿Cual es la frecuencia cardiaca normal en adultos?", a:["60-100 lpm","40-60 lpm","80-120 lpm","100-140 lpm"], c:0, e:"La frecuencia cardiaca normal es 60-100 latidos por minuto.", cat:"constantes"},
+  {q:"¿Cuando se habla de bradicardia?", a:["< 60 lpm","< 80 lpm","< 50 lpm","< 100 lpm"], c:0, e:"La bradicardia es una frecuencia cardiaca inferior a 60 latidos por minuto.", cat:"constantes"},
+  {q:"¿Cuando se habla de taquicardia?", a:["> 100 lpm","> 80 lpm","> 120 lpm","> 90 lpm"], c:0, e:"La taquicardia es una frecuencia cardiaca superior a 100 latidos por minuto.", cat:"constantes"},
+  {q:"¿Cual es la frecuencia respiratoria normal en adultos?", a:["12-20 rpm","8-12 rpm","20-30 rpm","16-24 rpm"], c:0, e:"La frecuencia respiratoria normal es 12-20 respiraciones por minuto.", cat:"constantes"},
+  {q:"¿Cuando se habla de bradipnea?", a:["< 12 rpm","< 20 rpm","< 8 rpm","< 16 rpm"], c:0, e:"La bradipnea es una frecuencia respiratoria inferior a 12 respiraciones por minuto.", cat:"constantes"},
+  {q:"¿Cuando se habla de taquipnea?", a:["> 20 rpm","> 12 rpm","> 30 rpm","> 16 rpm"], c:0, e:"La taquipnea es una frecuencia respiratoria superior a 20 respiraciones por minuto.", cat:"constantes"},
+  {q:"¿Cual es el valor aproximado normal de tension arterial sistolica?", a:["120 mmHg","140 mmHg","100 mmHg","130 mmHg"], c:0, e:"La tension arterial sistolica normal es aproximadamente 120 mmHg.", cat:"constantes"},
+  {q:"¿Cual es el valor aproximado normal de tension arterial diastolica?", a:["80 mmHg","90 mmHg","70 mmHg","60 mmHg"], c:0, e:"La tension arterial diastolica normal es aproximadamente 80 mmHg.", cat:"constantes"},
+  {q:"¿A partir de que valor de TA sistolica se considera hipertension?", a:["≥ 140 mmHg","≥ 130 mmHg","≥ 150 mmHg","≥ 120 mmHg"], c:0, e:"Se considera hipertension a partir de una TA sistolica ≥ 140 mmHg.", cat:"constantes"},
+  {q:"¿A partir de que valor de TA diastolica se considera hipertension?", a:["≥ 90 mmHg","≥ 80 mmHg","≥ 100 mmHg","≥ 85 mmHg"], c:0, e:"Se considera hipertension a partir de una TA diastolica ≥ 90 mmHg.", cat:"constantes"},
+  {q:"¿Cual es el rango normal de saturacion de oxigeno (SpO2)?", a:["95-100%","90-95%","85-100%","92-98%"], c:0, e:"La saturacion de oxigeno normal es del 95 al 100%.", cat:"constantes"},
+  {q:"¿Por debajo de que valor de SpO2 se considera hipoxemia grave?", a:["< 90%","< 95%","< 85%","< 92%"], c:0, e:"Por debajo del 90% de SpO2 se considera hipoxemia grave.", cat:"constantes"},
+  {q:"¿Cual es el rango normal de glucemia basal?", a:["70-110 mg/dl","80-120 mg/dl","60-100 mg/dl","90-130 mg/dl"], c:0, e:"La glucemia basal normal esta entre 70 y 110 mg/dl.", cat:"constantes"},
+  {q:"¿Por debajo de que valor de glucemia se habla de hipoglucemia?", a:["< 70 mg/dl","< 80 mg/dl","< 60 mg/dl","< 50 mg/dl"], c:0, e:"La hipoglucemia se define como glucemia inferior a 70 mg/dl.", cat:"constantes"},
+  {q:"¿A partir de que glucemia basal se sospecha diabetes?", a:["> 126 mg/dl","> 110 mg/dl","> 140 mg/dl","> 100 mg/dl"], c:0, e:"Se sospecha diabetes con glucemia basal superior a 126 mg/dl.", cat:"constantes"},
+
+  // ===== VOLUMENES Y CANTIDADES =====
+  {q:"¿Cual es la diuresis normal diaria?", a:["1.500-2.000 ml/dia","500-1.000 ml/dia","2.500-3.000 ml/dia","1.000-1.200 ml/dia"], c:0, e:"La diuresis normal es de 1.500 a 2.000 ml/dia (aprox. 1 ml/kg/hora).", cat:"volumenes"},
+  {q:"¿Por debajo de que volumen urinario diario se habla de oliguria?", a:["< 400 ml/dia","< 500 ml/dia","< 200 ml/dia","< 800 ml/dia"], c:0, e:"La oliguria se define como diuresis inferior a 400 ml/dia.", cat:"volumenes"},
+  {q:"¿Por debajo de que volumen urinario diario se habla de anuria?", a:["< 100 ml/dia","< 200 ml/dia","< 50 ml/dia","< 400 ml/dia"], c:0, e:"La anuria se define como diuresis inferior a 100 ml/dia.", cat:"volumenes"},
+  {q:"¿A partir de que volumen urinario diario se habla de poliuria?", a:["> 3.000 ml/dia","> 2.000 ml/dia","> 2.500 ml/dia","> 4.000 ml/dia"], c:0, e:"La poliuria se define como diuresis superior a 3.000 ml/dia.", cat:"volumenes"},
+  {q:"¿Cual es la capacidad vesical normal?", a:["300-500 ml","100-200 ml","500-800 ml","200-300 ml"], c:0, e:"La capacidad vesical normal es de 300 a 500 ml.", cat:"volumenes"},
+  {q:"¿Cuantas gotas equivalen a 1 ml en un goteo IV estandar?", a:["20 gotas","15 gotas","10 gotas","60 gotas"], c:0, e:"En goteo IV estandar, 1 ml equivale a 20 gotas.", cat:"volumenes"},
+  {q:"¿Cuantas microgotas equivalen a 1 ml en un microgotero?", a:["60 microgotas","20 microgotas","30 microgotas","100 microgotas"], c:0, e:"En un microgotero, 1 ml equivale a 60 microgotas.", cat:"volumenes"},
+  {q:"¿Como se comprueba la posicion correcta de una SNG?", a:["Aspirar contenido + pH < 5","Insuflar aire + auscultar","Radiografia de control","Observar si sale liquido"], c:0, e:"La posicion gastrica de la SNG se comprueba aspirando contenido y verificando pH < 5.", cat:"volumenes"},
+  {q:"¿Cuanto tiempo maximo debe durar cada aspiracion de secreciones?", a:["< 15 segundos","< 30 segundos","< 10 segundos","< 20 segundos"], c:0, e:"Cada aspiracion de secreciones debe durar menos de 15 segundos para evitar hipoxia.", cat:"volumenes"},
+  {q:"¿Cual es la diuresis normal por hora y kilo de peso?", a:["1 ml/kg/hora","2 ml/kg/hora","0,5 ml/kg/hora","3 ml/kg/hora"], c:0, e:"La diuresis normal es aproximadamente 1 ml/kg/hora.", cat:"volumenes"},
+
+  // ===== TIEMPOS IMPORTANTES =====
+  {q:"¿Cada cuanto tiempo se realizan los cambios posturales para prevenir UPP?", a:["Cada 2-3 horas","Cada 4-6 horas","Cada 1 hora","Cada 8 horas"], c:0, e:"Los cambios posturales para prevencion de UPP se realizan cada 2-3 horas.", cat:"tiempos"},
+  {q:"¿Cuanto dura el lavado de manos social (con jabon)?", a:["40-60 segundos","20-30 segundos","10-15 segundos","1-2 minutos"], c:0, e:"El lavado de manos social con jabon normal dura 40-60 segundos.", cat:"tiempos"},
+  {q:"¿Cuanto dura el lavado de manos quirurgico?", a:["3-5 minutos","1-2 minutos","40-60 segundos","5-10 minutos"], c:0, e:"El lavado de manos quirurgico dura 3-5 minutos con cepillo y antiseptico.", cat:"tiempos"},
+  {q:"¿Cuanto dura la friccion con solucion hidroalcoholica?", a:["20-30 segundos","40-60 segundos","10-15 segundos","1-2 minutos"], c:0, e:"La friccion con solucion hidroalcoholica dura 20-30 segundos.", cat:"tiempos"},
+  {q:"¿Cuanto dura cada pasada de aspiracion de secreciones?", a:["10-15 segundos max","20-30 segundos","5 segundos","30-60 segundos"], c:0, e:"Cada pasada de aspiracion de secreciones dura 10-15 segundos maximo.", cat:"tiempos"},
+  {q:"¿Cual es el ritmo de compresiones en RCP?", a:["100-120/min","60-80/min","80-100/min","120-140/min"], c:0, e:"En RCP, el ritmo de compresiones es de 100-120 por minuto con profundidad de 5-6 cm.", cat:"tiempos"},
+  {q:"¿Cual es la profundidad de las compresiones toracicas en RCP adulto?", a:["5-6 cm","3-4 cm","7-8 cm","4-5 cm"], c:0, e:"Las compresiones en RCP adulto deben tener una profundidad de 5-6 cm.", cat:"tiempos"},
+  {q:"¿Cuanto tiempo minimo se debe conservar la historia clinica?", a:["Minimo 5 anos desde el alta","Minimo 10 anos","Minimo 3 anos","Minimo 15 anos"], c:0, e:"La historia clinica se conserva un minimo de 5 anos desde el alta.", cat:"tiempos"},
+  {q:"¿Cuando comienza la rigidez cadaverica?", a:["A las 3-4 horas","A las 6-8 horas","Inmediatamente","A las 12 horas"], c:0, e:"La rigidez cadaverica comienza a las 3-4 horas y alcanza su maximo a las 12-24 horas.", cat:"tiempos"},
+  {q:"¿Cuanto dura el autoclave flash a 134°C para priones?", a:["18 minutos","7 minutos","20 minutos","30 minutos"], c:0, e:"Para priones, el autoclave a 134°C funciona durante 18 minutos.", cat:"tiempos"},
+
+  // ===== ANGULOS DE INYECCION =====
+  {q:"¿Con que angulo se administra una inyeccion intradermica (ID)?", a:["15 grados","45 grados","90 grados","30 grados"], c:0, e:"La via intradermica se administra con un angulo de 15 grados, con bisel hacia arriba.", cat:"inyecciones"},
+  {q:"¿Con que angulo se administra una inyeccion subcutanea (SC)?", a:["45 grados","15 grados","90 grados","30 grados"], c:0, e:"La via subcutanea se administra con un angulo de 45 grados, con pellizco.", cat:"inyecciones"},
+  {q:"¿Con que angulo se administra una inyeccion intramuscular (IM)?", a:["90 grados","45 grados","60 grados","30 grados"], c:0, e:"La via intramuscular se administra con un angulo de 90 grados.", cat:"inyecciones"},
+  {q:"¿Con que angulo se administra una inyeccion intravenosa (IV)?", a:["15-30 grados","45 grados","90 grados","0 grados"], c:0, e:"La via intravenosa se administra con un angulo de 15-30 grados.", cat:"inyecciones"},
+  {q:"¿Que calibre de aguja se usa para via intradermica?", a:["25-27G","21-23G","18-20G","14-16G"], c:0, e:"Para via intradermica se usa aguja de calibre 25-27G con bisel hacia arriba.", cat:"inyecciones"},
+  {q:"¿Que calibre de aguja se usa para via intramuscular?", a:["21-23G","25-27G","18-20G","14-16G"], c:0, e:"Para via intramuscular se usa aguja de calibre 21-23G, larga.", cat:"inyecciones"},
+  {q:"¿Que calibre de aguja se usa para via subcutanea?", a:["25-27G corta","21-23G larga","18-20G","14-16G"], c:0, e:"Para via subcutanea se usa aguja de calibre 25-27G corta.", cat:"inyecciones"},
+  {q:"¿En que via de inyeccion se realiza la tecnica del pellizco?", a:["Subcutanea","Intradermica","Intramuscular","Intravenosa"], c:0, e:"La tecnica del pellizco se utiliza en la via subcutanea (45 grados).", cat:"inyecciones"},
+  {q:"¿En que posicion se coloca el bisel en la inyeccion intradermica?", a:["Bisel hacia arriba","Bisel hacia abajo","Bisel lateral","Indiferente"], c:0, e:"En la inyeccion intradermica, el bisel se coloca hacia arriba con angulo de 15 grados.", cat:"inyecciones"},
+
+  // ===== POSICIONES DEL PACIENTE =====
+  {q:"¿A cuantos grados se eleva el cabecero en la posicion Semi-Fowler?", a:["30 grados","45 grados","60 grados","90 grados"], c:0, e:"En Semi-Fowler el cabecero se eleva 30 grados. Se usa en disnea leve.", cat:"posiciones"},
+  {q:"¿A cuantos grados se eleva el cabecero en la posicion Fowler?", a:["45 grados","30 grados","60 grados","90 grados"], c:0, e:"En Fowler el cabecero se eleva 45 grados. Se usa para alimentacion y disnea.", cat:"posiciones"},
+  {q:"¿A cuantos grados se eleva el cabecero en la posicion Fowler alta?", a:["90 grados","45 grados","60 grados","120 grados"], c:0, e:"En Fowler alta el cabecero se eleva a 90 grados. Se usa en disnea severa.", cat:"posiciones"},
+  {q:"¿Cuantos grados se elevan los pies en Trendelenburg?", a:["15-30 grados","10-15 grados","30-45 grados","45-60 grados"], c:0, e:"En Trendelenburg los pies se elevan 15-30 grados. Se usa en shock y lipotimia.", cat:"posiciones"},
+  {q:"¿Para que se usa la posicion de Trendelenburg?", a:["Shock y lipotimia","Alimentacion","Disnea severa","Cirugia abdominal"], c:0, e:"La posicion de Trendelenburg (pies 15-30 grados arriba) se usa en shock y lipotimia.", cat:"posiciones"},
+  {q:"¿Para que se usa la posicion Anti-Trendelenburg?", a:["Cirugia abdominal","Shock","Enemas","Disnea leve"], c:0, e:"La posicion Anti-Trendelenburg (cabeza 15-30 grados arriba) se usa en cirugia abdominal.", cat:"posiciones"},
+  {q:"¿En que posicion se coloca al paciente para administrar un enema?", a:["Sims (lateral izquierdo)","Fowler","Trendelenburg","Decubito prono"], c:0, e:"Para enemas se coloca al paciente en posicion de Sims: lateral izquierdo con pierna flexionada.", cat:"posiciones"},
+  {q:"¿Para que se usa la posicion de litotomia?", a:["Sondaje mujer y ginecologia","Cirugia abdominal","Alimentacion","Shock"], c:0, e:"La litotomia (supino + estribos) se usa para sondaje de la mujer y exploraciones ginecologicas.", cat:"posiciones"},
+  {q:"¿Para que se usa la posicion de Roser o Proetz?", a:["Intubacion","Enemas","Alimentacion","Cirugia abdominal"], c:0, e:"La posicion de Roser/Proetz (cabeza colgando) se usa para intubacion.", cat:"posiciones"},
+  {q:"¿Que posicion se usa para la alimentacion del paciente?", a:["Fowler (45°)","Trendelenburg","Decubito lateral","Semi-Fowler (30°)"], c:0, e:"Para alimentar al paciente se usa la posicion Fowler con el cabecero a 45 grados.", cat:"posiciones"},
+
+  // ===== LEGISLACION =====
+  {q:"¿En que ano se aprobo la Constitucion Espanola?", a:["1978","1982","1975","1986"], c:0, e:"La Constitucion Espanola se aprobo en 1978 (referendum el 6 de diciembre).", cat:"legislacion"},
+  {q:"¿Que articulo de la CE reconoce el derecho a la proteccion de la salud?", a:["Articulo 43","Articulo 14","Articulo 149","Articulo 50"], c:0, e:"El articulo 43 de la Constitucion Espanola reconoce el derecho a la proteccion de la salud.", cat:"legislacion"},
+  {q:"¿Que articulo de la CE establece las bases de la sanidad como competencia estatal?", a:["Articulo 149.1.16","Articulo 43","Articulo 148","Articulo 139"], c:0, e:"El articulo 149.1.16 CE establece las bases y coordinacion de la sanidad como competencia del Estado.", cat:"legislacion"},
+  {q:"¿En que ano se aprobo la Ley General de Sanidad?", a:["1986","1978","1995","2002"], c:0, e:"La Ley General de Sanidad (Ley 14/1986) se aprobo en 1986.", cat:"legislacion"},
+  {q:"¿Cual es el numero de la Ley General de Sanidad?", a:["Ley 14/1986","Ley 16/2003","Ley 41/2002","Ley 33/2011"], c:0, e:"La Ley General de Sanidad es la Ley 14/1986.", cat:"legislacion"},
+  {q:"¿En que ano se aprobo la Ley de Prevencion de Riesgos Laborales?", a:["1995","1986","2003","2001"], c:0, e:"La Ley de Prevencion de Riesgos Laborales (Ley 31/1995) se aprobo en 1995.", cat:"legislacion"},
+  {q:"¿Cual es el numero de la Ley de PRL?", a:["Ley 31/1995","Ley 14/1986","Ley 55/2003","Ley 41/2002"], c:0, e:"La Ley de Prevencion de Riesgos Laborales es la Ley 31/1995.", cat:"legislacion"},
+  {q:"¿Que ley creo el Servicio Extremeno de Salud (SES)?", a:["Ley 10/2001","Ley 14/1986","Ley 16/2003","Ley 55/2003"], c:0, e:"La Ley 10/2001 de Salud de Extremadura creo el SES.", cat:"legislacion"},
+  {q:"¿En que ano se creo el Servicio Extremeno de Salud?", a:["2001","2003","1986","1995"], c:0, e:"El SES se creo con la Ley 10/2001 de Salud de Extremadura.", cat:"legislacion"},
+  {q:"¿Que ley regula la autonomia del paciente?", a:["Ley 41/2002","Ley 14/1986","Ley 16/2003","Ley 33/2011"], c:0, e:"La Ley 41/2002 regula la autonomia del paciente y derechos de informacion y documentacion clinica.", cat:"legislacion"},
+  {q:"¿En que ano se aprobo la Ley de Autonomia del Paciente?", a:["2002","2003","1986","2011"], c:0, e:"La Ley de Autonomia del Paciente (Ley 41/2002) se aprobo en 2002.", cat:"legislacion"},
+  {q:"¿Que ley establece la cohesion del Sistema Nacional de Salud?", a:["Ley 16/2003","Ley 14/1986","Ley 41/2002","Ley 33/2011"], c:0, e:"La Ley 16/2003 de Cohesion y Calidad del Sistema Nacional de Salud.", cat:"legislacion"},
+  {q:"¿Que es la Ley 55/2003?", a:["Estatuto Marco del personal estatutario","Ley General de Sanidad","Ley de PRL","Ley de Autonomia del Paciente"], c:0, e:"La Ley 55/2003 es el Estatuto Marco del personal estatutario de los servicios de salud.", cat:"legislacion"},
+  {q:"¿En que ano se aprobo el Estatuto Marco?", a:["2003","2002","1995","2011"], c:0, e:"El Estatuto Marco (Ley 55/2003) se aprobo en 2003.", cat:"legislacion"},
+  {q:"¿Que ley es la Ley 33/2011?", a:["Ley General de Salud Publica","Ley de Cohesion del SNS","Ley de Autonomia del Paciente","Ley General de Sanidad"], c:0, e:"La Ley 33/2011 es la Ley General de Salud Publica.", cat:"legislacion"},
+  {q:"¿En que ano se aprobo el Estatuto de Autonomia de Extremadura?", a:["1983","1978","1986","1995"], c:0, e:"El Estatuto de Autonomia de Extremadura (LO 1/1983) se aprobo en 1983, reformado en 2011.", cat:"legislacion"},
+  {q:"¿En que ano se reformo el Estatuto de Autonomia de Extremadura?", a:["2011","2003","2007","1999"], c:0, e:"El Estatuto de Autonomia de Extremadura se reformo en 2011.", cat:"legislacion"},
+  {q:"¿Cuando fue el referendum de la Constitucion Espanola?", a:["6 de diciembre de 1978","6 de diciembre de 1975","29 de diciembre de 1978","1 de enero de 1979"], c:0, e:"El referendum de la Constitucion Espanola fue el 6 de diciembre de 1978.", cat:"legislacion"},
+
+  // ===== ESCALAS DE VALORACION =====
+  {q:"¿Que mide la escala de Norton?", a:["Riesgo de UPP","Actividades basicas de la vida diaria","Nivel de consciencia","Dolor"], c:0, e:"La escala de Norton mide el riesgo de ulceras por presion (UPP). Riesgo si ≤ 14.", cat:"escalas"},
+  {q:"¿A partir de que puntuacion en la escala Norton existe riesgo de UPP?", a:["≤ 14 puntos","≥ 14 puntos","≤ 20 puntos","≥ 20 puntos"], c:0, e:"En la escala de Norton hay riesgo de UPP con puntuacion ≤ 14.", cat:"escalas"},
+  {q:"¿Que mide la escala de Braden?", a:["Riesgo de UPP","Dolor","ABVD","Riesgo de caidas"], c:0, e:"La escala de Braden mide el riesgo de UPP, como alternativa a la escala de Norton.", cat:"escalas"},
+  {q:"¿A partir de que puntuacion en la escala Braden hay alto riesgo de UPP?", a:["< 13 puntos","< 14 puntos","< 18 puntos","< 10 puntos"], c:0, e:"En la escala de Braden hay alto riesgo de UPP con puntuacion < 13.", cat:"escalas"},
+  {q:"¿Que mide la escala de Barthel?", a:["Actividades basicas de la vida diaria (ABVD)","Riesgo de UPP","Nivel de consciencia","Actividades instrumentales"], c:0, e:"La escala de Barthel mide las ABVD. Rango 0-100, dependencia total con < 20.", cat:"escalas"},
+  {q:"¿Cual es el rango de puntuacion de la escala de Barthel?", a:["0-100 puntos","0-10 puntos","0-15 puntos","0-50 puntos"], c:0, e:"La escala de Barthel va de 0 a 100 puntos. Menos de 20 indica dependencia total.", cat:"escalas"},
+  {q:"¿Por debajo de que puntuacion en Barthel se considera dependencia total?", a:["< 20 puntos","< 40 puntos","< 50 puntos","< 10 puntos"], c:0, e:"En la escala de Barthel, una puntuacion < 20 indica dependencia total.", cat:"escalas"},
+  {q:"¿Que mide la escala de Lawton?", a:["Actividades instrumentales de la vida diaria (AIVD)","ABVD","Riesgo de UPP","Deterioro cognitivo"], c:0, e:"La escala de Lawton y Brody mide las AIVD. Rango 0-8 puntos.", cat:"escalas"},
+  {q:"¿Cual es el rango de puntuacion de la escala de Lawton?", a:["0-8 puntos","0-100 puntos","0-15 puntos","0-10 puntos"], c:0, e:"La escala de Lawton va de 0 a 8 puntos para medir actividades instrumentales.", cat:"escalas"},
+  {q:"¿Que mide la escala de Glasgow?", a:["Nivel de consciencia","Dolor","Riesgo de UPP","ABVD"], c:0, e:"La escala de Glasgow mide el nivel de consciencia. Rango 3-15, coma < 8.", cat:"escalas"},
+  {q:"¿Cual es el rango de puntuacion de la escala de Glasgow?", a:["3-15 puntos","0-15 puntos","1-10 puntos","0-100 puntos"], c:0, e:"La escala de Glasgow va de 3 (minimo) a 15 (maximo).", cat:"escalas"},
+  {q:"¿Por debajo de que puntuacion en Glasgow se considera coma?", a:["< 8 puntos","< 10 puntos","< 5 puntos","< 12 puntos"], c:0, e:"En la escala de Glasgow, una puntuacion < 8 indica estado de coma.", cat:"escalas"},
+  {q:"¿Que mide la escala EVA?", a:["Dolor (0-10)","Nivel de consciencia","Riesgo de UPP","ABVD"], c:0, e:"La Escala Visual Analogica (EVA) mide el dolor de 0 a 10.", cat:"escalas"},
+  {q:"¿Cual es el rango de la escala EVA de dolor?", a:["0-10","0-100","0-5","1-15"], c:0, e:"La escala EVA de dolor va de 0 (sin dolor) a 10 (dolor maximo).", cat:"escalas"},
+  {q:"¿Que mide la escala de Pfeiffer?", a:["Deterioro cognitivo","Dolor","Riesgo de UPP","Riesgo de caidas"], c:0, e:"La escala de Pfeiffer mide el deterioro cognitivo. Deterioro si ≥ 5 errores.", cat:"escalas"},
+  {q:"¿A partir de cuantos errores en Pfeiffer se considera deterioro cognitivo?", a:["≥ 5 errores","≥ 3 errores","≥ 7 errores","≥ 10 errores"], c:0, e:"En la escala de Pfeiffer, ≥ 5 errores indican deterioro cognitivo.", cat:"escalas"},
+  {q:"¿Que mide la escala de Downton?", a:["Riesgo de caidas","Deterioro cognitivo","Riesgo de UPP","ABVD"], c:0, e:"La escala de Downton mide el riesgo de caidas. Alto riesgo si ≥ 3.", cat:"escalas"},
+  {q:"¿A partir de que puntuacion en Downton hay alto riesgo de caidas?", a:["≥ 3 puntos","≥ 5 puntos","≥ 7 puntos","≥ 2 puntos"], c:0, e:"En la escala de Downton, ≥ 3 puntos indican alto riesgo de caidas.", cat:"escalas"},
+
+  // ===== NUTRICION =====
+  {q:"¿Cuantas calorias diarias necesita un adulto aproximadamente?", a:["2.000-2.500 kcal","1.000-1.500 kcal","3.000-3.500 kcal","1.500-1.800 kcal"], c:0, e:"Un adulto necesita aproximadamente 2.000-2.500 kcal diarias segun actividad.", cat:"nutricion"},
+  {q:"¿Que porcentaje de la dieta deben representar las proteinas?", a:["10-15%","25-30%","55-60%","5-10%"], c:0, e:"Las proteinas deben representar el 10-15% de la dieta (4 kcal/g).", cat:"nutricion"},
+  {q:"¿Que porcentaje de la dieta deben representar los hidratos de carbono?", a:["55-60%","25-30%","10-15%","40-45%"], c:0, e:"Los hidratos de carbono deben representar el 55-60% de la dieta (4 kcal/g).", cat:"nutricion"},
+  {q:"¿Que porcentaje de la dieta deben representar las grasas?", a:["25-30%","55-60%","10-15%","40-45%"], c:0, e:"Las grasas deben representar el 25-30% de la dieta (9 kcal/g).", cat:"nutricion"},
+  {q:"¿Cuantas kcal aporta 1 gramo de proteinas?", a:["4 kcal","9 kcal","7 kcal","2 kcal"], c:0, e:"Las proteinas aportan 4 kcal por gramo.", cat:"nutricion"},
+  {q:"¿Cuantas kcal aporta 1 gramo de grasas?", a:["9 kcal","4 kcal","7 kcal","2 kcal"], c:0, e:"Las grasas aportan 9 kcal por gramo, el macronutriente mas calorico.", cat:"nutricion"},
+  {q:"¿Cuantas kcal aporta 1 gramo de hidratos de carbono?", a:["4 kcal","9 kcal","7 kcal","2 kcal"], c:0, e:"Los hidratos de carbono aportan 4 kcal por gramo, igual que las proteinas.", cat:"nutricion"},
+  {q:"¿Cuanta agua debe beber un adulto al dia?", a:["1,5-2 litros","0,5-1 litro","3-4 litros","1-1,5 litros"], c:0, e:"Un adulto debe beber 1,5-2 litros de agua al dia (mas en ancianos).", cat:"nutricion"},
+  {q:"¿Cuanta fibra diaria se recomienda?", a:["25-30 g/dia","10-15 g/dia","40-50 g/dia","5-10 g/dia"], c:0, e:"Se recomienda consumir 25-30 g de fibra al dia para prevenir el estrenimiento.", cat:"nutricion"},
+  {q:"¿Cual es el rango de IMC normal?", a:["18,5-24,9","20-25","15-20","25-30"], c:0, e:"El IMC normal esta entre 18,5 y 24,9. Por debajo de 18,5 es bajo peso y por encima de 30 es obesidad.", cat:"nutricion"},
+  {q:"¿A partir de que IMC se considera obesidad?", a:["> 30","> 25","> 35","> 28"], c:0, e:"Se considera obesidad a partir de un IMC superior a 30.", cat:"nutricion"},
+  {q:"¿Por debajo de que IMC se considera bajo peso?", a:["< 18,5","< 20","< 16","< 22"], c:0, e:"Se considera bajo peso un IMC inferior a 18,5.", cat:"nutricion"}
+];
+
+// Shuffle answers for each question (keeping track of correct)
+function shuffleQuestion(q) {
+  const correctText = q.a[q.c];
+  const shuffled = [...q.a];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return { ...q, a: shuffled, c: shuffled.indexOf(correctText) };
+}
+
+const catNames = {
+  temperaturas: "Temperaturas",
+  constantes: "Constantes Vitales",
+  volumenes: "Volumenes y Cantidades",
+  tiempos: "Tiempos / Plazos",
+  inyecciones: "Angulos de Inyeccion",
+  posiciones: "Posiciones del Paciente",
+  legislacion: "Legislacion",
+  escalas: "Escalas de Valoracion",
+  nutricion: "Nutricion",
+  todas: "Todas las Categorias"
+};
+
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+let wrongAnswers = [];
+
+function startGame(cat) {
+  let pool;
+  if (cat === 'todas') {
+    pool = [...cifras];
+  } else {
+    pool = cifras.filter(q => q.cat === cat);
+  }
+  // Shuffle pool
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  currentQuestions = pool.map(shuffleQuestion);
+  currentIndex = 0;
+  score = 0;
+  wrongAnswers = [];
+  answered = false;
+
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  document.getElementById('resultsScreen').classList.add('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = currentQuestions[currentIndex];
+  const total = currentQuestions.length;
+
+  document.getElementById('qCat').textContent = catNames[q.cat] || q.cat;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('scoreLabel').textContent = `Aciertos: ${score}/${currentIndex}`;
+  document.getElementById('qCounter').textContent = `Pregunta ${currentIndex + 1}/${total}`;
+  document.getElementById('progressBar').style.width = ((currentIndex / total) * 100) + '%';
+  document.getElementById('explanation').style.display = 'none';
+  document.getElementById('btnNext').classList.add('hidden');
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const container = document.getElementById('optsContainer');
+  container.innerHTML = '';
+  q.a.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    container.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = currentQuestions[currentIndex];
+  const btns = document.querySelectorAll('.opt-btn');
+
+  btns.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.c) btn.classList.add('correct');
+    if (i === idx && idx !== q.c) btn.classList.add('wrong');
+  });
+
+  if (idx === q.c) {
+    score++;
+  } else {
+    wrongAnswers.push({
+      q: q.q,
+      selected: q.a[idx],
+      correct: q.a[q.c],
+      explanation: q.e
+    });
+  }
+
+  document.getElementById('scoreLabel').textContent = `Aciertos: ${score}/${currentIndex + 1}`;
+
+  const expEl = document.getElementById('explanation');
+  expEl.innerHTML = `<strong>${idx === q.c ? '✅ ¡Correcto!' : '❌ Incorrecto'}</strong><br>${q.e}`;
+  expEl.style.display = 'block';
+
+  document.getElementById('btnNext').classList.remove('hidden');
+  document.getElementById('btnNext').textContent = currentIndex < currentQuestions.length - 1 ? 'Siguiente →' : 'Ver resultados →';
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < currentQuestions.length) {
+    showQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('quizScreen').classList.add('hidden');
+  const total = currentQuestions.length;
+  const pct = Math.round((score / total) * 100);
+
+  let emoji, msg;
+  if (pct === 100) { emoji = '🏆'; msg = '¡Perfecto! Dominas todas las cifras clave.'; }
+  else if (pct >= 80) { emoji = '🌟'; msg = '¡Excelente! Casi perfecto, sigue asi.'; }
+  else if (pct >= 60) { emoji = '👍'; msg = 'Bien, pero repasa las que has fallado.'; }
+  else if (pct >= 40) { emoji = '📖'; msg = 'Necesitas repasar bastante. ¡No te rindas!'; }
+  else { emoji = '💪'; msg = 'A estudiar las cifras clave. ¡Tu puedes!'; }
+
+  let html = `<div class="results">
+    <h2>${emoji} Resultados</h2>
+    <div class="score-big">${score}/${total}</div>
+    <div class="score-pct">${pct}% de aciertos</div>
+    <div class="score-msg">${msg}</div>
+    <button class="btn-main" onclick="location.reload()">🔄 Jugar de nuevo</button>
+    <button class="btn-secondary" onclick="goHome()">🏠 Menu</button>`;
+
+  if (wrongAnswers.length > 0) {
+    html += `<div class="review-section"><h3>❌ Respuestas incorrectas (${wrongAnswers.length})</h3>`;
+    wrongAnswers.forEach(w => {
+      html += `<div class="review-item">
+        <div class="ri-q">${w.q}</div>
+        <div class="ri-wrong">Tu respuesta: ${w.selected}</div>
+        <div class="ri-correct">✅ Correcta: ${w.correct}</div>
+        <div class="ri-exp">${w.explanation}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  const resultsScreen = document.getElementById('resultsScreen');
+  resultsScreen.innerHTML = html;
+  resultsScreen.classList.remove('hidden');
+}
+
+function goHome() {
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

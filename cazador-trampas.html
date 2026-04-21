@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Cazador de Trampas - OpoJuegos TCAE</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪤</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);min-height:100vh;color:#fff;display:flex;flex-direction:column;align-items:center;padding:15px;-webkit-tap-highlight-color:transparent;user-select:none}
+a{color:#e74c3c;text-decoration:none}
+.back-btn{align-self:flex-start;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 18px;color:#fff;font-size:.95em;display:inline-flex;align-items:center;gap:6px;transition:all .3s;min-height:44px;min-width:44px}
+.back-btn:active{background:rgba(255,255,255,.15);transform:scale(.95)}
+h1{font-size:1.6em;text-align:center;margin:12px 0 4px;background:linear-gradient(90deg,#e74c3c,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{color:#aaa;font-size:.9em;margin-bottom:15px;text-align:center}
+.container{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;flex:1}
+
+/* Start Screen */
+#startScreen{text-align:center;padding:20px 10px;animation:fadeIn .5s}
+.start-icon{font-size:4em;margin:20px 0 10px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.start-desc{color:#ccc;font-size:.95em;line-height:1.6;margin:15px 0 25px;text-align:left;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:14px;padding:18px}
+.start-desc strong{color:#e74c3c}
+.topic-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:15px 0 25px}
+.topic-chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 14px;font-size:.8em;color:#aaa}
+.btn-start{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border:none;border-radius:16px;padding:18px 50px;font-size:1.15em;font-weight:700;cursor:pointer;transition:all .3s;min-height:56px;box-shadow:0 4px 20px rgba(231,76,60,.35)}
+.btn-start:active{transform:scale(.95);box-shadow:0 2px 10px rgba(231,76,60,.25)}
+
+/* Game Screen */
+#gameScreen{display:none;width:100%;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.top-bar{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:10px;padding:0 2px}
+.stat-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;font-size:.8em;text-align:center}
+.stat-label{color:#888;font-size:.75em;display:block}
+.stat-value{font-weight:700;font-size:1.1em;color:#fff}
+.stat-value.streak{color:#f39c12}
+.progress-wrap{width:100%;background:rgba(255,255,255,.08);border-radius:10px;height:8px;margin-bottom:15px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:10px;transition:width .4s ease;width:0%}
+.topic-badge{background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.3);border-radius:20px;padding:5px 16px;font-size:.8em;font-weight:600;text-align:center;margin-bottom:12px;display:inline-block;align-self:center}
+.statement-card{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 22px;margin-bottom:20px;font-size:1.1em;line-height:1.6;text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center;transition:all .4s}
+.statement-card.correct-border{border-color:#27ae60;background:rgba(39,174,96,.08)}
+.statement-card.trap-border{border-color:#e74c3c;background:rgba(231,76,60,.08)}
+.buttons-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;margin-bottom:15px}
+.btn-answer{border:none;border-radius:16px;padding:20px 10px;font-size:1.05em;font-weight:700;cursor:pointer;transition:all .3s;min-height:60px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.btn-answer:active{transform:scale(.95)}
+.btn-correct{background:linear-gradient(135deg,#27ae60,#219a52);color:#fff;box-shadow:0 4px 15px rgba(39,174,96,.3)}
+.btn-trap{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;box-shadow:0 4px 15px rgba(231,76,60,.3)}
+.btn-answer:disabled{opacity:.5;transform:none!important}
+.btn-answer .emoji{font-size:1.4em}
+.btn-answer .label{font-size:.85em}
+
+/* Feedback */
+.feedback{display:none;border-radius:16px;padding:20px;margin-bottom:15px;animation:fadeIn .3s;width:100%}
+.feedback.show{display:block}
+.feedback.right{background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3)}
+.feedback.wrong{background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.3)}
+.feedback-header{font-weight:700;font-size:1.1em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.feedback.right .feedback-header{color:#2ecc71}
+.feedback.wrong .feedback-header{color:#e74c3c}
+.feedback-text{color:#ccc;font-size:.92em;line-height:1.5}
+.btn-next{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:16px;font-size:1em;font-weight:600;color:#fff;cursor:pointer;width:100%;min-height:52px;transition:all .3s;margin-top:5px}
+.btn-next:active{background:rgba(255,255,255,.18);transform:scale(.97)}
+
+/* Results Screen */
+#resultsScreen{display:none;text-align:center;padding:10px;animation:fadeIn .5s;width:100%}
+.results-icon{font-size:3.5em;margin:15px 0}
+.results-score{font-size:2.2em;font-weight:800;margin:10px 0}
+.results-score .highlight{color:#e74c3c}
+.results-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
+.results-stat{background:rgba(255,255,255,.06);border-radius:14px;padding:14px 8px}
+.results-stat .val{font-size:1.5em;font-weight:700}
+.results-stat .lbl{font-size:.75em;color:#888;margin-top:4px}
+.results-stat.green .val{color:#2ecc71}
+.results-stat.red .val{color:#e74c3c}
+.results-stat.orange .val{color:#f39c12}
+.missed-section{text-align:left;margin:20px 0;background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.15);border-radius:16px;padding:18px}
+.missed-title{font-weight:700;color:#e74c3c;margin-bottom:12px;font-size:1em}
+.missed-item{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.88em;line-height:1.5}
+.missed-item:last-child{border-bottom:none}
+.missed-item .stmt{color:#fff;margin-bottom:4px}
+.missed-item .expl{color:#aaa;font-size:.9em}
+.btn-row{display:flex;gap:12px;margin-top:20px}
+.btn-row button{flex:1;border:none;border-radius:14px;padding:16px;font-size:.95em;font-weight:600;cursor:pointer;min-height:52px;transition:all .3s}
+.btn-row button:active{transform:scale(.95)}
+.btn-retry{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff}
+.btn-review{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)!important;color:#fff}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">🏠 Menu</a>
+
+<h1>🪤 Cazador de Trampas</h1>
+<p class="subtitle">OpoJuegos TCAE — SEPAD 2026</p>
+
+<div class="container">
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <div class="start-icon">🔍</div>
+  <div class="start-desc">
+    <strong>Detecta las trampas tipicas del examen TCAE.</strong><br><br>
+    En el examen real cambian una sola palabra, un numero o cruzan dos conceptos para confundirte. Aqui practicaras con los <strong>errores mas repetidos</strong> en examenes reales.<br><br>
+    Se te mostrara un enunciado. Decide si es <strong>CORRECTO</strong> o si contiene una <strong>TRAMPA</strong>. Despues veras la explicacion.
+  </div>
+  <div class="topic-chips">
+    <span class="topic-chip">Legislacion</span>
+    <span class="topic-chip">Constitucion</span>
+    <span class="topic-chip">Esterilizacion</span>
+    <span class="topic-chip">Aislamientos</span>
+    <span class="topic-chip">Temperaturas</span>
+    <span class="topic-chip">Escalas</span>
+    <span class="topic-chip">Posiciones</span>
+    <span class="topic-chip">Inyecciones</span>
+    <span class="topic-chip">RCP</span>
+    <span class="topic-chip">Inf. Nosocomial</span>
+  </div>
+  <button class="btn-start" onclick="startGame()">Empezar a cazar trampas</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+  <div class="top-bar">
+    <div class="stat-box"><span class="stat-label">Pregunta</span><span class="stat-value" id="qNum">1/80</span></div>
+    <div class="stat-box"><span class="stat-label">Aciertos</span><span class="stat-value" id="scoreVal">0</span></div>
+    <div class="stat-box"><span class="stat-label">Racha</span><span class="stat-value streak" id="streakVal">🔥 0</span></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="topic-badge" id="topicBadge">Tema</div>
+  <div class="statement-card" id="statementCard">
+    Enunciado aqui...
+  </div>
+  <div class="buttons-row" id="answersRow">
+    <button class="btn-answer btn-correct" onclick="answer(false)"><span class="emoji">✅</span><span class="label">CORRECTO</span></button>
+    <button class="btn-answer btn-trap" onclick="answer(true)"><span class="emoji">🪤</span><span class="label">¡TRAMPA!</span></button>
+  </div>
+  <div class="feedback" id="feedback">
+    <div class="feedback-header" id="feedbackHeader"></div>
+    <div class="feedback-text" id="feedbackText"></div>
+  </div>
+  <button class="btn-next" id="btnNext" style="display:none" onclick="nextQuestion()">Siguiente →</button>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="resultsScreen">
+  <div class="results-icon" id="resultsIcon">🏆</div>
+  <div class="results-score"><span class="highlight" id="finalScore">0</span> / <span id="finalTotal">0</span></div>
+  <p style="color:#aaa;margin:5px 0 15px" id="resultsMsg">Buen trabajo</p>
+  <div class="results-stats">
+    <div class="results-stat green"><div class="val" id="rCorrect">0</div><div class="lbl">Aciertos</div></div>
+    <div class="results-stat red"><div class="val" id="rWrong">0</div><div class="lbl">Fallos</div></div>
+    <div class="results-stat orange"><div class="val" id="rStreak">0</div><div class="lbl">Mejor racha</div></div>
+  </div>
+  <div class="missed-section" id="missedSection" style="display:none">
+    <div class="missed-title">🪤 Trampas que se te escaparon:</div>
+    <div id="missedList"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-retry" onclick="startGame()">🔄 Repetir</button>
+    <button class="btn-review" onclick="location.href='index.html'">🏠 Menu</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const trampas = [
+  // ===== LEGISLACION =====
+  // Traps
+  { statement: "La Ley 14/1986 es la Ley de Cohesion y Calidad del Sistema Nacional de Salud", isTrap: true, explanation: "TRAMPA: La Ley 14/1986 es la Ley GENERAL de Sanidad (la primera, la madre de todas). La de Cohesion es la 16/2003.", topic: "Legislacion" },
+  { statement: "La Ley 16/2003 es la Ley General de Sanidad", isTrap: true, explanation: "TRAMPA: La Ley 16/2003 es la Ley de COHESION y Calidad del SNS. La Ley General de Sanidad es la 14/1986.", topic: "Legislacion" },
+  { statement: "La Ley 41/2002 es la Ley de Sanidad", isTrap: true, explanation: "TRAMPA: La Ley 41/2002 es la Ley de AUTONOMIA del Paciente (derechos y obligaciones en materia de informacion y documentacion clinica).", topic: "Legislacion" },
+  { statement: "La Ley 33/2011 regula los derechos del paciente", isTrap: true, explanation: "TRAMPA: La Ley 33/2011 es la Ley General de Salud PUBLICA. Los derechos del paciente los regula la Ley 41/2002.", topic: "Legislacion" },
+  { statement: "La Ley 55/2003 es la Ley de Prevencion de Riesgos Laborales", isTrap: true, explanation: "TRAMPA: La Ley 55/2003 es el Estatuto MARCO del personal estatutario. La LPRL es la Ley 31/1995.", topic: "Legislacion" },
+  { statement: "La Ley 31/1995 es el Estatuto Marco del personal estatutario", isTrap: true, explanation: "TRAMPA: La Ley 31/1995 es la Ley de Prevencion de Riesgos Laborales (PRL). El Estatuto Marco es la Ley 55/2003.", topic: "Legislacion" },
+  { statement: "El consentimiento informado esta regulado por la Ley 14/1986", isTrap: true, explanation: "TRAMPA: El consentimiento informado esta regulado por la Ley 41/2002 (Autonomia del Paciente), NO por la Ley 14/1986 (General de Sanidad).", topic: "Legislacion" },
+  // Correct
+  { statement: "La Ley 14/1986 es la Ley General de Sanidad", isTrap: false, explanation: "CORRECTO: La Ley 14/1986 es efectivamente la Ley General de Sanidad, la primera ley sanitaria importante de la democracia.", topic: "Legislacion" },
+  { statement: "La Ley 16/2003 es la Ley de Cohesion y Calidad del SNS", isTrap: false, explanation: "CORRECTO: La Ley 16/2003 es la de Cohesion y Calidad. Vino despues de la General para cohesionar el sistema.", topic: "Legislacion" },
+  { statement: "La Ley 41/2002 regula la autonomia del paciente y el consentimiento informado", isTrap: false, explanation: "CORRECTO: La Ley 41/2002 es la Ley basica reguladora de la autonomia del paciente. Regula consentimiento informado, historia clinica, etc.", topic: "Legislacion" },
+  { statement: "La Ley 33/2011 es la Ley General de Salud Publica", isTrap: false, explanation: "CORRECTO: La Ley 33/2011 es la mas reciente de las grandes leyes sanitarias y trata sobre salud publica.", topic: "Legislacion" },
+  { statement: "La Ley 31/1995 es la Ley de Prevencion de Riesgos Laborales", isTrap: false, explanation: "CORRECTO: La Ley 31/1995 (PRL) regula la prevencion de riesgos laborales en todos los ambitos.", topic: "Legislacion" },
+  { statement: "La Ley 55/2003 es el Estatuto Marco del personal estatutario de los servicios de salud", isTrap: false, explanation: "CORRECTO: La Ley 55/2003 regula las condiciones del personal estatutario sanitario.", topic: "Legislacion" },
+
+  // ===== CONSTITUCION =====
+  // Traps
+  { statement: "El articulo 43 de la Constitucion Espanola reconoce el derecho a la educacion", isTrap: true, explanation: "TRAMPA: El art. 43 CE reconoce el derecho a la proteccion de la SALUD. El derecho a la educacion es el art. 27.", topic: "Constitucion" },
+  { statement: "El articulo 14 de la Constitucion Espanola reconoce el derecho a la salud", isTrap: true, explanation: "TRAMPA: El art. 14 CE reconoce el derecho a la IGUALDAD ante la ley. El derecho a la salud es el art. 43.", topic: "Constitucion" },
+  { statement: "El articulo 149.1.16 de la Constitucion atribuye a las Comunidades Autonomas las bases de la sanidad", isTrap: true, explanation: "TRAMPA: El art. 149.1.16 atribuye al ESTADO (no a las CCAA) la competencia sobre bases y coordinacion general de la sanidad.", topic: "Constitucion" },
+  { statement: "La Constitucion Espanola tiene un titulo preliminar y 11 titulos mas", isTrap: true, explanation: "TRAMPA: La CE tiene un Titulo Preliminar + 10 titulos (no 11). El Titulo Preliminar no se numera.", topic: "Constitucion" },
+  // Correct
+  { statement: "El articulo 43 de la Constitucion Espanola reconoce el derecho a la proteccion de la salud", isTrap: false, explanation: "CORRECTO: El art. 43 CE reconoce el derecho a la proteccion de la salud y encomienda a los poderes publicos organizar la sanidad.", topic: "Constitucion" },
+  { statement: "El articulo 14 de la Constitucion Espanola consagra el derecho a la igualdad ante la ley", isTrap: false, explanation: "CORRECTO: El art. 14 CE establece que todos los espanoles son iguales ante la ley, sin discriminacion.", topic: "Constitucion" },
+  { statement: "El articulo 149.1.16 CE atribuye al Estado la competencia sobre bases y coordinacion general de la sanidad", isTrap: false, explanation: "CORRECTO: Las bases de la sanidad son competencia del Estado segun el art. 149.1.16 CE.", topic: "Constitucion" },
+  { statement: "La Constitucion Espanola se estructura en un Titulo Preliminar y 10 titulos numerados", isTrap: false, explanation: "CORRECTO: La CE tiene Titulo Preliminar + 10 titulos (del I al X).", topic: "Constitucion" },
+
+  // ===== DESINFECCION / ESTERILIZACION =====
+  // Traps
+  { statement: "La desinfeccion elimina todos los microorganismos incluidas las esporas", isTrap: true, explanation: "TRAMPA: La desinfeccion NO elimina esporas. Solo la esterilizacion elimina TODOS los microorganismos incluidas esporas.", topic: "Esterilizacion" },
+  { statement: "La esterilizacion solo elimina bacterias, no virus ni hongos", isTrap: true, explanation: "TRAMPA: La esterilizacion elimina TODO: bacterias, virus, hongos, esporas... Es el proceso mas completo.", topic: "Esterilizacion" },
+  { statement: "La antisepsia se aplica sobre objetos y superficies inanimadas", isTrap: true, explanation: "TRAMPA: La antisepsia se aplica sobre TEJIDOS VIVOS (piel, mucosas). Sobre objetos se aplica desinfeccion.", topic: "Esterilizacion" },
+  { statement: "La asepsia consiste en aplicar un producto sobre la piel del paciente", isTrap: true, explanation: "TRAMPA: La asepsia es la AUSENCIA de microorganismos (un estado, no una accion). Aplicar producto sobre la piel es antisepsia.", topic: "Esterilizacion" },
+  { statement: "El orden correcto es: limpieza, descontaminacion, desinfeccion y esterilizacion", isTrap: true, explanation: "TRAMPA: El orden correcto es DESCONTAMINACION -> LIMPIEZA -> DESINFECCION -> ESTERILIZACION. La descontaminacion va ANTES de la limpieza.", topic: "Esterilizacion" },
+  // Correct
+  { statement: "La desinfeccion elimina la mayoria de microorganismos pero NO las esporas", isTrap: false, explanation: "CORRECTO: La desinfeccion reduce la carga microbiana pero no es capaz de destruir las esporas bacterianas.", topic: "Esterilizacion" },
+  { statement: "La esterilizacion elimina todos los microorganismos, incluidas las esporas", isTrap: false, explanation: "CORRECTO: La esterilizacion es el proceso mas completo: destruye todo tipo de vida microbiana incluidas esporas.", topic: "Esterilizacion" },
+  { statement: "La antisepsia se aplica sobre tejidos vivos como la piel y mucosas", isTrap: false, explanation: "CORRECTO: Los antisepticos se usan sobre tejidos vivos (piel, mucosas) a diferencia de los desinfectantes que van sobre superficies.", topic: "Esterilizacion" },
+  { statement: "El orden correcto del procesado de material es: descontaminacion, limpieza, desinfeccion y esterilizacion", isTrap: false, explanation: "CORRECTO: Descontaminacion (1ro) -> Limpieza (2do) -> Desinfeccion (3ro) -> Esterilizacion (4to).", topic: "Esterilizacion" },
+
+  // ===== AISLAMIENTOS =====
+  // Traps
+  { statement: "El aislamiento de contacto requiere habitacion con presion negativa", isTrap: true, explanation: "TRAMPA: El aislamiento de contacto solo requiere guantes + bata. La presion negativa es para el aislamiento AEREO.", topic: "Aislamientos" },
+  { statement: "El aislamiento aereo solo requiere mascarilla quirurgica normal", isTrap: true, explanation: "TRAMPA: El aislamiento aereo requiere mascarilla FFP2 + habitacion con presion negativa. La quirurgica es para aislamiento de GOTAS.", topic: "Aislamientos" },
+  { statement: "El aislamiento por gotas requiere presion negativa en la habitacion", isTrap: true, explanation: "TRAMPA: El aislamiento de gotas NO requiere presion negativa. Solo necesita mascarilla quirurgica y distancia de 1 metro. Las gotas caen, no flotan.", topic: "Aislamientos" },
+  // Correct
+  { statement: "El aislamiento de contacto requiere el uso de guantes y bata", isTrap: false, explanation: "CORRECTO: En el aislamiento de contacto se usan guantes y bata para evitar la transmision por contacto directo o indirecto.", topic: "Aislamientos" },
+  { statement: "El aislamiento aereo requiere mascarilla FFP2 y habitacion con presion negativa", isTrap: false, explanation: "CORRECTO: Las particulas aereas (<5 micras) permanecen suspendidas, por eso se necesita FFP2 y presion negativa.", topic: "Aislamientos" },
+  { statement: "El aislamiento por gotas requiere mascarilla quirurgica y distancia minima de 1 metro", isTrap: false, explanation: "CORRECTO: Las gotas (>5 micras) caen por gravedad, asi que basta con mascarilla quirurgica y 1 metro de distancia.", topic: "Aislamientos" },
+
+  // ===== TEMPERATURAS =====
+  // Traps
+  { statement: "La temperatura del agua para el bano del paciente encamado debe ser de 35°C", isTrap: true, explanation: "TRAMPA: La temperatura del bano encamado es 37-40°C (como la temperatura corporal o algo mas). 35°C seria demasiado fria.", topic: "Temperaturas" },
+  { statement: "La esterilizacion en autoclave se realiza siempre a 121°C", isTrap: true, explanation: "TRAMPA: El autoclave puede funcionar a 121°C/20 minutos O a 134°C/7 minutos (ciclo flash). No es siempre 121°C.", topic: "Temperaturas" },
+  { statement: "Se considera fiebre a partir de 37°C de temperatura corporal", isTrap: true, explanation: "TRAMPA: La fiebre empieza a partir de 38°C. Entre 37 y 38°C se denomina febricula.", topic: "Temperaturas" },
+  { statement: "Se considera hipotermia cuando la temperatura corporal es inferior a 36°C", isTrap: true, explanation: "TRAMPA: La hipotermia se define por temperatura inferior a 35°C (no 36°C). Por debajo de 35°C hay peligro.", topic: "Temperaturas" },
+  // Correct
+  { statement: "La temperatura del agua para el bano del paciente encamado debe estar entre 37°C y 40°C", isTrap: false, explanation: "CORRECTO: El agua debe estar a temperatura corporal o ligeramente superior (37-40°C) para confort del paciente.", topic: "Temperaturas" },
+  { statement: "El autoclave puede funcionar a 121°C durante 20 minutos o a 134°C durante 7 minutos", isTrap: false, explanation: "CORRECTO: Son los dos programas estandar del autoclave (vapor a presion). 134°C/7min es el ciclo flash.", topic: "Temperaturas" },
+  { statement: "Se considera fiebre a partir de 38°C y febricula entre 37°C y 38°C", isTrap: false, explanation: "CORRECTO: 37-38°C = febricula. A partir de 38°C = fiebre propiamente dicha.", topic: "Temperaturas" },
+  { statement: "Se considera hipotermia cuando la temperatura corporal baja de 35°C", isTrap: false, explanation: "CORRECTO: Por debajo de 35°C se habla de hipotermia. Es una situacion de peligro.", topic: "Temperaturas" },
+
+  // ===== TIEMPOS Y VOLUMENES =====
+  // Traps
+  { statement: "La aspiracion de secreciones puede mantenerse hasta 30 segundos por cada intento", isTrap: true, explanation: "TRAMPA: La aspiracion debe durar 10-15 segundos MAXIMO por intento. Mas de 15 segundos puede provocar hipoxia.", topic: "Tiempos y volumenes" },
+  { statement: "La diuresis normal en un adulto es de 500 a 800 ml al dia", isTrap: true, explanation: "TRAMPA: La diuresis normal es de 1.500 a 2.000 ml/dia. 500-800 ml seria una diuresis disminuida.", topic: "Tiempos y volumenes" },
+  { statement: "Se habla de anuria cuando el volumen de orina es inferior a 400 ml al dia", isTrap: true, explanation: "TRAMPA: La anuria es cuando el volumen es inferior a 100 ml/dia. Menos de 400 ml/dia se denomina OLIGURIA.", topic: "Tiempos y volumenes" },
+  { statement: "La historia clinica debe conservarse un minimo de 10 anos desde el alta del paciente", isTrap: true, explanation: "TRAMPA: La historia clinica debe conservarse un minimo de 5 anos desde el alta (segun la Ley 41/2002), no 10.", topic: "Tiempos y volumenes" },
+  // Correct
+  { statement: "La aspiracion de secreciones no debe durar mas de 10-15 segundos por intento", isTrap: false, explanation: "CORRECTO: Cada aspiracion debe ser de 10-15 segundos maximo para evitar hipoxia en el paciente.", topic: "Tiempos y volumenes" },
+  { statement: "La diuresis normal en un adulto es de 1.500 a 2.000 ml al dia", isTrap: false, explanation: "CORRECTO: Un adulto sano produce entre 1,5 y 2 litros de orina al dia.", topic: "Tiempos y volumenes" },
+  { statement: "Se denomina oliguria a un volumen de orina inferior a 400 ml al dia", isTrap: false, explanation: "CORRECTO: Oliguria = menos de 400 ml/dia. No confundir con anuria que es menos de 100 ml/dia.", topic: "Tiempos y volumenes" },
+  { statement: "La historia clinica debe conservarse un minimo de 5 anos desde el alta del paciente", isTrap: false, explanation: "CORRECTO: Segun la Ley 41/2002, la historia clinica se conserva al menos 5 anos desde la fecha de alta.", topic: "Tiempos y volumenes" },
+
+  // ===== ESCALAS =====
+  // Traps
+  { statement: "La escala de Norton se utiliza para valorar las actividades basicas de la vida diaria", isTrap: true, explanation: "TRAMPA: La escala de Norton se usa para valorar el riesgo de UPP (ulceras por presion). Para ABVD se usa la escala de Barthel.", topic: "Escalas" },
+  { statement: "La escala de Barthel mide el riesgo de ulceras por presion", isTrap: true, explanation: "TRAMPA: Barthel mide las ABVD (Actividades Basicas de la Vida Diaria). El riesgo de UPP se mide con Norton.", topic: "Escalas" },
+  { statement: "La escala de Glasgow mide la intensidad del dolor del paciente", isTrap: true, explanation: "TRAMPA: Glasgow mide el nivel de CONSCIENCIA (ocular, verbal, motora). Para el dolor se usa la escala EVA.", topic: "Escalas" },
+  { statement: "La escala EVA se utiliza para medir el nivel de consciencia", isTrap: true, explanation: "TRAMPA: La escala EVA (Escala Visual Analogica) mide el DOLOR de 0 a 10. La consciencia se mide con Glasgow.", topic: "Escalas" },
+  { statement: "La escala de Lawton-Brody se usa para valorar el riesgo de caidas", isTrap: true, explanation: "TRAMPA: Lawton-Brody mide las AIVD (Actividades Instrumentales de la Vida Diaria). No tiene que ver con caidas.", topic: "Escalas" },
+  { statement: "El test de Pfeiffer valora el grado de dependencia funcional", isTrap: true, explanation: "TRAMPA: Pfeiffer valora el DETERIORO COGNITIVO (capacidad de pensar). La dependencia la miden Barthel y Lawton.", topic: "Escalas" },
+  // Correct
+  { statement: "La escala de Norton valora el riesgo de desarrollar ulceras por presion (UPP)", isTrap: false, explanation: "CORRECTO: Norton = UPP. Valora estado fisico, mental, actividad, movilidad e incontinencia. A menor puntuacion, mayor riesgo.", topic: "Escalas" },
+  { statement: "La escala de Barthel mide la capacidad para realizar las actividades basicas de la vida diaria", isTrap: false, explanation: "CORRECTO: Barthel = ABVD (comer, vestirse, banarse, etc.). Es la escala mas utilizada para dependencia funcional basica.", topic: "Escalas" },
+  { statement: "La escala de Glasgow valora el nivel de consciencia del paciente", isTrap: false, explanation: "CORRECTO: Glasgow mide la consciencia mediante tres parametros: apertura ocular, respuesta verbal y respuesta motora.", topic: "Escalas" },
+  { statement: "La escala EVA (Escala Visual Analogica) mide la intensidad del dolor de 0 a 10", isTrap: false, explanation: "CORRECTO: EVA = dolor. El paciente senala su dolor en una linea de 0 (sin dolor) a 10 (maximo dolor).", topic: "Escalas" },
+  { statement: "La escala de Lawton-Brody mide las actividades instrumentales de la vida diaria (AIVD)", isTrap: false, explanation: "CORRECTO: Lawton = AIVD (usar telefono, cocinar, manejar dinero, etc.). Son actividades mas complejas que las basicas.", topic: "Escalas" },
+  { statement: "El test de Pfeiffer se utiliza para detectar deterioro cognitivo", isTrap: false, explanation: "CORRECTO: Pfeiffer = deterioro cognitivo. Consta de 10 preguntas sencillas. 3 o mas errores sugieren deterioro.", topic: "Escalas" },
+
+  // ===== POSICIONES DEL PACIENTE =====
+  // Traps
+  { statement: "La posicion de Fowler eleva el cabecero de la cama 30 grados", isTrap: true, explanation: "TRAMPA: Fowler eleva el cabecero a 45°. La posicion de 30° es Semi-Fowler.", topic: "Posiciones" },
+  { statement: "La posicion de Trendelenburg coloca al paciente con la cabeza mas alta que los pies", isTrap: true, explanation: "TRAMPA: En Trendelenburg los PIES estan mas altos que la cabeza. Es justo al reves de lo que parece logico.", topic: "Posiciones" },
+  { statement: "La posicion de Sims es un decubito prono completo", isTrap: true, explanation: "TRAMPA: Sims es un decubito LATERAL izquierdo con la pierna superior flexionada (semi-lateral), no prono.", topic: "Posiciones" },
+  { statement: "La posicion de litotomia coloca al paciente en decubito lateral", isTrap: true, explanation: "TRAMPA: La litotomia es en decubito SUPINO con las piernas en estribos. Se usa en ginecologia y sondaje femenino.", topic: "Posiciones" },
+  { statement: "La posicion anti-Trendelenburg coloca los pies del paciente mas altos que la cabeza", isTrap: true, explanation: "TRAMPA: Anti-Trendelenburg es la CONTRARIA a Trendelenburg: la CABEZA esta mas alta que los pies.", topic: "Posiciones" },
+  // Correct
+  { statement: "La posicion de Fowler eleva el cabecero de la cama a 45 grados", isTrap: false, explanation: "CORRECTO: Fowler = 45°. Semi-Fowler = 30°. Es una posicion semisentada para facilitar la respiracion.", topic: "Posiciones" },
+  { statement: "En la posicion de Trendelenburg los pies estan mas elevados que la cabeza", isTrap: false, explanation: "CORRECTO: Trendelenburg = pies arriba. Se usa en casos de shock, hipotension, etc.", topic: "Posiciones" },
+  { statement: "La posicion de Sims es un decubito lateral izquierdo con la pierna superior flexionada", isTrap: false, explanation: "CORRECTO: Sims = semi-lateral izquierdo. Se usa para administrar enemas, exploracion rectal, etc.", topic: "Posiciones" },
+  { statement: "La posicion de litotomia coloca al paciente en decubito supino con las piernas en estribos", isTrap: false, explanation: "CORRECTO: Litotomia = supino + piernas elevadas en estribos. Se usa en ginecologia y sondaje vesical femenino.", topic: "Posiciones" },
+  { statement: "La posicion anti-Trendelenburg eleva la cabeza por encima de los pies", isTrap: false, explanation: "CORRECTO: Anti-Trendelenburg = cabeza arriba, pies abajo. Es la contraria a Trendelenburg.", topic: "Posiciones" },
+
+  // ===== ANGULOS DE INYECCION =====
+  // Traps
+  { statement: "La inyeccion intradermica se administra con un angulo de 45 grados", isTrap: true, explanation: "TRAMPA: La intradermica se administra a 15° (casi paralela a la piel). Es la mas superficial = menos angulo.", topic: "Inyecciones" },
+  { statement: "La inyeccion subcutanea se administra con un angulo de 90 grados", isTrap: true, explanation: "TRAMPA: La subcutanea se administra a 45° con pellizco. El angulo de 90° es para la intramuscular.", topic: "Inyecciones" },
+  { statement: "La inyeccion intramuscular se administra con un angulo de 45 grados", isTrap: true, explanation: "TRAMPA: La intramuscular se administra a 90° (perpendicular). Es la mas profunda = maximo angulo.", topic: "Inyecciones" },
+  { statement: "La inyeccion intravenosa se administra con un angulo de 90 grados", isTrap: true, explanation: "TRAMPA: La intravenosa se administra a 15-30° (angulo bajo, casi paralelo a la vena). La de 90° es intramuscular.", topic: "Inyecciones" },
+  // Correct
+  { statement: "La inyeccion intradermica se administra con un angulo de 15 grados, casi paralela a la piel", isTrap: false, explanation: "CORRECTO: Intradermica = 15° (la mas superficial). Se usa para pruebas alergicas y Mantoux.", topic: "Inyecciones" },
+  { statement: "La inyeccion subcutanea se administra con un angulo de 45 grados realizando un pellizco en la piel", isTrap: false, explanation: "CORRECTO: Subcutanea = 45° con pellizco. Se usa para heparina, insulina, etc.", topic: "Inyecciones" },
+  { statement: "La inyeccion intramuscular se administra con un angulo de 90 grados, perpendicular a la piel", isTrap: false, explanation: "CORRECTO: Intramuscular = 90° (perpendicular). Es la via de mayor profundidad. Se usa para vacunas, antibioticos, etc.", topic: "Inyecciones" },
+  { statement: "La inyeccion intravenosa se administra con un angulo de 15 a 30 grados", isTrap: false, explanation: "CORRECTO: Intravenosa = 15-30° (angulo bajo para entrar en la vena). Regla: ID(15) < SC(45) < IM(90). IV es especial (15-30).", topic: "Inyecciones" },
+
+  // ===== RCP BASICA ADULTO =====
+  // Traps
+  { statement: "La relacion compresiones-ventilaciones en RCP basica del adulto es de 15:2", isTrap: true, explanation: "TRAMPA: La relacion correcta es 30:2 (30 compresiones por cada 2 ventilaciones). 15:2 es un dato antiguo.", topic: "RCP" },
+  { statement: "La frecuencia de las compresiones en RCP debe ser de 80 a 100 por minuto", isTrap: true, explanation: "TRAMPA: La frecuencia correcta es 100-120 compresiones por minuto. Minimo 100, maximo 120.", topic: "RCP" },
+  { statement: "La profundidad de las compresiones toracicas en adulto debe ser de 3 a 4 cm", isTrap: true, explanation: "TRAMPA: La profundidad debe ser de 5-6 cm en adulto. 3-4 cm es insuficiente.", topic: "RCP" },
+  { statement: "En la RCP basica se debe empezar siempre por las ventilaciones antes de las compresiones", isTrap: true, explanation: "TRAMPA: Se empieza por las COMPRESIONES (secuencia C-A-B: Compresiones - Airway - Breathing). Primero comprimir.", topic: "RCP" },
+  // Correct
+  { statement: "En la RCP basica del adulto la relacion es de 30 compresiones por cada 2 ventilaciones", isTrap: false, explanation: "CORRECTO: 30:2 es la relacion universal para RCP basica en adultos (un solo reanimador o dos).", topic: "RCP" },
+  { statement: "La frecuencia de compresiones en RCP debe ser de 100 a 120 por minuto", isTrap: false, explanation: "CORRECTO: Entre 100 y 120 compresiones por minuto. Ni demasiado lento ni demasiado rapido.", topic: "RCP" },
+  { statement: "La profundidad de las compresiones toracicas en adulto debe ser de al menos 5 cm y no superar los 6 cm", isTrap: false, explanation: "CORRECTO: 5-6 cm de profundidad en adulto para que las compresiones sean efectivas.", topic: "RCP" },
+  { statement: "La secuencia de RCP basica sigue el orden C-A-B: Compresiones, Via aerea, Ventilaciones", isTrap: false, explanation: "CORRECTO: Primero Compresiones (C), luego abrir Via Aerea (A) y despues Ventilaciones (B).", topic: "RCP" },
+
+  // ===== INFECCION NOSOCOMIAL =====
+  // Traps
+  { statement: "La infeccion nosocomial mas frecuente es la neumonia asociada a ventilacion mecanica", isTrap: true, explanation: "TRAMPA: La mas FRECUENTE es la ITU (infeccion del tracto urinario), asociada al sondaje vesical. La neumonia es la mas GRAVE/MORTAL.", topic: "Inf. Nosocomial" },
+  { statement: "La infeccion nosocomial con mayor mortalidad es la infeccion del tracto urinario (ITU)", isTrap: true, explanation: "TRAMPA: La ITU es la mas FRECUENTE, pero la mas MORTAL es la neumonia. En el examen intentan cruzar estos dos datos.", topic: "Inf. Nosocomial" },
+  { statement: "El lavado de manos social o higienico tiene una duracion de 3 a 5 minutos", isTrap: true, explanation: "TRAMPA: El lavado social dura 40-60 SEGUNDOS. El de 3-5 minutos es el lavado QUIRURGICO.", topic: "Inf. Nosocomial" },
+  { statement: "El lavado de manos quirurgico tiene una duracion de aproximadamente 1 minuto", isTrap: true, explanation: "TRAMPA: El lavado quirurgico dura 3-5 MINUTOS (con cepillo y antiseptico). 1 minuto es insuficiente; el social dura 40-60 segundos.", topic: "Inf. Nosocomial" },
+  // Correct
+  { statement: "La infeccion nosocomial mas frecuente es la infeccion del tracto urinario (ITU), asociada al sondaje vesical", isTrap: false, explanation: "CORRECTO: La ITU es la infeccion nosocomial mas frecuente, principalmente por el uso de sondas vesicales.", topic: "Inf. Nosocomial" },
+  { statement: "La neumonia nosocomial es la infeccion hospitalaria con mayor mortalidad", isTrap: false, explanation: "CORRECTO: La neumonia (especialmente la asociada a ventilacion mecanica) es la infeccion nosocomial mas grave y con mayor mortalidad.", topic: "Inf. Nosocomial" },
+  { statement: "El lavado de manos social o higienico tiene una duracion de 40 a 60 segundos", isTrap: false, explanation: "CORRECTO: El lavado social/higienico con agua y jabon normal dura entre 40 y 60 segundos.", topic: "Inf. Nosocomial" },
+  { statement: "El lavado de manos quirurgico dura entre 3 y 5 minutos, desde las unas hasta los codos", isTrap: false, explanation: "CORRECTO: El lavado quirurgico es mas largo (3-5 min) con cepillo y antiseptico, cubriendo de las unas a los codos.", topic: "Inf. Nosocomial" }
+];
+
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let missed = [];
+let answered = false;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGame() {
+  currentQuestions = shuffle([...trampas]);
+  currentIndex = 0;
+  score = 0;
+  streak = 0;
+  bestStreak = 0;
+  missed = [];
+  answered = false;
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = currentQuestions[currentIndex];
+
+  document.getElementById('qNum').textContent = (currentIndex + 1) + '/' + currentQuestions.length;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = '🔥 ' + streak;
+  document.getElementById('progressBar').style.width = ((currentIndex / currentQuestions.length) * 100) + '%';
+  document.getElementById('topicBadge').textContent = '📂 ' + q.topic;
+
+  const card = document.getElementById('statementCard');
+  card.textContent = q.statement;
+  card.className = 'statement-card';
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').classList.remove('show');
+  document.getElementById('btnNext').style.display = 'none';
+
+  const btns = document.querySelectorAll('.btn-answer');
+  btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+}
+
+function answer(userSaysTrap) {
+  if (answered) return;
+  answered = true;
+
+  const q = currentQuestions[currentIndex];
+  const correct = (userSaysTrap === q.isTrap);
+
+  const card = document.getElementById('statementCard');
+  card.className = 'statement-card ' + (q.isTrap ? 'trap-border' : 'correct-border');
+
+  const fb = document.getElementById('feedback');
+  const fbH = document.getElementById('feedbackHeader');
+  const fbT = document.getElementById('feedbackText');
+
+  if (correct) {
+    score++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    fb.className = 'feedback right show';
+    fbH.textContent = '✅ ¡Bien cazado!';
+  } else {
+    streak = 0;
+    missed.push(q);
+    fb.className = 'feedback wrong show';
+    fbH.textContent = '❌ ¡Se te escapo!';
+  }
+  fbT.textContent = q.explanation;
+
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = '🔥 ' + streak;
+
+  const btns = document.querySelectorAll('.btn-answer');
+  btns.forEach(b => { b.disabled = true; b.style.opacity = '.4'; });
+
+  document.getElementById('btnNext').style.display = 'block';
+
+  // Scroll feedback into view
+  setTimeout(() => {
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuestions.length) {
+    showResults();
+  } else {
+    showQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function showResults() {
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+
+  const total = currentQuestions.length;
+  const pct = Math.round((score / total) * 100);
+
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalTotal').textContent = total;
+  document.getElementById('rCorrect').textContent = score;
+  document.getElementById('rWrong').textContent = total - score;
+  document.getElementById('rStreak').textContent = bestStreak;
+
+  let icon = '🏆';
+  let msg = '';
+  if (pct >= 90) { icon = '🏆'; msg = '¡Experto cazador de trampas! Casi imposible enganarte.'; }
+  else if (pct >= 75) { icon = '🎯'; msg = '¡Muy bien! Detectas la mayoria de trampas. Sigue asi.'; }
+  else if (pct >= 60) { icon = '💪'; msg = 'Buen nivel, pero algunas trampas se te escapan. Repasa los fallos.'; }
+  else if (pct >= 40) { icon = '📚'; msg = 'Necesitas repasar. Fijate bien en las explicaciones.'; }
+  else { icon = '🪤'; msg = 'Las trampas te han cazado a ti. ¡Repasa y vuelve a intentarlo!'; }
+
+  document.getElementById('resultsIcon').textContent = icon;
+  document.getElementById('resultsMsg').textContent = msg + ' (' + pct + '%)';
+
+  const missedSection = document.getElementById('missedSection');
+  const missedList = document.getElementById('missedList');
+  missedList.innerHTML = '';
+
+  if (missed.length > 0) {
+    missedSection.style.display = 'block';
+    missed.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'missed-item';
+      div.innerHTML = '<div class="stmt">' + (m.isTrap ? '🪤' : '✅') + ' "' + m.statement + '"</div><div class="expl">' + m.explanation + '</div>';
+      missedList.appendChild(div);
+    });
+  } else {
+    missedSection.style.display = 'none';
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
