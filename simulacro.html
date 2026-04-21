@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Simulacro Examen TCAE SEPAD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;color:#fff;padding:10px}
+.header{text-align:center;padding:10px}
+.header h1{font-size:1.3em;background:linear-gradient(90deg,#e94560,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .sub{color:#aaa;font-size:.85em}
+.timer{text-align:center;font-size:1.8em;font-weight:bold;color:#ffc107;margin:5px 0}
+.timer.danger{color:#ff4444;animation:pulse .5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.stats{display:flex;justify-content:center;gap:12px;font-size:.85em;margin:5px 0;flex-wrap:wrap}
+.stats span{padding:4px 10px;border-radius:12px}
+.s-ok{background:#4caf5033;color:#4caf50}.s-fail{background:#f4433633;color:#f44336}.s-blank{background:#78909c33;color:#78909c}.s-flag{background:#ff980033;color:#ff9800}
+.progress{height:4px;background:#333;border-radius:2px;margin:8px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,#e94560,#ff6b6b);border-radius:2px;transition:width .3s}
+.q-box{background:rgba(255,255,255,.05);border:1px solid #333;border-radius:16px;padding:16px;margin:8px 0}
+.q-num{font-size:.8em;color:#e94560;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.q-text{font-size:1.05em;line-height:1.5;margin-bottom:14px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{padding:14px;border:2px solid #333;border-radius:12px;background:rgba(255,255,255,.03);cursor:pointer;font-size:.95em;text-align:left;color:#fff;transition:all .2s;min-height:48px;touch-action:manipulation;display:flex;align-items:center;gap:8px}
+.opt:active{transform:scale(.98)}
+.opt.selected{border-color:#e94560;background:rgba(233,69,96,.15)}
+.opt.correct{border-color:#4caf50!important;background:rgba(76,175,80,.2)!important}
+.opt.wrong{border-color:#f44336!important;background:rgba(244,67,54,.2)!important}
+.opt .letter{font-weight:bold;color:#e94560;min-width:20px}
+.nav-row{display:flex;gap:8px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.btn{padding:12px 20px;border:none;border-radius:12px;font-size:.95em;font-weight:bold;cursor:pointer;min-height:48px;touch-action:manipulation;transition:all .2s}
+.btn:active{transform:scale(.95)}
+.btn-nav{background:#2a2a5e;color:#fff;border:1px solid #444}
+.btn-flag{background:#ff980022;color:#ff9800;border:1px solid #ff9800}
+.btn-flag.flagged{background:#ff9800;color:#000}
+.btn-end{background:linear-gradient(135deg,#e94560,#ff6b6b);color:#fff}
+.btn-start{background:linear-gradient(135deg,#e94560,#ff6b6b);color:#fff;font-size:1.1em;padding:16px 40px}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0}
+.grid-cell{width:100%;aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7em;cursor:pointer;border:1px solid #333;background:rgba(255,255,255,.03);touch-action:manipulation}
+.grid-cell.answered{background:#2a2a5e;border-color:#555}
+.grid-cell.flagged{border-color:#ff9800;box-shadow:0 0 4px #ff980044}
+.grid-cell.current{border-color:#e94560;box-shadow:0 0 6px #e9456044}
+.grid-cell.review-correct{background:#4caf5044;border-color:#4caf50}
+.grid-cell.review-wrong{background:#f4433644;border-color:#f44336}
+.exp-box{background:#1a3a1a;border:1px solid #4caf50;border-radius:10px;padding:10px;margin-top:10px;font-size:.9em;line-height:1.4}
+.result-box{background:rgba(255,255,255,.05);border:1px solid #e94560;border-radius:20px;padding:24px;text-align:center;max-width:400px;margin:20px auto}
+.result-box h2{color:#e94560;font-size:1.6em;margin-bottom:12px}
+.result-box .nota{font-size:2.5em;font-weight:bold;margin:10px 0}
+.nota.aprobado{color:#4caf50}.nota.suspendido{color:#f44336}
+.result-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;font-size:.95em}
+.result-detail div{padding:8px;border-radius:8px}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.hidden{display:none}
+.home-link{display:block;text-align:center;margin-top:12px;color:#aaa;text-decoration:none;font-size:.9em}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>SIMULACRO DE EXAMEN</h1>
+<p class="sub">TCAE SEPAD 2026 — 100 preguntas — 120 min</p>
+</div>
+
+<div id="startScreen" style="text-align:center;padding:30px 10px">
+<p style="margin-bottom:8px;font-size:1.1em">Simula el examen real de oposicion</p>
+<p style="color:#aaa;margin-bottom:6px;font-size:.9em">100 preguntas tipo test — 4 opciones</p>
+<p style="color:#aaa;margin-bottom:6px;font-size:.9em">Acierto: +1 punto | Fallo: -0,25 | En blanco: 0</p>
+<p style="color:#aaa;margin-bottom:20px;font-size:.9em">Tiempo: 120 minutos</p>
+<button class="btn btn-start" onclick="startExam()">COMENZAR SIMULACRO</button>
+<a href="index.html" class="home-link">← Volver al menu</a>
+</div>
+
+<div id="examArea" class="hidden">
+<div class="timer" id="timer">120:00</div>
+<div class="stats">
+<span class="s-ok" id="sOk">✓ 0</span>
+<span class="s-fail" id="sFail">✗ 0</span>
+<span class="s-blank" id="sBlank">— 100</span>
+<span class="s-flag" id="sFlag">⚑ 0</span>
+</div>
+<div class="progress"><div class="progress-fill" id="progFill"></div></div>
+<div class="q-box" id="qBox"></div>
+<div class="nav-row">
+<button class="btn btn-nav" onclick="go(-1)">← Anterior</button>
+<button class="btn btn-flag" id="flagBtn" onclick="toggleFlag()">⚑ Marcar</button>
+<button class="btn btn-nav" onclick="go(1)">Siguiente →</button>
+</div>
+<div class="nav-row"><button class="btn btn-end" onclick="confirmEnd()">FINALIZAR EXAMEN</button></div>
+<div class="grid" id="grid"></div>
+</div>
+
+<div id="resultArea" class="hidden"></div>
+
+<script>
+const Q=[
+{q:'La Constitucion fue aprobada en referendum el:',a:['6 dic 1976','6 dic 1978','27 dic 1978','6 ene 1979'],c:1,e:'Referendum 6/12/1978, sancionada 27/12/1978',t:1},
+{q:'Cuantos titulos tiene la CE (sin preliminar)?',a:['9','10','11','8'],c:1,e:'10 titulos + titulo preliminar',t:1},
+{q:'El derecho a la salud se recoge en el articulo:',a:['39 CE','41 CE','43 CE','45 CE'],c:2,e:'Art. 43 CE proteccion de la salud',t:1},
+{q:'La reforma agravada de la CE es el articulo:',a:['166','167','168','169'],c:2,e:'Art. 168: titulo preliminar, derechos o Corona',t:1},
+{q:'El Estatuto de Extremadura fue aprobado por:',a:['LO 1/1983','LO 1/2011','LO 2/1983','LO 2/2011'],c:0,e:'LO 1/1983, de 25 de febrero',t:2},
+{q:'La Asamblea de Extremadura tiene sede en:',a:['Caceres','Merida','Badajoz','Plasencia'],c:1,e:'Merida, capital de la comunidad',t:2},
+{q:'Diputados de la Asamblea de Extremadura:',a:['55','60','65','75'],c:2,e:'65 diputados: 36 Badajoz + 29 Caceres',t:2},
+{q:'Competencia sanidad Extremadura, articulo:',a:['9.1','10.1','7.1','8.1'],c:0,e:'Art. 9.1 del Estatuto',t:2},
+{q:'La Ley General de Sanidad es:',a:['14/1986','16/2003','41/2002','33/2011'],c:0,e:'Ley 14/1986, de 25 de abril',t:3},
+{q:'La Ley de Cohesion del SNS es:',a:['Ley 14/1986','Ley 16/2003','Ley 41/2002','Ley 33/2011'],c:1,e:'Ley 16/2003, de 28 de mayo',t:3},
+{q:'Organo de coordinacion del SNS:',a:['Ministerio Sanidad','Consejo Interterritorial','Conferencia Presidentes','Tribunal Cuentas'],c:1,e:'CISNS: coordinacion Estado y CCAA',t:3},
+{q:'Areas de salud: poblacion minima:',a:['100.000','150.000','200.000','250.000'],c:2,e:'Minimo 200.000 segun LGS',t:3},
+{q:'El SES fue creado por la Ley:',a:['1/2001','10/2001','7/2001','3/2005'],c:1,e:'Ley 10/2001 de Salud de Extremadura',t:4},
+{q:'Areas de salud del SES:',a:['6','7','8','9'],c:2,e:'8 areas de salud',t:4},
+{q:'Organo de gobierno del SES:',a:['Consejero Sanidad','Direccion Gerencia','Consejo Gobierno Junta','Asamblea'],c:2,e:'Consejo de Gobierno de la Junta',t:4},
+{q:'El SES se adscribe a Consejeria de:',a:['Economia','Sanidad y Politicas Sociales','Educacion','Presidencia'],c:1,e:'Consejeria con competencia en sanidad',t:4},
+{q:'El Estatuto Marco es la Ley:',a:['55/2003','7/2007','30/1984','53/1984'],c:0,e:'Ley 55/2003, de 16 de diciembre',t:5},
+{q:'Personal estatutario fijo se clasifica en:',a:['Sanitario y no sanitario','Funcionario y laboral','Facultativo y tecnico','Directivo y operativo'],c:0,e:'Sanitario y de gestion y servicios',t:5},
+{q:'Jornada ordinaria estatutario max:',a:['35 h/sem','37,5 h/sem','40 h/sem','38 h/sem'],c:1,e:'37,5 horas semanales promedio semestral',t:5},
+{q:'El TCAE pertenece al grupo:',a:['A1','A2','C1','C2'],c:3,e:'Grupo C2: titulo ESO o equivalente',t:5},
+{q:'Ley de autonomia del paciente:',a:['14/1986','16/2003','41/2002','33/2011'],c:2,e:'Ley 41/2002, de 14 de noviembre',t:6},
+{q:'Consentimiento informado escrito si:',a:['Cualquier riesgo','Riesgo grave','Riesgo leve','Solo anestesia'],c:1,e:'Por escrito cuando hay riesgo grave',t:6},
+{q:'Historia clinica se conserva minimo:',a:['3 anos','5 anos','10 anos','15 anos'],c:1,e:'Minimo 5 anos desde alta',t:6},
+{q:'Instrucciones previas, articulo:',a:['8 Ley 41','9 Ley 41','11 Ley 41','10 Ley 41'],c:2,e:'Art. 11 voluntades anticipadas',t:6},
+{q:'Ley de PRL:',a:['31/1995','54/2003','RD 39/1997','14/1986'],c:0,e:'Ley 31/1995, de 8 de noviembre',t:24},
+{q:'Los EPI son responsabilidad de:',a:['Trabajador','Empresario','Comite empresa','Delegado prevencion'],c:1,e:'Empresario proporciona los EPI',t:24},
+{q:'Comite Seguridad y Salud, empresas de:',a:['25 trab.','30 trab.','50 trab.','100 trab.'],c:2,e:'50 o mas trabajadores',t:24},
+{q:'Riesgos biologicos, grupos del:',a:['1 al 3','1 al 4','1 al 5','2 al 4'],c:1,e:'4 grupos de riesgo biologico',t:24},
+{q:'Se considera anciano a partir de:',a:['60 anos','65 anos','70 anos','75 anos'],c:1,e:'OMS: 65 anos inicio vejez',t:2},
+{q:'Paciente geriatrico se caracteriza por:',a:['Una enfermedad','Pluripatologia y dependencia','Solo memoria','Buena reserva'],c:1,e:'Pluripatologia, polifarmacia, fragilidad',t:2},
+{q:'Escala ABVD:',a:['Lawton','Barthel','Pfeiffer','Norton'],c:1,e:'Barthel: comer, vestirse, aseo...',t:2},
+{q:'Sindrome geriatrico mas frecuente:',a:['Demencia','Incontinencia','Inmovilidad','Caidas'],c:3,e:'Caidas: el mas frecuente',t:18},
+{q:'Temperatura bano encamado:',a:['32-34 C','35-37 C','37-40 C','40-42 C'],c:2,e:'37-40 C para confort',t:9},
+{q:'Bano encamado, direccion:',a:['Proximal a distal','Distal a proximal','Arriba a abajo','Sin orden'],c:1,e:'Distal a proximal: retorno venoso',t:9},
+{q:'Higiene bucal inconsciente:',a:['Cepillo normal','Torunda con colutorio','Enjuague','Pasta'],c:1,e:'Torunda, paciente en decubito lateral',t:9},
+{q:'Ultima zona en lavarse:',a:['Espalda','Pies','Genitales','Cabeza'],c:2,e:'Genitales siempre al final',t:9},
+{q:'Posicion Fowler eleva cabecero a:',a:['30 grados','45 grados','60 grados','90 grados'],c:1,e:'Fowler 45. Semi-Fowler 30. Alta 90',t:7},
+{q:'Trendelenburg consiste en:',a:['Elevar cabeza','Elevar pies 15-30','Decubito lateral','Sentado'],c:1,e:'Pies arriba, cabeza mas baja. Para shock',t:7},
+{q:'Trasladar cama a silla, el TCAE:',a:['Flexionar rodillas, espalda recta','Flexionar espalda','Separar poco pies','Usar solo brazos'],c:0,e:'Mecanica corporal correcta',t:8},
+{q:'Posicion de Sims:',a:['Supino','Lateral izq pierna flex','Prono','Sentado'],c:1,e:'Lateral izquierdo, pierna sup. flexionada',t:7},
+{q:'Estadio I UPP:',a:['Eritema no palidece','Perdida parcial','Exposicion hueso','Ampolla'],c:0,e:'Eritema no blanqueable, piel intacta',t:13},
+{q:'Escala riesgo UPP:',a:['Barthel','Norton','Glasgow','Lawton'],c:1,e:'Norton: <=14 riesgo. Braden alternativa',t:13},
+{q:'Cambios posturales cada:',a:['1 hora','2-3 horas','4 horas','6 horas'],c:1,e:'Cada 2-3 horas prevenir UPP',t:13},
+{q:'UPP mas frecuente en supino:',a:['Trocanter','Sacro','Talon','Escapula'],c:1,e:'Sacro: mayor presion en supino',t:13},
+{q:'Frec. cardiaca normal adulto:',a:['40-60 lpm','60-100 lpm','80-120 lpm','100-140 lpm'],c:1,e:'60-100 latidos por minuto',t:14},
+{q:'Fiebre a partir de:',a:['36,5 C','37 C','37,5 C','38 C'],c:3,e:'Febricula 37-38. Fiebre >=38',t:14},
+{q:'TA se mide con:',a:['Fonendo solo','Esfigmo + fonendo','Termometro','Pulsioximetro'],c:1,e:'Esfigmomanometro + fonendoscopio',t:14},
+{q:'SpO2 normal:',a:['85-90%','90-95%','95-100%','80-85%'],c:2,e:'95-100% normal',t:14},
+{q:'Calorias adulto/dia aprox:',a:['1.000-1.500','1.500-2.000','2.000-2.500','3.000-3.500'],c:2,e:'Segun actividad',t:11},
+{q:'Dieta astringente indicada en:',a:['Estrenimiento','Diarrea','Diabetes','HTA'],c:1,e:'Arroz, zanahoria, manzana',t:11},
+{q:'SNG alimentacion mas comun:',a:['Levin','Salem','PEG','Sengstaken'],c:0,e:'Sonda de Levin: una luz',t:11},
+{q:'Nutricion parenteral via:',a:['Oral','Nasogastrica','Intravenosa','Rectal'],c:2,e:'IV: periferica o central',t:11},
+{q:'Diuresis normal:',a:['500-800 ml','800-1.200 ml','1.500-2.000 ml','2.500-3.000 ml'],c:2,e:'1 ml/kg/h aprox',t:5},
+{q:'Anuria es diuresis menor de:',a:['100 ml/dia','200 ml/dia','400 ml/dia','500 ml/dia'],c:0,e:'Anuria <100. Oliguria <400',t:5},
+{q:'Sondaje vesical mujer, posicion:',a:['Sims','Litotomia','Trendelenburg','Lateral'],c:1,e:'Supino piernas flexionadas en estribos',t:5},
+{q:'Enema limpieza, temperatura:',a:['25-30 C','30-33 C','35-37 C','37-40 C'],c:2,e:'Temperatura corporal',t:6},
+{q:'Frec. respiratoria normal:',a:['8-12 rpm','12-20 rpm','20-28 rpm','25-30 rpm'],c:1,e:'12-20 respiraciones/min',t:14},
+{q:'Mascarilla Venturi concentracion:',a:['24-50%','60-100%','21-24%','50-80%'],c:0,e:'Flujo preciso 24 a 50%',t:14},
+{q:'Gafas nasales flujo max:',a:['2 l/min','4 l/min','6 l/min','10 l/min'],c:2,e:'1-6 l/min (24-44% FiO2)',t:14},
+{q:'Aspiracion secreciones max:',a:['5 seg','10-15 seg','20-25 seg','30 seg'],c:1,e:'10-15 seg evitar hipoxia',t:14},
+{q:'Via intradermica para:',a:['Vacunas','Mantoux','Antibioticos','Analgesicos'],c:1,e:'Intradermica: Mantoux, alergias',t:17},
+{q:'Angulo inyeccion IM:',a:['15 grados','45 grados','75 grados','90 grados'],c:3,e:'Perpendicular a 90 grados',t:17},
+{q:'Via subcutanea angulo:',a:['15 grados','30 grados','45 grados','90 grados'],c:2,e:'45 grados con pellizco',t:17},
+{q:'Las 5C de medicamentos:',a:['Paciente, medic, dosis, via, hora','Color, cantidad, calidad, caduc, conserv','Cinco del laboratorio','Cinco controles'],c:0,e:'5 correctos',t:17},
+{q:'Orina 24h comienza desechando:',a:['Primera miccion','Ultima miccion','Miccion noche','Ninguna'],c:0,e:'Se desecha la primera',t:9},
+{q:'Hemocultivo se recoge en:',a:['Despues antibiotico','Pico febril','En ayunas','Por la noche'],c:1,e:'Pico febril, ANTES de antibiotico',t:9},
+{q:'Esputo se recoge mejor:',a:['Noche','Despues comer','Manana ayunas','Tras ejercicio'],c:2,e:'Primera hora, ayunas, higiene bucal',t:9},
+{q:'Glucemia capilar se pincha en:',a:['Pulpejo central','Lateral del dedo','Yema pulgar','Dorso mano'],c:1,e:'Lateral: menos dolor, mejor flujo',t:17},
+{q:'Esterilizacion mas usada:',a:['Oxido etileno','Autoclave vapor','Glutaraldehido','UV'],c:1,e:'Vapor 121C/20min o 134C/7min',t:12},
+{q:'Autoclave flash temperatura:',a:['100 C','121 C','134 C','160 C'],c:2,e:'134C para priones',t:12},
+{q:'Indicador biologico autoclave:',a:['E. coli','B. stearothermophilus','B. subtilis','Staphylococcus'],c:1,e:'B. stearothermophilus para vapor',t:12},
+{q:'Lejia es desinfectante de nivel:',a:['Bajo','Intermedio','Alto','Esterilizante'],c:2,e:'Alto: bacterias, virus, hongos, mico',t:12},
+{q:'Infeccion nosocomial mas frecuente:',a:['Neumonia','ITU','Bacteriemia','Herida quirurgica'],c:1,e:'ITU asociada a sondaje',t:12},
+{q:'Lavado quirurgico dura:',a:['1 min','2-3 min','3-5 min','10 min'],c:2,e:'Cepillo y jabon antiseptico',t:12},
+{q:'Precauciones estandar incluyen:',a:['Solo guantes','Higiene manos + EPI','Solo mascarilla','Solo bata'],c:1,e:'Higiene + EPI segun riesgo',t:12},
+{q:'Aislamiento contacto requiere:',a:['Solo FFP2','Guantes y bata','Solo guantes','Presion negativa'],c:1,e:'Guantes + bata al entrar',t:12},
+{q:'Signos precoces de muerte:',a:['Rigidez','Midriasis y sin pulso','Livideces','Putrefaccion'],c:1,e:'Midriasis, sin pulso, apnea',t:15},
+{q:'Rigidez cadaverica comienza:',a:['1-2 horas','3-4 horas','6-8 horas','12 horas'],c:1,e:'3-4h inicio, maxima 12-24h',t:15},
+{q:'Protesis dentales al amortajar:',a:['Se retiran','Se dejan puestas','Se guardan aparte','Decide familia'],c:1,e:'Despues es dificil colocarlas',t:15},
+{q:'Certificado defuncion lo firma:',a:['TCAE','Enfermero/a','Medico/a','Celador/a'],c:2,e:'Acto medico exclusivo',t:15},
+{q:'Neurotransmisor en depresion:',a:['Dopamina','Serotonina','Acetilcolina','GABA'],c:1,e:'Deficit de serotonina',t:3},
+{q:'Contencion mecanica requiere:',a:['Orden verbal','Prescripcion medica','Decision TCAE','Consentimiento familiar'],c:1,e:'Siempre prescripcion medica',t:21},
+{q:'Paciente agitado, TCAE debe:',a:['Sujetarlo','Distancia y hablar calma','Dejarlo solo','Llamar seguridad'],c:1,e:'Desescalada: calma, distancia',t:21},
+{q:'Delirium vs demencia:',a:['Es irreversible','Inicio brusco y reversible','No afecta consciencia','Es hereditario'],c:1,e:'Delirium: agudo, fluctuante, reversible',t:3},
+{q:'Objetivo cuidados paliativos:',a:['Curar','Calidad de vida','Prolongar supervivencia','Tratamiento agresivo'],c:1,e:'Control sintomas y calidad de vida',t:10},
+{q:'Via eleccion paliativos si no oral:',a:['Intravenosa','Subcutanea','Intramuscular','Rectal'],c:1,e:'Subcutanea: menos invasiva',t:10},
+{q:'Escala que mide dolor:',a:['Norton','EVA','Barthel','Glasgow'],c:1,e:'EVA: 0 sin dolor a 10 maximo',t:10},
+{q:'Duelo patologico se caracteriza por:',a:['Llorar en funeral','Duracion excesiva','Tristeza 1a semana','Recordar fallecido'],c:1,e:'Prolongado con incapacidad funcional',t:10},
+{q:'RCP adulta compresiones/ventilaciones:',a:['15:2','30:2','15:1','30:1'],c:1,e:'30 compresiones : 2 ventilaciones',t:19},
+{q:'Frecuencia compresiones RCP:',a:['60-80/min','80-100/min','100-120/min','120-140/min'],c:2,e:'100-120/min, profundidad 5-6 cm',t:19},
+{q:'Maniobra Heimlich ante:',a:['Parada cardiaca','OVACE','Hemorragia','Fractura'],c:1,e:'Obstruccion via aerea en consciente',t:19},
+{q:'Hemorragia externa, primero:',a:['Torniquete','Compresion directa','Elevar extremidad','Llamar 112'],c:1,e:'Compresion directa sobre herida',t:20},
+{q:'Comunicacion no verbal es aprox:',a:['10%','30%','55-65%','90%'],c:2,e:'Mehrabian: 55% corporal, 38% tono',t:25},
+{q:'Escucha activa implica:',a:['Interrumpir','Atender y parafrasear','Solo oir','Cambiar tema'],c:1,e:'Atencion plena, parafraseo, empatia',t:25},
+{q:'Empatia consiste en:',a:['Sentir lastima','Ponerse en lugar del otro','Estar de acuerdo','Dar la razon'],c:1,e:'Comprender desde su perspectiva',t:25},
+{q:'Relacion de ayuda se basa en:',a:['Autoridad','Confianza, respeto, empatia','Simpatia','Distancia total'],c:1,e:'Confianza, respeto, empatia, autenticidad',t:25},
+{q:'La historia clinica es documento:',a:['Administrativo','Clinico-asistencial','Judicial','Economico'],c:1,e:'Fundamental clinico-asistencial',t:25},
+{q:'El CMBD se utiliza para:',a:['Diagnostico','Codificacion y estadistica','Facturacion','Solo investigacion'],c:1,e:'Datos al alta para estadisticas',t:25},
+{q:'Grafica enfermeria registra:',a:['Solo medicacion','Constantes, balance, observaciones','Solo temperatura','Solo diagnostico'],c:1,e:'Constantes, balance hidrico, dieta',t:25},
+{q:'Consentimiento informado forma parte de:',a:['Historia social','Historia clinica','Informe alta','Receta'],c:1,e:'Documentacion de la H. clinica',t:25}
+];
+
+let cur=0,answers=[],flags=[],timerSec=7200,interval,reviewing=false;
+function startExam(){
+  answers=new Array(100).fill(-1);flags=new Array(100).fill(false);
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('examArea').classList.remove('hidden');
+  buildGrid();showQ();
+  interval=setInterval(()=>{
+    timerSec--;
+    const m=Math.floor(timerSec/60),s=timerSec%60;
+    const tb=document.getElementById('timer');
+    tb.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(timerSec<=300)tb.classList.add('danger');
+    if(timerSec<=0){clearInterval(interval);endExam()}
+  },1000);
+}
+function showQ(){
+  const q=Q[cur],letters=['A','B','C','D'];
+  const fb=document.getElementById('flagBtn');
+  fb.className='btn btn-flag'+(flags[cur]?' flagged':'');
+  document.getElementById('qBox').innerHTML=`
+    <div class="q-num"><span>Pregunta ${cur+1} / 100</span></div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts">${q.a.map((a,i)=>{
+      let cls='opt';
+      if(!reviewing&&answers[cur]===i)cls+=' selected';
+      if(reviewing){
+        if(i===q.c)cls+=' correct';
+        else if(answers[cur]===i)cls+=' wrong';
+      }
+      return `<div class="${cls}" onclick="pick(${i})"><span class="letter">${letters[i]}</span>${a}</div>`;
+    }).join('')}</div>
+    ${reviewing?`<div class="exp-box">✓ Correcta: ${letters[q.c]}) ${q.a[q.c]}<br>${q.e}</div>`:''}`;
+  updateGrid();updateStats();
+  document.getElementById('progFill').style.width=((cur+1)/100*100)+'%';
+}
+function pick(i){
+  if(reviewing)return;
+  answers[cur]=answers[cur]===i?-1:i;
+  showQ();
+}
+function go(d){cur=Math.max(0,Math.min(99,cur+d));showQ()}
+function goTo(i){cur=i;showQ()}
+function toggleFlag(){flags[cur]=!flags[cur];showQ()}
+function buildGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  for(let i=0;i<100;i++){
+    const c=document.createElement('div');c.className='grid-cell';c.textContent=i+1;
+    c.onclick=()=>goTo(i);g.appendChild(c);
+  }
+}
+function updateGrid(){
+  document.querySelectorAll('.grid-cell').forEach((c,i)=>{
+    c.className='grid-cell';
+    if(answers[i]>=0)c.classList.add('answered');
+    if(flags[i])c.classList.add('flagged');
+    if(i===cur)c.classList.add('current');
+    if(reviewing){
+      if(answers[i]>=0){
+        c.classList.add(answers[i]===Q[i].c?'review-correct':'review-wrong');
+      }
+    }
+  });
+}
+function updateStats(){
+  let ok=0,fail=0,blank=0,fl=flags.filter(f=>f).length;
+  answers.forEach((a,i)=>{if(a<0)blank++;else if(a===Q[i].c)ok++;else fail++});
+  document.getElementById('sOk').textContent='✓ '+ok;
+  document.getElementById('sFail').textContent='✗ '+fail;
+  document.getElementById('sBlank').textContent='— '+blank;
+  document.getElementById('sFlag').textContent='⚑ '+fl;
+}
+function confirmEnd(){if(confirm('¿Finalizar el examen? No podras cambiar las respuestas.'))endExam()}
+function endExam(){
+  clearInterval(interval);
+  let ok=0,fail=0,blank=0;
+  answers.forEach((a,i)=>{if(a<0)blank++;else if(a===Q[i].c)ok++;else fail++});
+  const nota=Math.max(0,(ok-fail*0.25)/100*10).toFixed(2);
+  const pct=Math.round(ok/100*100);
+  const aprobado=parseFloat(nota)>=5;
+  reviewing=true;
+  document.getElementById('examArea').querySelector('.timer').textContent='FINALIZADO';
+  document.getElementById('examArea').querySelector('.timer').classList.remove('danger');
+  document.querySelectorAll('.btn-end').forEach(b=>b.classList.add('hidden'));
+  document.querySelectorAll('.btn-flag').forEach(b=>b.classList.add('hidden'));
+  const ra=document.getElementById('resultArea');ra.classList.remove('hidden');
+  ra.innerHTML=`
+    <div class="result-box">
+      <h2>${aprobado?'¡APROBADO!':'SUSPENSO'}</h2>
+      <div class="nota ${aprobado?'aprobado':'suspendido'}">${nota}</div>
+      <p style="color:#aaa">sobre 10 (con penalizacion -0,25)</p>
+      <div class="result-detail">
+        <div style="background:#4caf5022;color:#4caf50">✓ Aciertos: ${ok}</div>
+        <div style="background:#f4433622;color:#f44336">✗ Fallos: ${fail}</div>
+        <div style="background:#78909c22;color:#78909c">— En blanco: ${blank}</div>
+        <div style="background:#ffc10722;color:#ffc107">% Acierto: ${pct}%</div>
+      </div>
+      <p style="font-size:.85em;color:#aaa;margin-top:10px">Navega por las preguntas para ver las respuestas correctas y explicaciones</p>
+      <button class="btn btn-start" onclick="location.reload()" style="margin-top:12px;font-size:.95em;padding:12px 30px">REPETIR SIMULACRO</button>
+      <a href="index.html" class="home-link">← Volver al menu</a>
+    </div>`;
+  cur=0;showQ();
+}
+</script>
+</body>
+</html>
