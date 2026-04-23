@@ -86,9 +86,14 @@ h1{font-size:1.4em;text-align:center;padding:12px 0 4px;background:linear-gradie
       <div class="cat-btn" onclick="startGame('tiempos')"><span class="cat-icon">⏱️</span>Tiempos/Plazos</div>
       <div class="cat-btn" onclick="startGame('inyecciones')"><span class="cat-icon">💉</span>Inyecciones</div>
       <div class="cat-btn" onclick="startGame('posiciones')"><span class="cat-icon">🛏️</span>Posiciones</div>
+      <div class="cat-btn" onclick="startGame('rcp')"><span class="cat-icon">🫀</span>RCP/Emergencias</div>
+      <div class="cat-btn" onclick="startGame('wallace')"><span class="cat-icon">🔥</span>Wallace/Quemaduras</div>
       <div class="cat-btn" onclick="startGame('legislacion')"><span class="cat-icon">📜</span>Legislacion</div>
       <div class="cat-btn" onclick="startGame('escalas')"><span class="cat-icon">📊</span>Escalas</div>
       <div class="cat-btn" onclick="startGame('nutricion')"><span class="cat-icon">🍎</span>Nutricion</div>
+      <div class="cat-btn" onclick="startGame('convenio')"><span class="cat-icon">📋</span>Convenio SEPAD</div>
+      <div class="cat-btn" onclick="startGame('oxigenoterapia')"><span class="cat-icon">💨</span>Oxigenoterapia</div>
+      <div class="cat-btn" onclick="startGame('residuos')"><span class="cat-icon">♻️</span>Residuos</div>
       <div class="cat-btn todas" onclick="startGame('todas')"><span class="cat-icon">⭐</span>TODAS LAS CATEGORIAS</div>
     </div>
   </div>
@@ -130,6 +135,13 @@ const cifras = [
   {q:"¿A que temperatura se conservan en nevera la insulina y las vacunas?", a:["2-8°C","0-4°C","8-12°C","15-25°C"], c:0, e:"La nevera de medicamentos se mantiene entre 2 y 8°C para conservar insulina, vacunas, etc.", cat:"temperaturas"},
   {q:"¿Cuanto tiempo dura el ciclo de autoclave estandar a 121°C?", a:["20 minutos","15 minutos","30 minutos","10 minutos"], c:0, e:"El autoclave estandar funciona a 121°C durante 20 minutos.", cat:"temperaturas"},
   {q:"¿Cuanto dura la esterilizacion por calor seco (Poupinel)?", a:["1-2 horas","30 minutos","20 minutos","3 horas"], c:0, e:"La esterilizacion por calor seco dura 1-2 horas a 160-180°C.", cat:"temperaturas"},
+  {q:"¿Cuanto mas alta es la temperatura rectal respecto a la axilar?", a:["+0,5°C","+1°C","+0,3°C","+0,8°C"], c:0, e:"La temperatura rectal es aproximadamente 0,5°C superior a la axilar.", cat:"temperaturas"},
+  {q:"¿Que via de medicion de temperatura es la mas rapida?", a:["Timpanica","Rectal","Axilar","Oral"], c:0, e:"La medicion timpanica es la mas rapida, obteniendo el resultado en segundos.", cat:"temperaturas"},
+  {q:"¿A que ritmo desciende la temperatura corporal tras la muerte (algor mortis)?", a:["1°C por hora","0,5°C por hora","2°C por hora","0,25°C por hora"], c:0, e:"El algor mortis produce un enfriamiento de aproximadamente 1°C por hora.", cat:"temperaturas"},
+  {q:"¿Cuantos dias puede usarse la insulina a temperatura ambiente una vez abierta?", a:["28 dias","14 dias","7 dias","60 dias"], c:0, e:"La insulina en uso puede mantenerse a temperatura ambiente durante un maximo de 28 dias.", cat:"temperaturas"},
+  {q:"¿Cuanto tiempo se debe enfriar una quemadura con agua?", a:["15-20 minutos","5-10 minutos","30 minutos","1-2 minutos"], c:0, e:"Las quemaduras deben enfriarse con agua durante 15-20 minutos.", cat:"temperaturas"},
+  {q:"¿A cuantas atmosferas de presion funciona el autoclave estandar?", a:["1 atmosfera extra","2 atmosferas extra","0,5 atmosferas extra","3 atmosferas extra"], c:0, e:"El autoclave estandar funciona a 1 atmosfera extra de presion (121°C/20 min).", cat:"temperaturas"},
+  {q:"¿A que temperatura funciona el Poupinel de ciclo rapido (170°C)?", a:["170°C durante 60 min","170°C durante 30 min","170°C durante 120 min","170°C durante 90 min"], c:0, e:"El Poupinel a 170°C requiere 60 minutos de esterilizacion.", cat:"temperaturas"},
 
   // ===== CONSTANTES VITALES =====
   {q:"¿Cual es la frecuencia cardiaca normal en adultos?", a:["60-100 lpm","40-60 lpm","80-120 lpm","100-140 lpm"], c:0, e:"La frecuencia cardiaca normal es 60-100 latidos por minuto.", cat:"constantes"},
@@ -147,6 +159,10 @@ const cifras = [
   {q:"¿Cual es el rango normal de glucemia basal?", a:["70-110 mg/dl","80-120 mg/dl","60-100 mg/dl","90-130 mg/dl"], c:0, e:"La glucemia basal normal esta entre 70 y 110 mg/dl.", cat:"constantes"},
   {q:"¿Por debajo de que valor de glucemia se habla de hipoglucemia?", a:["< 70 mg/dl","< 80 mg/dl","< 60 mg/dl","< 50 mg/dl"], c:0, e:"La hipoglucemia se define como glucemia inferior a 70 mg/dl.", cat:"constantes"},
   {q:"¿A partir de que glucemia basal se sospecha diabetes?", a:["> 126 mg/dl","> 110 mg/dl","> 140 mg/dl","> 100 mg/dl"], c:0, e:"Se sospecha diabetes con glucemia basal superior a 126 mg/dl.", cat:"constantes"},
+  {q:"¿Por debajo de que cifra de TA sistolica se considera hipotension?", a:["< 90 mmHg","< 100 mmHg","< 80 mmHg","< 110 mmHg"], c:0, e:"Se considera hipotension cuando la TA sistolica es inferior a 90 mmHg.", cat:"constantes"},
+  {q:"¿Por debajo de que cifra de TA diastolica se considera hipotension?", a:["< 60 mmHg","< 70 mmHg","< 50 mmHg","< 80 mmHg"], c:0, e:"Se considera hipotension cuando la TA diastolica es inferior a 60 mmHg.", cat:"constantes"},
+  {q:"¿A partir de que valor de glucemia se considera hiperglucemia?", a:["> 180 mg/dl","> 150 mg/dl","> 200 mg/dl","> 126 mg/dl"], c:0, e:"Se habla de hiperglucemia cuando la glucemia supera los 180 mg/dl.", cat:"constantes"},
+  {q:"¿Cual es el valor normal de HbA1c (hemoglobina glicosilada)?", a:["< 7%","< 5%","< 10%","< 9%"], c:0, e:"El valor normal de HbA1c es inferior al 7%. Indica el control glucemico de los ultimos 2-3 meses.", cat:"constantes"},
 
   // ===== VOLUMENES Y CANTIDADES =====
   {q:"¿Cual es la diuresis normal diaria?", a:["1.500-2.000 ml/dia","500-1.000 ml/dia","2.500-3.000 ml/dia","1.000-1.200 ml/dia"], c:0, e:"La diuresis normal es de 1.500 a 2.000 ml/dia (aprox. 1 ml/kg/hora).", cat:"volumenes"},
@@ -159,6 +175,13 @@ const cifras = [
   {q:"¿Como se comprueba la posicion correcta de una SNG?", a:["Aspirar contenido + pH < 5","Insuflar aire + auscultar","Radiografia de control","Observar si sale liquido"], c:0, e:"La posicion gastrica de la SNG se comprueba aspirando contenido y verificando pH < 5.", cat:"volumenes"},
   {q:"¿Cuanto tiempo maximo debe durar cada aspiracion de secreciones?", a:["< 15 segundos","< 30 segundos","< 10 segundos","< 20 segundos"], c:0, e:"Cada aspiracion de secreciones debe durar menos de 15 segundos para evitar hipoxia.", cat:"volumenes"},
   {q:"¿Cual es la diuresis normal por hora y kilo de peso?", a:["1 ml/kg/hora","2 ml/kg/hora","0,5 ml/kg/hora","3 ml/kg/hora"], c:0, e:"La diuresis normal es aproximadamente 1 ml/kg/hora.", cat:"volumenes"},
+  {q:"¿Cuantos centimetros se introduce la sonda rectal en un adulto?", a:["7-10 cm","3-5 cm","12-15 cm","15-20 cm"], c:0, e:"La sonda rectal se introduce 7-10 cm en el adulto.", cat:"volumenes"},
+  {q:"¿A que altura se coloca el irrigador del enema sobre el ano del paciente?", a:["30-45 cm","15-20 cm","50-60 cm","60-80 cm"], c:0, e:"El irrigador del enema se coloca a 30-45 cm por encima del ano del paciente.", cat:"volumenes"},
+  {q:"¿Cual es el peso maximo de carga recomendado en manipulacion manual?", a:["25 kg","15 kg","30 kg","20 kg"], c:0, e:"El peso maximo de carga en manipulacion manual es de 25 kg (15 kg para embarazadas o personas sensibles).", cat:"volumenes"},
+  {q:"¿Cual es el peso maximo de carga para embarazadas o personas sensibles?", a:["15 kg","10 kg","20 kg","25 kg"], c:0, e:"Para embarazadas o personas sensibles, el peso maximo de carga es de 15 kg.", cat:"volumenes"},
+  {q:"¿Que calibre de sonda vesical se usa habitualmente en mujeres?", a:["14-16 Fr","16-18 Fr","10-12 Fr","18-20 Fr"], c:0, e:"En mujeres se usan sondas vesicales de calibre 14-16 French.", cat:"volumenes"},
+  {q:"¿Que calibre de sonda vesical se usa habitualmente en hombres?", a:["16-18 Fr","14-16 Fr","18-20 Fr","12-14 Fr"], c:0, e:"En hombres se usan sondas vesicales de calibre 16-18 French.", cat:"volumenes"},
+  {q:"¿Cuantos dedos deben caber entre el dispositivo de contencion y la piel?", a:["1-2 dedos","3-4 dedos","Solo 1 dedo","Ninguno, debe estar ajustado"], c:0, e:"Entre el dispositivo de contencion y la piel deben caber 1-2 dedos para evitar lesiones.", cat:"volumenes"},
 
   // ===== TIEMPOS IMPORTANTES =====
   {q:"¿Cada cuanto tiempo se realizan los cambios posturales para prevenir UPP?", a:["Cada 2-3 horas","Cada 4-6 horas","Cada 1 hora","Cada 8 horas"], c:0, e:"Los cambios posturales para prevencion de UPP se realizan cada 2-3 horas.", cat:"tiempos"},
@@ -166,11 +189,18 @@ const cifras = [
   {q:"¿Cuanto dura el lavado de manos quirurgico?", a:["3-5 minutos","1-2 minutos","40-60 segundos","5-10 minutos"], c:0, e:"El lavado de manos quirurgico dura 3-5 minutos con cepillo y antiseptico.", cat:"tiempos"},
   {q:"¿Cuanto dura la friccion con solucion hidroalcoholica?", a:["20-30 segundos","40-60 segundos","10-15 segundos","1-2 minutos"], c:0, e:"La friccion con solucion hidroalcoholica dura 20-30 segundos.", cat:"tiempos"},
   {q:"¿Cuanto dura cada pasada de aspiracion de secreciones?", a:["10-15 segundos max","20-30 segundos","5 segundos","30-60 segundos"], c:0, e:"Cada pasada de aspiracion de secreciones dura 10-15 segundos maximo.", cat:"tiempos"},
-  {q:"¿Cual es el ritmo de compresiones en RCP?", a:["100-120/min","60-80/min","80-100/min","120-140/min"], c:0, e:"En RCP, el ritmo de compresiones es de 100-120 por minuto con profundidad de 5-6 cm.", cat:"tiempos"},
-  {q:"¿Cual es la profundidad de las compresiones toracicas en RCP adulto?", a:["5-6 cm","3-4 cm","7-8 cm","4-5 cm"], c:0, e:"Las compresiones en RCP adulto deben tener una profundidad de 5-6 cm.", cat:"tiempos"},
   {q:"¿Cuanto tiempo minimo se debe conservar la historia clinica?", a:["Minimo 5 anos desde el alta","Minimo 10 anos","Minimo 3 anos","Minimo 15 anos"], c:0, e:"La historia clinica se conserva un minimo de 5 anos desde el alta.", cat:"tiempos"},
-  {q:"¿Cuando comienza la rigidez cadaverica?", a:["A las 3-4 horas","A las 6-8 horas","Inmediatamente","A las 12 horas"], c:0, e:"La rigidez cadaverica comienza a las 3-4 horas y alcanza su maximo a las 12-24 horas.", cat:"tiempos"},
+  {q:"¿Cuando comienza la rigidez cadaverica?", a:["A las 2-4 horas","A las 6-8 horas","Inmediatamente","A las 12 horas"], c:0, e:"La rigidez cadaverica comienza a las 2-4 horas postmortem.", cat:"tiempos"},
   {q:"¿Cuanto dura el autoclave flash a 134°C para priones?", a:["18 minutos","7 minutos","20 minutos","30 minutos"], c:0, e:"Para priones, el autoclave a 134°C funciona durante 18 minutos.", cat:"tiempos"},
+  {q:"¿Cada cuanto tiempo se vigila al paciente con contencion mecanica?", a:["Cada 15-30 minutos","Cada 1 hora","Cada 2 horas","Cada 5 minutos"], c:0, e:"El paciente con contencion mecanica se vigila cada 15-30 minutos.", cat:"tiempos"},
+  {q:"¿Cada cuanto tiempo se valora la retirada de la contencion mecanica?", a:["Cada 2-4 horas","Cada 6-8 horas","Cada 12 horas","Cada 1 hora"], c:0, e:"La retirada de la contencion mecanica se valora cada 2-4 horas.", cat:"tiempos"},
+  {q:"¿Cuanto tiempo despues de la toma debe permanecer en Fowler el paciente con SNG?", a:["30-60 minutos","15 minutos","2 horas","10 minutos"], c:0, e:"Tras la alimentacion por SNG, el paciente debe permanecer en posicion Fowler 30-60 minutos.", cat:"tiempos"},
+  {q:"¿En cuanto tiempo hay que comunicar al juez la aplicacion de contencion mecanica?", a:["24 horas","12 horas","48 horas","72 horas"], c:0, e:"La aplicacion de contencion mecanica debe comunicarse al juez en un plazo maximo de 24 horas.", cat:"tiempos"},
+  {q:"¿Cual es la duracion maxima de las estancias temporales en centros residenciales?", a:["60 dias","30 dias","90 dias","45 dias"], c:0, e:"Las estancias temporales en centros residenciales tienen una duracion maxima de 60 dias.", cat:"tiempos"},
+  {q:"¿Cuanto tiempo necesita el glutaraldehido para desinfeccion de alto nivel?", a:["30 minutos","10 minutos","60 minutos","15 minutos"], c:0, e:"El glutaraldehido necesita 30 minutos para desinfeccion de alto nivel.", cat:"tiempos"},
+  {q:"¿Cuanto tiempo necesita el glutaraldehido para esterilizacion?", a:["10 horas","5 horas","2 horas","30 minutos"], c:0, e:"El glutaraldehido necesita 10 horas para lograr esterilizacion.", cat:"tiempos"},
+  {q:"¿Cuando alcanza su maximo la rigidez cadaverica?", a:["A las 12-24 horas","A las 6-8 horas","A las 2-4 horas","A las 36-48 horas"], c:0, e:"La rigidez cadaverica alcanza su maximo a las 12-24 horas postmortem.", cat:"tiempos"},
+  {q:"¿Cuando desaparece la rigidez cadaverica?", a:["A las 24-36 horas","A las 12-24 horas","A las 48-72 horas","A las 6-12 horas"], c:0, e:"La rigidez cadaverica desaparece a las 24-36 horas postmortem.", cat:"tiempos"},
 
   // ===== ANGULOS DE INYECCION =====
   {q:"¿Con que angulo se administra una inyeccion intradermica (ID)?", a:["15 grados","45 grados","90 grados","30 grados"], c:0, e:"La via intradermica se administra con un angulo de 15 grados, con bisel hacia arriba.", cat:"inyecciones"},
@@ -182,10 +212,11 @@ const cifras = [
   {q:"¿Que calibre de aguja se usa para via subcutanea?", a:["25-27G corta","21-23G larga","18-20G","14-16G"], c:0, e:"Para via subcutanea se usa aguja de calibre 25-27G corta.", cat:"inyecciones"},
   {q:"¿En que via de inyeccion se realiza la tecnica del pellizco?", a:["Subcutanea","Intradermica","Intramuscular","Intravenosa"], c:0, e:"La tecnica del pellizco se utiliza en la via subcutanea (45 grados).", cat:"inyecciones"},
   {q:"¿En que posicion se coloca el bisel en la inyeccion intradermica?", a:["Bisel hacia arriba","Bisel hacia abajo","Bisel lateral","Indiferente"], c:0, e:"En la inyeccion intradermica, el bisel se coloca hacia arriba con angulo de 15 grados.", cat:"inyecciones"},
+  {q:"¿Con que angulo se administra la insulina?", a:["45 grados (subcutanea)","90 grados (intramuscular)","15 grados (intradermica)","30 grados (intravenosa)"], c:0, e:"La insulina se administra por via subcutanea con un angulo de 45 grados.", cat:"inyecciones"},
 
   // ===== POSICIONES DEL PACIENTE =====
-  {q:"¿A cuantos grados se eleva el cabecero en la posicion Semi-Fowler?", a:["30 grados","45 grados","60 grados","90 grados"], c:0, e:"En Semi-Fowler el cabecero se eleva 30 grados. Se usa en disnea leve.", cat:"posiciones"},
-  {q:"¿A cuantos grados se eleva el cabecero en la posicion Fowler?", a:["45 grados","30 grados","60 grados","90 grados"], c:0, e:"En Fowler el cabecero se eleva 45 grados. Se usa para alimentacion y disnea.", cat:"posiciones"},
+  {q:"¿A cuantos grados se eleva el cabecero en la posicion Semi-Fowler?", a:["30-45 grados","15-30 grados","45-60 grados","60-90 grados"], c:0, e:"En Semi-Fowler el cabecero se eleva 30-45 grados.", cat:"posiciones"},
+  {q:"¿A cuantos grados se eleva el cabecero en la posicion Fowler?", a:["45-90 grados","30 grados","60 grados","120 grados"], c:0, e:"En Fowler el cabecero se eleva 45-90 grados. Se usa para alimentacion y disnea.", cat:"posiciones"},
   {q:"¿A cuantos grados se eleva el cabecero en la posicion Fowler alta?", a:["90 grados","45 grados","60 grados","120 grados"], c:0, e:"En Fowler alta el cabecero se eleva a 90 grados. Se usa en disnea severa.", cat:"posiciones"},
   {q:"¿Cuantos grados se elevan los pies en Trendelenburg?", a:["15-30 grados","10-15 grados","30-45 grados","45-60 grados"], c:0, e:"En Trendelenburg los pies se elevan 15-30 grados. Se usa en shock y lipotimia.", cat:"posiciones"},
   {q:"¿Para que se usa la posicion de Trendelenburg?", a:["Shock y lipotimia","Alimentacion","Disnea severa","Cirugia abdominal"], c:0, e:"La posicion de Trendelenburg (pies 15-30 grados arriba) se usa en shock y lipotimia.", cat:"posiciones"},
@@ -194,6 +225,28 @@ const cifras = [
   {q:"¿Para que se usa la posicion de litotomia?", a:["Sondaje mujer y ginecologia","Cirugia abdominal","Alimentacion","Shock"], c:0, e:"La litotomia (supino + estribos) se usa para sondaje de la mujer y exploraciones ginecologicas.", cat:"posiciones"},
   {q:"¿Para que se usa la posicion de Roser o Proetz?", a:["Intubacion","Enemas","Alimentacion","Cirugia abdominal"], c:0, e:"La posicion de Roser/Proetz (cabeza colgando) se usa para intubacion.", cat:"posiciones"},
   {q:"¿Que posicion se usa para la alimentacion del paciente?", a:["Fowler (45°)","Trendelenburg","Decubito lateral","Semi-Fowler (30°)"], c:0, e:"Para alimentar al paciente se usa la posicion Fowler con el cabecero a 45 grados.", cat:"posiciones"},
+  {q:"¿A cuantos grados se eleva el cabecero del paciente con contencion mecanica?", a:["30 grados","45 grados","15 grados","60 grados"], c:0, e:"El cabecero del paciente con contencion mecanica se eleva a 30 grados para prevenir aspiracion.", cat:"posiciones"},
+
+  // ===== RCP Y EMERGENCIAS =====
+  {q:"¿Cual es la relacion compresiones-ventilaciones en RCP adulto?", a:["30:2","15:2","30:1","15:1"], c:0, e:"En RCP adulto la relacion es 30 compresiones por cada 2 ventilaciones.", cat:"rcp"},
+  {q:"¿Cual es el ritmo de compresiones en RCP?", a:["100-120 por minuto","60-80 por minuto","80-100 por minuto","120-140 por minuto"], c:0, e:"En RCP, el ritmo de compresiones es de 100-120 por minuto.", cat:"rcp"},
+  {q:"¿Cual es la profundidad de las compresiones toracicas en RCP adulto?", a:["5-6 cm","3-4 cm","7-8 cm","4-5 cm"], c:0, e:"Las compresiones en RCP adulto deben tener una profundidad de 5-6 cm.", cat:"rcp"},
+  {q:"¿Cuanto tiempo maximo se emplea en VER-OIR-SENTIR la respiracion?", a:["10 segundos","5 segundos","15 segundos","30 segundos"], c:0, e:"La maniobra VER-OIR-SENTIR para comprobar respiracion dura un maximo de 10 segundos.", cat:"rcp"},
+  {q:"¿Cuantos golpes interescapulares se dan en la maniobra de desobstruccion?", a:["5 golpes","3 golpes","10 golpes","1 golpe"], c:0, e:"Se dan 5 golpes interescapulares seguidos de 5 compresiones abdominales (Heimlich).", cat:"rcp"},
+  {q:"¿Cuantas compresiones abdominales (Heimlich) se dan tras los golpes?", a:["5 compresiones","3 compresiones","10 compresiones","1 compresion"], c:0, e:"Se dan 5 compresiones abdominales (Heimlich) alternando con 5 golpes interescapulares.", cat:"rcp"},
+  {q:"¿Con cuantas ventilaciones de rescate se inicia la RCP pediatrica?", a:["5 ventilaciones","2 ventilaciones","3 ventilaciones","10 ventilaciones"], c:0, e:"La RCP pediatrica se inicia con 5 ventilaciones de rescate antes de las compresiones.", cat:"rcp"},
+  {q:"¿Con cuantos dedos se realizan las compresiones en el lactante?", a:["2 dedos","3 dedos","1 dedo","Toda la mano"], c:0, e:"En lactantes las compresiones se realizan con 2 dedos en el tercio inferior del esternon.", cat:"rcp"},
+  {q:"¿Cual es la profundidad de compresiones en RCP pediatrica/lactante?", a:["4 cm (1/3 del torax)","5-6 cm","2 cm","3 cm"], c:0, e:"En RCP pediatrica la profundidad es de aproximadamente 4 cm o 1/3 del diametro del torax.", cat:"rcp"},
+
+  // ===== WALLACE (QUEMADURAS) =====
+  {q:"¿Que porcentaje de superficie corporal representa la cabeza segun la regla de Wallace?", a:["9%","18%","4,5%","1%"], c:0, e:"Segun la regla de los 9 de Wallace, la cabeza representa el 9% de la superficie corporal.", cat:"wallace"},
+  {q:"¿Que porcentaje representa cada miembro superior segun Wallace?", a:["9%","18%","4,5%","1%"], c:0, e:"Cada miembro superior (brazo completo) representa el 9% de la superficie corporal.", cat:"wallace"},
+  {q:"¿Que porcentaje representa el tronco anterior segun Wallace?", a:["18%","9%","36%","27%"], c:0, e:"El tronco anterior representa el 18% de la superficie corporal segun Wallace.", cat:"wallace"},
+  {q:"¿Que porcentaje representa el tronco posterior segun Wallace?", a:["18%","9%","36%","27%"], c:0, e:"El tronco posterior representa el 18% de la superficie corporal segun Wallace.", cat:"wallace"},
+  {q:"¿Que porcentaje representa cada miembro inferior segun Wallace?", a:["18%","9%","27%","36%"], c:0, e:"Cada miembro inferior (pierna completa) representa el 18% de la superficie corporal.", cat:"wallace"},
+  {q:"¿Que porcentaje representan los genitales segun Wallace?", a:["1%","2%","4,5%","9%"], c:0, e:"Los genitales representan el 1% de la superficie corporal segun Wallace.", cat:"wallace"},
+  {q:"¿Que porcentaje de superficie corporal equivale a la palma de la mano del paciente?", a:["1%","2%","0,5%","5%"], c:0, e:"La palma de la mano del paciente equivale aproximadamente al 1% de su superficie corporal.", cat:"wallace"},
+  {q:"¿Cual es la suma total de porcentajes en la regla de Wallace?", a:["100%","99%","90%","108%"], c:0, e:"La regla de los 9 de Wallace suma el 100% de la superficie corporal total.", cat:"wallace"},
 
   // ===== LEGISLACION =====
   {q:"¿En que ano se aprobo la Constitucion Espanola?", a:["1978","1982","1975","1986"], c:0, e:"La Constitucion Espanola se aprobo en 1978 (referendum el 6 de diciembre).", cat:"legislacion"},
@@ -214,6 +267,14 @@ const cifras = [
   {q:"¿En que ano se aprobo el Estatuto de Autonomia de Extremadura?", a:["1983","1978","1986","1995"], c:0, e:"El Estatuto de Autonomia de Extremadura (LO 1/1983) se aprobo en 1983, reformado en 2011.", cat:"legislacion"},
   {q:"¿En que ano se reformo el Estatuto de Autonomia de Extremadura?", a:["2011","2003","2007","1999"], c:0, e:"El Estatuto de Autonomia de Extremadura se reformo en 2011.", cat:"legislacion"},
   {q:"¿Cuando fue el referendum de la Constitucion Espanola?", a:["6 de diciembre de 1978","6 de diciembre de 1975","29 de diciembre de 1978","1 de enero de 1979"], c:0, e:"El referendum de la Constitucion Espanola fue el 6 de diciembre de 1978.", cat:"legislacion"},
+  {q:"¿Cual es el numero de la Ley de Dependencia?", a:["Ley 39/2006","Ley 41/2002","Ley 31/1995","Ley 16/2003"], c:0, e:"La Ley de Dependencia es la Ley 39/2006 de Promocion de la Autonomia Personal.", cat:"legislacion"},
+  {q:"¿Cuantos grados de dependencia establece la Ley 39/2006?", a:["3 grados","2 grados","4 grados","5 grados"], c:0, e:"La Ley 39/2006 establece 3 grados de dependencia: moderada, severa y gran dependencia.", cat:"legislacion"},
+  {q:"¿Que articulo de la CE reconoce la igualdad ante la ley?", a:["Articulo 14","Articulo 43","Articulo 17","Articulo 15"], c:0, e:"El articulo 14 de la Constitucion reconoce el derecho a la igualdad ante la ley.", cat:"legislacion"},
+  {q:"¿Que articulo de la CE reconoce el derecho a la libertad?", a:["Articulo 17","Articulo 14","Articulo 43","Articulo 15"], c:0, e:"El articulo 17 de la Constitucion reconoce el derecho a la libertad y seguridad.", cat:"legislacion"},
+  {q:"¿Cual es el numero de la Ley Organica de Igualdad?", a:["LO 3/2007","LO 1/2004","LO 2/2010","LO 4/2000"], c:0, e:"La Ley Organica de Igualdad efectiva entre mujeres y hombres es la LO 3/2007.", cat:"legislacion"},
+  {q:"¿Cual es el numero de la Ley de Violencia de Genero?", a:["LO 1/2004","LO 3/2007","LO 2/2010","LO 4/2000"], c:0, e:"La Ley Organica de Medidas de Proteccion Integral contra la Violencia de Genero es la LO 1/2004.", cat:"legislacion"},
+  {q:"¿A partir de cuantos trabajadores es obligatorio un plan de igualdad en la empresa?", a:["50 trabajadores","100 trabajadores","25 trabajadores","250 trabajadores"], c:0, e:"Los planes de igualdad son obligatorios en empresas con 50 o mas trabajadores.", cat:"legislacion"},
+  {q:"¿A partir de cuantos trabajadores se constituye el Comite de Seguridad y Salud?", a:["50 trabajadores","25 trabajadores","100 trabajadores","10 trabajadores"], c:0, e:"El Comite de Seguridad y Salud se constituye en empresas con 50 o mas trabajadores.", cat:"legislacion"},
 
   // ===== ESCALAS DE VALORACION =====
   {q:"¿Que mide la escala de Norton?", a:["Riesgo de UPP","Actividades basicas de la vida diaria","Nivel de consciencia","Dolor"], c:0, e:"La escala de Norton mide el riesgo de ulceras por presion (UPP). Riesgo si ≤ 14.", cat:"escalas"},
@@ -234,6 +295,20 @@ const cifras = [
   {q:"¿A partir de cuantos errores en Pfeiffer se considera deterioro cognitivo?", a:["≥ 5 errores","≥ 3 errores","≥ 7 errores","≥ 10 errores"], c:0, e:"En la escala de Pfeiffer, ≥ 5 errores indican deterioro cognitivo.", cat:"escalas"},
   {q:"¿Que mide la escala de Downton?", a:["Riesgo de caidas","Deterioro cognitivo","Riesgo de UPP","ABVD"], c:0, e:"La escala de Downton mide el riesgo de caidas. Alto riesgo si ≥ 3.", cat:"escalas"},
   {q:"¿A partir de que puntuacion en Downton hay alto riesgo de caidas?", a:["≥ 3 puntos","≥ 5 puntos","≥ 7 puntos","≥ 2 puntos"], c:0, e:"En la escala de Downton, ≥ 3 puntos indican alto riesgo de caidas.", cat:"escalas"},
+  {q:"¿Cual es el rango del MMSE (Mini Mental State Examination)?", a:["0-30 puntos","0-100 puntos","0-15 puntos","3-15 puntos"], c:0, e:"El MMSE va de 0 a 30 puntos. Una puntuacion < 24 indica deterioro cognitivo.", cat:"escalas"},
+  {q:"¿Por debajo de que puntuacion en el MMSE se sospecha deterioro cognitivo?", a:["< 24 puntos","< 20 puntos","< 15 puntos","< 30 puntos"], c:0, e:"En el MMSE, una puntuacion inferior a 24 indica sospecha de deterioro cognitivo.", cat:"escalas"},
+  {q:"¿Cuantos items tiene la escala de Norton?", a:["5 items","6 items","4 items","10 items"], c:0, e:"La escala de Norton tiene 5 items: estado fisico, estado mental, actividad, movilidad e incontinencia.", cat:"escalas"},
+  {q:"¿Cuantos items tiene la escala de Braden?", a:["6 items","5 items","4 items","8 items"], c:0, e:"La escala de Braden tiene 6 items: percepcion sensorial, humedad, actividad, movilidad, nutricion, friccion.", cat:"escalas"},
+  {q:"¿A partir de que puntuacion en Braden se considera riesgo de UPP?", a:["< 18 puntos","< 14 puntos","< 20 puntos","< 10 puntos"], c:0, e:"En la escala de Braden, una puntuacion < 18 indica riesgo de UPP.", cat:"escalas"},
+  {q:"¿Cuantas preguntas tiene la escala de Pfeiffer?", a:["10 preguntas","5 preguntas","15 preguntas","20 preguntas"], c:0, e:"La escala de Pfeiffer consta de 10 preguntas sobre orientacion y memoria.", cat:"escalas"},
+  {q:"¿Cuantas fases tiene la escala GDS-Reisberg de deterioro cognitivo?", a:["7 fases","5 fases","4 fases","10 fases"], c:0, e:"La escala GDS-Reisberg tiene 7 fases, desde normalidad (1) hasta deterioro muy severo (7).", cat:"escalas"},
+  {q:"¿Por debajo de que puntuacion en Tinetti existe alto riesgo de caidas?", a:["< 19 puntos","< 24 puntos","< 14 puntos","< 10 puntos"], c:0, e:"En la escala de Tinetti, una puntuacion < 19 indica alto riesgo de caidas.", cat:"escalas"},
+  {q:"¿A partir de cuantos segundos en el test TUG se considera alto riesgo de caidas?", a:["> 20 segundos","> 10 segundos","> 30 segundos","> 15 segundos"], c:0, e:"En el test Timed Up and Go (TUG), mas de 20 segundos indica alto riesgo de caidas.", cat:"escalas"},
+  {q:"¿Cuantas fases del duelo describe Kubler-Ross?", a:["5 fases","4 fases","7 fases","3 fases"], c:0, e:"Kubler-Ross describe 5 fases del duelo: negacion, ira, negociacion, depresion y aceptacion.", cat:"escalas"},
+  {q:"¿Cuantas necesidades basicas describe Virginia Henderson?", a:["14 necesidades","12 necesidades","10 necesidades","16 necesidades"], c:0, e:"Virginia Henderson describe 14 necesidades basicas del ser humano.", cat:"escalas"},
+  {q:"¿Cuantos niveles tiene la piramide de Maslow?", a:["5 niveles","4 niveles","7 niveles","3 niveles"], c:0, e:"La piramide de Maslow tiene 5 niveles: fisiologicas, seguridad, sociales, estima y autorrealizacion.", cat:"escalas"},
+  {q:"¿Cuantas actividades basicas mide la escala de Katz?", a:["6 actividades","8 actividades","10 actividades","4 actividades"], c:0, e:"La escala de Katz mide 6 actividades basicas de la vida diaria.", cat:"escalas"},
+  {q:"¿Cuantos escalones tiene la escalera analgesica de la OMS?", a:["3 escalones","4 escalones","2 escalones","5 escalones"], c:0, e:"La escalera analgesica de la OMS tiene 3 escalones: AINE, opioides menores y opioides mayores.", cat:"escalas"},
 
   // ===== NUTRICION =====
   {q:"¿Cuantas calorias diarias necesita un adulto aproximadamente?", a:["2.000-2.500 kcal","1.000-1.500 kcal","3.000-3.500 kcal","1.500-1.800 kcal"], c:0, e:"Un adulto necesita aproximadamente 2.000-2.500 kcal diarias segun actividad.", cat:"nutricion"},
@@ -247,7 +322,63 @@ const cifras = [
   {q:"¿Cuanta fibra diaria se recomienda?", a:["25-30 g/dia","10-15 g/dia","40-50 g/dia","5-10 g/dia"], c:0, e:"Se recomienda consumir 25-30 g de fibra al dia para prevenir el estrenimiento.", cat:"nutricion"},
   {q:"¿Cual es el rango de IMC normal?", a:["18,5-24,9","20-25","15-20","25-30"], c:0, e:"El IMC normal esta entre 18,5 y 24,9. Por debajo de 18,5 es bajo peso y por encima de 30 es obesidad.", cat:"nutricion"},
   {q:"¿A partir de que IMC se considera obesidad?", a:["> 30","> 25","> 35","> 28"], c:0, e:"Se considera obesidad a partir de un IMC superior a 30.", cat:"nutricion"},
-  {q:"¿Por debajo de que IMC se considera bajo peso?", a:["< 18,5","< 20","< 16","< 22"], c:0, e:"Se considera bajo peso un IMC inferior a 18,5.", cat:"nutricion"}
+  {q:"¿Por debajo de que IMC se considera bajo peso?", a:["< 18,5","< 20","< 16","< 22"], c:0, e:"Se considera bajo peso un IMC inferior a 18,5.", cat:"nutricion"},
+  {q:"¿Cuantas kcal aporta 1 gramo de alcohol?", a:["7 kcal","4 kcal","9 kcal","2 kcal"], c:0, e:"El alcohol aporta 7 kcal por gramo, calorias vacias sin valor nutritivo.", cat:"nutricion"},
+  {q:"¿Cuantas vertebras cervicales tiene la columna vertebral?", a:["7","5","12","4"], c:0, e:"La columna vertebral tiene 7 vertebras cervicales.", cat:"nutricion"},
+  {q:"¿Cuantas vertebras dorsales (toracicas) tiene la columna vertebral?", a:["12","7","5","10"], c:0, e:"La columna vertebral tiene 12 vertebras dorsales o toracicas.", cat:"nutricion"},
+  {q:"¿Cuantas vertebras lumbares tiene la columna vertebral?", a:["5","7","4","12"], c:0, e:"La columna vertebral tiene 5 vertebras lumbares.", cat:"nutricion"},
+  {q:"¿Cuantas vertebras sacras tiene la columna vertebral?", a:["5","4","3","7"], c:0, e:"La columna vertebral tiene 5 vertebras sacras (fusionadas formando el sacro).", cat:"nutricion"},
+  {q:"¿Cuantos huesos tiene el carpo (muneca)?", a:["8 huesos","6 huesos","10 huesos","12 huesos"], c:0, e:"El carpo (muneca) esta formado por 8 huesos dispuestos en dos filas.", cat:"nutricion"},
+  {q:"¿A partir de cuantos farmacos se considera polifarmacia?", a:["5 o mas farmacos","3 o mas farmacos","10 o mas farmacos","7 o mas farmacos"], c:0, e:"Se considera polifarmacia cuando un paciente toma 5 o mas farmacos de forma habitual.", cat:"nutricion"},
+
+  // ===== CONVENIO SEPAD =====
+  {q:"¿A que grupo profesional pertenece el TCAE en el Convenio SEPAD?", a:["Grupo IV","Grupo II","Grupo III","Grupo V"], c:0, e:"El TCAE pertenece al Grupo IV en el Convenio Colectivo del SEPAD.", cat:"convenio"},
+  {q:"¿A que grupo profesional pertenece el Enfermero en el Convenio SEPAD?", a:["Grupo II","Grupo IV","Grupo III","Grupo I"], c:0, e:"El Enfermero pertenece al Grupo II en el Convenio Colectivo del SEPAD.", cat:"convenio"},
+  {q:"¿Cual es la jornada semanal en el Convenio SEPAD?", a:["35 horas/semana","37,5 horas/semana","40 horas/semana","38 horas/semana"], c:0, e:"La jornada semanal en el Convenio SEPAD es de 35 horas semanales.", cat:"convenio"},
+  {q:"¿Cual es la jornada anual en el Convenio SEPAD?", a:["1.554 horas/ano","1.600 horas/ano","1.750 horas/ano","1.480 horas/ano"], c:0, e:"La jornada anual en el Convenio SEPAD es de 1.554 horas al ano.", cat:"convenio"},
+  {q:"¿Cual es el descanso minimo entre jornadas en el Convenio SEPAD?", a:["12 horas","8 horas","10 horas","16 horas"], c:0, e:"El descanso minimo entre jornadas en el Convenio SEPAD es de 12 horas.", cat:"convenio"},
+  {q:"¿Cuanto dura el periodo de prueba para los Grupos I y II del SEPAD?", a:["3 meses","1 mes","6 meses","2 meses"], c:0, e:"El periodo de prueba para los Grupos I y II del SEPAD es de 3 meses.", cat:"convenio"},
+  {q:"¿Cuanto dura el periodo de prueba para los Grupos III, IV y V del SEPAD?", a:["1 mes","3 meses","15 dias","2 meses"], c:0, e:"El periodo de prueba para los Grupos III, IV y V (incluido TCAE) es de 1 mes.", cat:"convenio"},
+  {q:"¿Cuantos dias habiles de vacaciones corresponden al ano?", a:["22 dias habiles","30 dias naturales","25 dias habiles","20 dias habiles"], c:0, e:"Corresponden 22 dias habiles de vacaciones al ano segun el Convenio SEPAD.", cat:"convenio"},
+  {q:"¿Cuantos dias de moscosos (asuntos propios) corresponden?", a:["6 dias + 2 adicionales","3 dias","5 dias","4 dias + 1 adicional"], c:0, e:"Corresponden 6 dias de asuntos propios (moscosos) mas 2 dias adicionales.", cat:"convenio"},
+  {q:"¿Cuantos dias naturales de permiso corresponden por matrimonio?", a:["15 dias naturales","7 dias naturales","20 dias naturales","10 dias naturales"], c:0, e:"Por matrimonio corresponden 15 dias naturales de permiso.", cat:"convenio"},
+  {q:"¿Cuantas semanas de permiso corresponden por nacimiento de hijo?", a:["16 semanas","12 semanas","8 semanas","20 semanas"], c:0, e:"Por nacimiento de hijo corresponden 16 semanas de permiso.", cat:"convenio"},
+  {q:"¿Cuantos dias de permiso por fallecimiento de familiar de 1er grado?", a:["3 dias (5 si >100 km)","2 dias (4 si >100 km)","5 dias (7 si >100 km)","1 dia (3 si >100 km)"], c:0, e:"Por fallecimiento de familiar de 1er grado: 3 dias, o 5 dias si la distancia es mayor de 100 km.", cat:"convenio"},
+  {q:"¿Cuantos dias de permiso por fallecimiento de familiar de 2° grado?", a:["2 dias (4 si >100 km)","3 dias (5 si >100 km)","1 dia (3 si >100 km)","5 dias (7 si >100 km)"], c:0, e:"Por fallecimiento de familiar de 2° grado: 2 dias, o 4 dias si la distancia es mayor de 100 km.", cat:"convenio"},
+  {q:"¿Cual es la duracion minima de la excedencia voluntaria?", a:["4 meses","1 ano","6 meses","2 meses"], c:0, e:"La excedencia voluntaria tiene una duracion minima de 4 meses.", cat:"convenio"},
+  {q:"¿Cual es la duracion maxima de la excedencia voluntaria?", a:["5 anos","3 anos","10 anos","2 anos"], c:0, e:"La excedencia voluntaria tiene una duracion maxima de 5 anos.", cat:"convenio"},
+  {q:"¿Hasta que edad del hijo se puede solicitar excedencia por cuidado de hijo?", a:["Hasta 3 anos","Hasta 1 ano","Hasta 5 anos","Hasta 2 anos"], c:0, e:"La excedencia por cuidado de hijo puede solicitarse hasta que el hijo cumpla 3 anos.", cat:"convenio"},
+  {q:"¿Cual es la duracion maxima de la excedencia por cuidado de familiar?", a:["Hasta 2 anos","Hasta 1 ano","Hasta 3 anos","Hasta 5 anos"], c:0, e:"La excedencia por cuidado de familiar tiene una duracion maxima de 2 anos.", cat:"convenio"},
+  {q:"¿En cuantos dias prescribe una falta leve segun el Convenio SEPAD?", a:["10 dias","20 dias","30 dias","5 dias"], c:0, e:"Las faltas leves prescriben a los 10 dias.", cat:"convenio"},
+  {q:"¿En cuantos dias prescribe una falta grave segun el Convenio SEPAD?", a:["20 dias","10 dias","30 dias","60 dias"], c:0, e:"Las faltas graves prescriben a los 20 dias.", cat:"convenio"},
+  {q:"¿En cuantos dias prescribe una falta muy grave segun el Convenio SEPAD?", a:["60 dias","30 dias","90 dias","20 dias"], c:0, e:"Las faltas muy graves prescriben a los 60 dias.", cat:"convenio"},
+  {q:"¿Cual es la sancion maxima por falta leve (dias de suspension)?", a:["Hasta 2 dias","Hasta 5 dias","Hasta 3 dias","Hasta 1 dia"], c:0, e:"La sancion por falta leve es de hasta 2 dias de suspension de empleo y sueldo.", cat:"convenio"},
+  {q:"¿Cual es la sancion por falta grave (dias de suspension)?", a:["3-15 dias","1-5 dias","5-20 dias","16-60 dias"], c:0, e:"La sancion por falta grave es de 3 a 15 dias de suspension de empleo y sueldo.", cat:"convenio"},
+  {q:"¿Cual es la sancion por falta muy grave (dias de suspension)?", a:["16-60 dias o despido","3-15 dias","5-30 dias","30-90 dias"], c:0, e:"La sancion por falta muy grave es de 16 a 60 dias de suspension o despido disciplinario.", cat:"convenio"},
+
+  // ===== OXIGENOTERAPIA =====
+  {q:"¿Que concentracion de oxigeno (FiO2) proporcionan las gafas nasales?", a:["24-40%","40-60%","50-80%","80-100%"], c:0, e:"Las gafas nasales proporcionan una FiO2 del 24 al 40%.", cat:"oxigenoterapia"},
+  {q:"¿A cuantos litros por minuto funcionan las gafas nasales?", a:["1-4 L/min","5-8 L/min","8-12 L/min","10-15 L/min"], c:0, e:"Las gafas nasales funcionan a un flujo de 1 a 4 litros por minuto.", cat:"oxigenoterapia"},
+  {q:"¿Que rango de FiO2 proporciona la mascarilla tipo Venturi?", a:["24-50%","40-80%","80-100%","10-24%"], c:0, e:"La mascarilla tipo Venturi proporciona una FiO2 precisa del 24 al 50%.", cat:"oxigenoterapia"},
+  {q:"¿Que FiO2 proporciona la mascarilla con reservorio?", a:["80-100%","40-60%","24-50%","60-80%"], c:0, e:"La mascarilla con reservorio proporciona una FiO2 del 80 al 100%.", cat:"oxigenoterapia"},
+  {q:"¿A cuantos litros por minuto funciona la mascarilla con reservorio?", a:["10-15 L/min","1-4 L/min","5-8 L/min","4-6 L/min"], c:0, e:"La mascarilla con reservorio funciona a un flujo de 10 a 15 litros por minuto.", cat:"oxigenoterapia"},
+  {q:"¿A partir de cuantos litros por minuto es obligatorio el humidificador en oxigenoterapia?", a:["> 4 L/min","> 2 L/min","> 6 L/min","> 8 L/min"], c:0, e:"Es obligatorio usar humidificador cuando el flujo de oxigeno supera los 4 litros por minuto.", cat:"oxigenoterapia"},
+
+  // ===== RESIDUOS =====
+  {q:"¿De que color es la bolsa para residuos del Grupo I (urbanos)?", a:["Negra","Verde","Roja","Amarilla"], c:0, e:"Los residuos del Grupo I (urbanos/asimilables) se depositan en bolsa negra.", cat:"residuos"},
+  {q:"¿De que color es la bolsa para residuos del Grupo II (sanitarios no especificos)?", a:["Verde","Negra","Roja","Amarilla"], c:0, e:"Los residuos del Grupo II (sanitarios no especificos) se depositan en bolsa verde.", cat:"residuos"},
+  {q:"¿De que color es la bolsa para residuos del Grupo III (biosanitarios especiales)?", a:["Roja","Verde","Negra","Amarilla"], c:0, e:"Los residuos del Grupo III (biosanitarios especiales) se depositan en bolsa roja.", cat:"residuos"},
+  {q:"¿A que grupo de residuos pertenecen los citostaticos?", a:["Grupo IV","Grupo III","Grupo II","Grupo V"], c:0, e:"Los residuos citostaticos pertenecen al Grupo IV y requieren gestion especial.", cat:"residuos"},
+  {q:"¿Cuantos grupos de residuos sanitarios existen?", a:["4 grupos","3 grupos","5 grupos","2 grupos"], c:0, e:"Existen 4 grupos de residuos sanitarios: I (urbanos), II (sanitarios no especificos), III (biosanitarios especiales) y IV (citostaticos).", cat:"residuos"},
+
+  // ===== PREGUNTAS ADICIONALES MIXTAS =====
+  {q:"¿Cual es la relacion compresiones-ventilaciones en RCP con 2 reanimadores en pediatria?", a:["15:2","30:2","10:2","5:1"], c:0, e:"En RCP pediatrica con 2 reanimadores, la relacion es 15 compresiones por cada 2 ventilaciones.", cat:"rcp"},
+  {q:"¿A partir de que IMC se considera sobrepeso?", a:["25-29,9","20-24,9","30-34,9","18,5-24,9"], c:0, e:"Se considera sobrepeso un IMC entre 25 y 29,9. A partir de 30 ya es obesidad.", cat:"nutricion"},
+  {q:"¿Que porcentaje representa la cabeza en el nino segun la regla de Wallace modificada?", a:["18%","9%","14%","27%"], c:0, e:"En ninos, la cabeza representa el 18% (el doble que en adultos) debido a la proporcion corporal.", cat:"wallace"},
+  {q:"¿Donde se depositan los objetos punzantes y cortantes (agujas, bisturis)?", a:["Contenedor rigido amarillo","Bolsa roja","Bolsa negra","Bolsa verde"], c:0, e:"Los objetos punzantes y cortantes se depositan en contenedores rigidos amarillos resistentes a la perforacion.", cat:"residuos"},
+  {q:"¿Cuantos vertebras tiene la columna vertebral en total (incluyendo coxis)?", a:["33-34","26","30","28"], c:0, e:"La columna vertebral tiene 33-34 vertebras: 7C + 12D + 5L + 5S + 4-5 coxis.", cat:"nutricion"},
+  {q:"¿Cada cuantas horas se realizan cambios posturales en pacientes sentados?", a:["Cada 1 hora","Cada 2-3 horas","Cada 30 minutos","Cada 4 horas"], c:0, e:"En pacientes sentados, los cambios posturales se realizan cada hora (mas frecuentes que en encamados).", cat:"tiempos"},
+  {q:"¿Cuantos grados de hipertension arterial existen segun la clasificacion?", a:["3 grados","2 grados","4 grados","5 grados"], c:0, e:"Existen 3 grados de HTA: grado 1 (140-159/90-99), grado 2 (160-179/100-109) y grado 3 (≥180/≥110).", cat:"constantes"}
 ];
 
 // Shuffle answers for each question (keeping track of correct)
@@ -268,9 +399,14 @@ const catNames = {
   tiempos: "Tiempos / Plazos",
   inyecciones: "Angulos de Inyeccion",
   posiciones: "Posiciones del Paciente",
+  rcp: "RCP y Emergencias",
+  wallace: "Wallace / Quemaduras",
   legislacion: "Legislacion",
   escalas: "Escalas de Valoracion",
   nutricion: "Nutricion",
+  convenio: "Convenio SEPAD",
+  oxigenoterapia: "Oxigenoterapia",
+  residuos: "Residuos Sanitarios",
   todas: "Todas las Categorias"
 };
 

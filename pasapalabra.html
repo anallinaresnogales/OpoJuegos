@@ -34,11 +34,27 @@ h1{text-align:center;padding:15px;font-size:1.6em;background:linear-gradient(90d
 .s-correct{background:#4caf5044;color:#4caf50}
 .s-wrong{background:#f4433644;color:#f44336}
 .s-passed{background:#ff980044;color:#ff9800}
-.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
-.overlay-box{background:linear-gradient(135deg,#1a1a4e,#2a2a6e);border-radius:20px;padding:30px;text-align:center;max-width:400px;width:100%;border:2px solid #ffc107}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;overflow-y:auto}
+.overlay-box{background:linear-gradient(135deg,#1a1a4e,#2a2a6e);border-radius:20px;padding:30px;text-align:center;max-width:500px;width:100%;border:2px solid #ffc107;margin:auto}
 .overlay-box h2{font-size:1.8em;margin-bottom:15px;color:#ffc107}
 .overlay-box p{font-size:1.1em;margin:8px 0;line-height:1.5}
 .hidden{display:none}
+.btn-mic{background:linear-gradient(135deg,#2196f3,#42a5f5);color:#fff;font-size:1.3em;width:52px;display:flex;align-items:center;justify-content:center}
+.btn-mic.listening{background:linear-gradient(135deg,#f44336,#ef5350);animation:pulse-mic 1s infinite}
+@keyframes pulse-mic{0%,100%{box-shadow:0 0 0 0 rgba(244,67,54,.5)}50%{box-shadow:0 0 0 12px rgba(244,67,54,0)}}
+.mic-status{font-size:.75em;color:#42a5f5;margin-top:4px;min-height:18px;text-align:center}
+.mic-status.error{color:#f44336}
+.answers-section{margin-top:20px;text-align:left;width:100%}
+.answers-section h3{color:#ffc107;font-size:1.2em;margin-bottom:12px;text-align:center;border-bottom:1px solid #ffc10744;padding-bottom:8px}
+.answer-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;padding:8px 10px;border-radius:10px;font-size:.9em;line-height:1.4}
+.answer-item.wrong-answer{background:rgba(244,67,54,0.15);border-left:3px solid #f44336}
+.answer-item.passed-answer{background:rgba(255,152,0,0.15);border-left:3px solid #ff9800}
+.answer-letter{font-weight:bold;font-size:1.1em;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wrong-answer .answer-letter{background:#f44336;color:#fff}
+.passed-answer .answer-letter{background:#ff9800;color:#fff}
+.answer-detail{flex:1}
+.answer-detail .a-question{color:#ccc;font-size:.85em;margin-bottom:3px}
+.answer-detail .a-correct{color:#4caf50;font-weight:bold}
 </style>
 </head>
 <body>
@@ -56,42 +72,165 @@ h1{text-align:center;padding:15px;font-size:1.6em;background:linear-gradient(90d
 </div>
 
 <div class="overlay hidden" id="endOverlay">
-  <div class="overlay-box">
+  <div class="overlay-box" id="endBox">
     <h2 id="endTitle">FIN DEL JUEGO</h2>
     <p id="endMsg"></p>
+    <div id="answersReview"></div>
     <button class="btn btn-start" onclick="location.reload()" style="margin-top:15px">JUGAR DE NUEVO</button>
   </div>
 </div>
 
 <script>
-const questions = [
-  {letter:'A',q:'Empieza por A: Ausencia total de microorganismos',answers:['asepsia']},
-  {letter:'B',q:'Empieza por B: Escala que mide las actividades basicas de la vida diaria (ABVD)',answers:['barthel','escala de barthel','indice de barthel']},
-  {letter:'C',q:'Empieza por C: Tipo de aislamiento para pacientes con tuberculosis pulmonar',answers:['contacto','aereo','respiratorio']},
-  {letter:'D',q:'Empieza por D: Posicion en la que el paciente se coloca boca abajo',answers:['decubito prono','decubito ventral']},
-  {letter:'E',q:'Empieza por E: Eliminacion de germenes patogenos excepto esporas',answers:['esterilizacion','esterilizaciOn']},
-  {letter:'F',q:'Empieza por F: Posicion semisentada con cabecero elevado a 45 grados',answers:['fowler']},
-  {letter:'G',q:'Empieza por G: Escala que valora el nivel de consciencia (ocular, verbal, motora)',answers:['glasgow','escala de glasgow']},
-  {letter:'H',q:'Empieza por H: Tension arterial elevada por encima de 140/90 mmHg',answers:['hipertension','hipertension arterial','hta']},
-  {letter:'I',q:'Empieza por I: Infeccion adquirida durante la estancia hospitalaria',answers:['infeccion nosocomial','infeccion hospitalaria','iras']},
-  {letter:'J',q:'Empieza por J: Liquido sinovial presente en las articulaciones',answers:['jugo sinovial','junta articular']},
-  {letter:'K',q:'Contiene la K: Enfermedad pulmonar cronica tambien llamada EPOC que incluye bronquitis y enfisema',answers:['epoc']},
-  {letter:'L',q:'Empieza por L: Ley General de Sanidad de 1986',answers:['ley 14/1986','ley general de sanidad','ley 14 1986']},
-  {letter:'M',q:'Empieza por M: Tecnica de lavado de manos usado en quirofano',answers:['manos quirurgico','lavado quirurgico']},
-  {letter:'N',q:'Empieza por N: Escala que mide el riesgo de ulceras por presion',answers:['norton','escala de norton']},
-  {letter:'O',q:'Empieza por O: Aparato que mide la saturacion de oxigeno en sangre',answers:['oximetro','pulsioximetro','oximetro de pulso']},
-  {letter:'P',q:'Empieza por P: Material utilizado para inmovilizar fracturas oseas',answers:['proteccion','ferula','escayola']},
-  {letter:'Q',q:'Contiene la Q: Aparato que se usa para aplicar calor seco localizado',answers:['moquero','bolsa']},
-  {letter:'R',q:'Empieza por R: Maniobra de reanimacion cardiopulmonar basica',answers:['rcp','reanimacion cardiopulmonar','reanimacion']},
-  {letter:'S',q:'Empieza por S: Posicion del paciente tumbado boca arriba',answers:['supino','decubito supino','supina']},
-  {letter:'T',q:'Empieza por T: Posicion con la cabeza mas baja que los pies',answers:['trendelenburg','posicion de trendelenburg']},
-  {letter:'U',q:'Empieza por U: Lesion en la piel causada por presion prolongada (siglas UPP)',answers:['upp','ulcera por presion','ulceras por presion']},
-  {letter:'V',q:'Empieza por V: Constante vital que mide las pulsaciones del corazon',answers:['velocidad','frecuencia']},
-  {letter:'W',q:'Contiene la W: Unidad de medida de potencia utilizada en electromedicina',answers:['watt','vatio','w']},
-  {letter:'X',q:'Contiene la X: Tecnica diagnostica por imagen que utiliza radiacion ionizante',answers:['rayos x','radiografia','rx']},
-  {letter:'Y',q:'Contiene la Y: Mineral esencial para la funcion tiroidea que se encuentra en la sal',answers:['yodo','iodo']},
-  {letter:'Z',q:'Empieza por Z: Tipo de vendaje en espiral que forma ochos',answers:['zigzag','espiga','espiral']},
+const allRoscos = [
+  // ===== ROSCO 1 =====
+  [
+    {letter:'A',q:'Empieza por A: Ausencia total de microorganismos patogenos y no patogenos',answers:['asepsia']},
+    {letter:'B',q:'Empieza por B: Escala que mide las actividades basicas de la vida diaria con puntuacion de 0 a 100',answers:['barthel','escala de barthel','indice de barthel']},
+    {letter:'C',q:'Empieza por C: Sonda vesical de permanencia con balon de fijacion',answers:['cateter foley','cateter','cateterismo']},
+    {letter:'D',q:'Empieza por D: Enfermedad metabolica cronica caracterizada por hiperglucemia por deficit de insulina',answers:['diabetes','diabetes mellitus']},
+    {letter:'E',q:'Empieza por E: Procedimiento que introduce liquido en el recto con fines de limpieza',answers:['enema','enema de limpieza']},
+    {letter:'F',q:'Empieza por F: Posicion semisentada con cabecero elevado a 45 grados',answers:['fowler','posicion de fowler']},
+    {letter:'G',q:'Empieza por G: Escala que valora el nivel de consciencia mediante respuesta ocular, verbal y motora',answers:['glasgow','escala de glasgow']},
+    {letter:'H',q:'Empieza por H: Maniobra de compresion abdominal para desobstruccion de la via aerea en adultos',answers:['heimlich','maniobra de heimlich']},
+    {letter:'I',q:'Empieza por I: Via de administracion de medicamentos con aguja en angulo de 90 grados en el musculo',answers:['intramuscular','via intramuscular','im']},
+    {letter:'J',q:'Contiene la J: Cama ortopedica con marco y poleas para traccion de extremidades',answers:['judet','cama de judet']},
+    {letter:'K',q:'Contiene la K: Escala de valoracion de independencia en actividades basicas de la vida diaria que clasifica de la A a la G',answers:['katz','escala de katz','indice de katz']},
+    {letter:'L',q:'Empieza por L: Ley de autonomia del paciente, de derechos y obligaciones en materia de informacion y documentacion clinica, numero 41 del ano 2002',answers:['ley 41/2002','ley 41 2002','ley de autonomia del paciente']},
+    {letter:'M',q:'Empieza por M: Teorica de enfermeria que definio las 14 necesidades basicas del ser humano',answers:['maslow','henderson','virginia henderson']},
+    {letter:'N',q:'Empieza por N: Escala que mide el riesgo de desarrollar ulceras por presion valorando estado fisico, mental, actividad, movilidad e incontinencia',answers:['norton','escala de norton']},
+    {letter:'O',q:'Empieza por O: Dispositivo de medicion no invasiva de la saturacion de oxigeno en sangre',answers:['oximetro','pulsioximetro','oximetro de pulso']},
+    {letter:'P',q:'Empieza por P: Cuidados dirigidos a pacientes terminales para aliviar el sufrimiento sin buscar la curacion',answers:['paliativos','cuidados paliativos']},
+    {letter:'Q',q:'Contiene la Q: Tipo de lavado de manos que se realiza antes de procedimientos invasivos en el area quirurgica',answers:['quirurgico','lavado quirurgico']},
+    {letter:'R',q:'Empieza por R: Maniobra de reanimacion cardiopulmonar basica con compresiones y ventilaciones en relacion 30:2',answers:['rcp','reanimacion cardiopulmonar','reanimacion']},
+    {letter:'S',q:'Empieza por S: Clasificacion de Spaulding que divide el material sanitario en critico, semicritico y no critico',answers:['spaulding','clasificacion de spaulding']},
+    {letter:'T',q:'Empieza por T: Posicion en la que la cabeza del paciente esta mas baja que los pies, con inclinacion de 15-30 grados',answers:['trendelenburg','posicion de trendelenburg']},
+    {letter:'U',q:'Empieza por U: Lesion en la piel causada por presion prolongada, siglas UPP',answers:['upp','ulcera por presion','ulceras por presion']},
+    {letter:'V',q:'Empieza por V: Conjunto de signos medibles que reflejan el estado fisiologico: temperatura, pulso, respiracion y tension arterial',answers:['vitales','constantes vitales','signos vitales']},
+    {letter:'W',q:'Contiene la W: Regla para calcular la superficie corporal quemada que divide el cuerpo en porcentajes de 9',answers:['wallace','regla de wallace','regla de los nueves']},
+    {letter:'X',q:'Contiene la X: Gas toxico utilizado como metodo de esterilizacion a baja temperatura para material termosensible',answers:['oxido de etileno','eto']},
+    {letter:'Y',q:'Contiene la Y: Escala de valoracion de la depresion en personas mayores de 65 anos',answers:['yesavage','escala de yesavage']},
+    {letter:'Z',q:'Contiene la Z: Enfermedad neurodegenerativa que es la causa mas frecuente de demencia, descrita por Alois en 1906',answers:['alzheimer','enfermedad de alzheimer']}
+  ],
+  // ===== ROSCO 2 =====
+  [
+    {letter:'A',q:'Empieza por A: Aparato que utiliza vapor de agua a presion y alta temperatura (121-134 grados) para esterilizar material sanitario',answers:['autoclave']},
+    {letter:'B',q:'Empieza por B: Escala de valoracion del riesgo de ulceras por presion que valora percepcion sensorial, humedad, actividad, movilidad, nutricion y friccion',answers:['braden','escala de braden']},
+    {letter:'C',q:'Empieza por C: Tipo de incontinencia urinaria asociada a la urgencia con contraccion involuntaria del detrusor',answers:['continencia','incontinencia de urgencia']},
+    {letter:'D',q:'Empieza por D: Test de valoracion de riesgo de caidas que puntua caidas previas, medicamentos, deficit sensorial, estado mental y deambulacion',answers:['downton','escala de downton']},
+    {letter:'E',q:'Empieza por E: Tipo de nutricion artificial que se administra directamente al tubo digestivo mediante sonda',answers:['enteral','nutricion enteral']},
+    {letter:'F',q:'Empieza por F: Sonda vesical de permanencia con balon hinchable para su fijacion en la vejiga',answers:['foley','sonda foley','sonda de foley']},
+    {letter:'G',q:'Empieza por G: Posicion en la que el paciente se coloca de rodillas apoyando la cabeza y el pecho sobre la cama',answers:['genupectoral','posicion genupectoral']},
+    {letter:'H',q:'Empieza por H: Disminucion de la glucosa en sangre por debajo de 70 mg/dl',answers:['hipoglucemia']},
+    {letter:'I',q:'Empieza por I: Angulo de insercion de la aguja en la inyeccion subcutanea, que es de 45 grados',answers:['intradermica','subcutanea','inyeccion subcutanea']},
+    {letter:'J',q:'Contiene la J: Tejido que recubre las articulaciones y contiene liquido sinovial',answers:['tejido conjuntivo','cartilago','articulacion']},
+    {letter:'K',q:'Contiene la K: Ejercicios de fortalecimiento del suelo pelvico indicados en la incontinencia urinaria de esfuerzo',answers:['kegel','ejercicios de kegel']},
+    {letter:'L',q:'Empieza por L: Escala que mide las actividades instrumentales de la vida diaria como usar telefono, hacer compras o manejar dinero',answers:['lawton','lawton y brody','escala de lawton']},
+    {letter:'M',q:'Empieza por M: Posicion quirurgica inversa al Trendelenburg, con la cabeza mas alta que los pies',answers:['morestin','anti-trendelenburg','antitrendelenburg','posicion de morestin']},
+    {letter:'N',q:'Empieza por N: Via de administracion de medicamentos a traves de sonda nasogastrica',answers:['nasogastrica','sonda nasogastrica']},
+    {letter:'O',q:'Empieza por O: Abertura quirurgica en la pared abdominal para derivar un segmento intestinal al exterior',answers:['ostomia','estoma']},
+    {letter:'P',q:'Empieza por P: Test rapido de cribado de deterioro cognitivo con preguntas sobre fecha, edad y presidente, de error breve',answers:['pfeiffer','test de pfeiffer']},
+    {letter:'Q',q:'Contiene la Q: Grado de quemadura que afecta a la epidermis y parte de la dermis con aparicion de ampollas o flictenas',answers:['quemadura de segundo grado','segundo grado','quemadura segundo grado']},
+    {letter:'R',q:'Empieza por R: Tipo de sujeccion mecanica que se aplica en munecas y tobillos para inmovilizar extremidades',answers:['restriccion','restriccion fisica','restriccion mecanica','contencion','contencion mecanica']},
+    {letter:'S',q:'Empieza por S: Posicion del paciente tumbado boca arriba, tambien llamada decubito dorsal',answers:['supino','decubito supino','supina']},
+    {letter:'T',q:'Empieza por T: Test que mide la movilidad funcional cronometrando el tiempo para levantarse, caminar 3 metros y volver a sentarse',answers:['timed up and go','tug','test tug']},
+    {letter:'U',q:'Empieza por U: Volumen de orina normal en 24 horas en un adulto, entre 800 y 2000 ml, conocida como diuresis normal',answers:['urea','diuresis','uresis']},
+    {letter:'V',q:'Empieza por V: Regla de los cinco correctos en la administracion de medicamentos: paciente, medicamento, dosis, via y...',answers:['verificacion','hora']},
+    {letter:'W',q:'Contiene la W: Teoria de la motivacion humana que organiza las necesidades en una piramide de cinco niveles',answers:['maslow','piramide de maslow']},
+    {letter:'X',q:'Contiene la X: Estado de falta de oxigeno en los tejidos del organismo',answers:['hipoxia','anoxia']},
+    {letter:'Y',q:'Contiene la Y: Proyeccion o abertura creada quirurgicamente para conectar una cavidad con el exterior, como la colostomia o ileostomia',answers:['yeyunostomia','ostomia','estomia']},
+    {letter:'Z',q:'Contiene la Z: Vendaje en forma de ocho utilizado en articulaciones para permitir cierta movilidad',answers:['zigzag','espiga','vendaje en ocho']}
+  ],
+  // ===== ROSCO 3 =====
+  [
+    {letter:'A',q:'Empieza por A: Dispositivo externo semiautomatico que analiza el ritmo cardiaco y administra descarga electrica en parada cardiaca',answers:['aed','dea','desfibrilador','desfibrilador externo automatico']},
+    {letter:'B',q:'Empieza por B: Indice de masa corporal que se calcula dividiendo el peso en kg entre la talla en metros al cuadrado',answers:['bmi','imc','indice de masa corporal']},
+    {letter:'C',q:'Empieza por C: Cadena de supervivencia que incluye alerta precoz, RCP precoz, desfibrilacion precoz y cuidados avanzados',answers:['cadena de supervivencia']},
+    {letter:'D',q:'Empieza por D: Eliminacion de todos los microorganismos patogenos de superficies y objetos, excepto esporas, mediante agentes quimicos',answers:['desinfeccion']},
+    {letter:'E',q:'Empieza por E: Metodo de esterilizacion gaseosa con oxido de etileno indicado para material termosensible',answers:['eto','oxido de etileno','esterilizacion por eto']},
+    {letter:'F',q:'Empieza por F: Temperatura corporal elevada por encima de 38 grados centigrados',answers:['fiebre','febricula','hipertermia']},
+    {letter:'G',q:'Empieza por G: Grupo de residuos sanitarios que incluye los residuos citotoxicos, segun la clasificacion de residuos hospitalarios (grupo IV)',answers:['grupo iv','grupo 4','grupo cuatro']},
+    {letter:'H',q:'Empieza por H: Modelo de necesidades basicas que incluye 14 necesidades fundamentales definido por Virginia',answers:['henderson','virginia henderson','modelo de henderson']},
+    {letter:'I',q:'Empieza por I: Tipo de incontinencia urinaria que se produce al toser, reir o realizar esfuerzos',answers:['incontinencia de esfuerzo','incontinencia urinaria de esfuerzo']},
+    {letter:'J',q:'Contiene la J: Primer eslabon de la cadena de supervivencia ante una parada cardiaca, que consiste en llamar al 112',answers:['alerta precoz','juicio','reconocimiento']},
+    {letter:'K',q:'Contiene la K: Sindrome de agotamiento emocional, despersonalizacion y baja realizacion profesional en el trabajador',answers:['burnout']},
+    {letter:'L',q:'Empieza por L: Ley de Dependencia numero 39 del ano 2006 que regula la autonomia personal y atencion a personas en situacion de dependencia',answers:['ley 39/2006','ley 39 2006','ley de dependencia']},
+    {letter:'M',q:'Empieza por M: Examen de estado mental breve que valora orientacion, memoria, atencion, calculo y lenguaje con puntuacion maxima de 30',answers:['minimental','mmse','mini mental','miniexamen','mini-mental']},
+    {letter:'N',q:'Empieza por N: Primer escalon de la escalera analgesica de la OMS, que incluye paracetamol y AINEs',answers:['no opioides','analgesicos no opioides','primer escalon']},
+    {letter:'O',q:'Empieza por O: Dispositivo de oxigenoterapia de bajo flujo formado por dos canulas que se introducen en las fosas nasales',answers:['oxigeno','gafas nasales','canula nasal']},
+    {letter:'P',q:'Empieza por P: Protocolo de actuacion ante emergencias que incluye Proteger, Avisar y Socorrer',answers:['pas','proteger avisar socorrer']},
+    {letter:'Q',q:'Contiene la Q: Tercer escalon de la escalera analgesica de la OMS que incluye opioides potentes como la morfina',answers:['quimico','opioides mayores','tercer escalon','morfina']},
+    {letter:'R',q:'Empieza por R: Tipo de hemorragia en la que la sangre fluye de forma continua y color rojo oscuro, procedente de una vena',answers:['roja oscura','venosa','hemorragia venosa']},
+    {letter:'S',q:'Empieza por S: Superficie especial para el manejo de la presion usada en la prevencion de UPP',answers:['semp','superficie especial para el manejo de la presion','superficie especial']},
+    {letter:'T',q:'Empieza por T: Escala que valora la marcha y el equilibrio para detectar riesgo de caidas en ancianos',answers:['tinetti','escala de tinetti','test de tinetti']},
+    {letter:'U',q:'Empieza por U: Ulcera por presion en estadio III que afecta a todo el espesor de la piel incluyendo tejido subcutaneo',answers:['upp estadio iii','upp estadio 3','estadio iii','estadio 3','ulcera estadio iii']},
+    {letter:'V',q:'Empieza por V: Via de administracion de medicamentos que se coloca debajo de la lengua para absorcion rapida',answers:['via sublingual','sublingual']},
+    {letter:'W',q:'Contiene la W: Posicion de decubito lateral izquierdo con pierna derecha flexionada usada para administrar enemas',answers:['sims','posicion de sims']},
+    {letter:'X',q:'Contiene la X: Dispositivo que suministra oxigeno a concentraciones fijas del 24 al 50 por ciento mediante sistema Venturi',answers:['mascarilla venturi','venturi','mascarilla de oxigeno']},
+    {letter:'Y',q:'Contiene la Y: Primera fase del duelo segun Kubler-Ross, en la que el paciente no acepta la realidad',answers:['negacion','negacion y aislamiento']},
+    {letter:'Z',q:'Contiene la Z: Tipo de dieta que se administra cuando el paciente no puede utilizar la via oral ni la via enterica',answers:['parenteral','nutricion parenteral']}
+  ],
+  // ===== ROSCO 4 =====
+  [
+    {letter:'A',q:'Empieza por A: Principio bioetico que respeta la capacidad del paciente para tomar sus propias decisiones sobre su salud',answers:['autonomia','principio de autonomia']},
+    {letter:'B',q:'Empieza por B: Cama hospitalaria con marco metalico, poleas y trapecio, tambien llamada cama ortopedica',answers:['balkan','cama de balkan','marco de balkan','cama balkanica']},
+    {letter:'C',q:'Empieza por C: Documento en el que el paciente manifiesta anticipadamente su voluntad sobre cuidados y tratamientos al final de su vida',answers:['consentimiento','voluntades anticipadas','testamento vital','instrucciones previas']},
+    {letter:'D',q:'Empieza por D: Posicion del paciente acostado boca abajo, tambien llamada decubito ventral',answers:['decubito prono','decubito ventral','prono']},
+    {letter:'E',q:'Empieza por E: Modelo de atencion integral al paciente formado por medicos, enfermeras, TCAE, fisioterapeutas y trabajadores sociales',answers:['equipo interdisciplinar','equipo multidisciplinar','equipo']},
+    {letter:'F',q:'Empieza por F: Complicacion cronica de la diabetes que afecta a los pies por neuropatia y vasculopatia',answers:['pie diabetico','foot']},
+    {letter:'G',q:'Empieza por G: Valoracion integral del anciano que incluye dimensiones clinica, funcional, mental y social',answers:['geriatrica','valoracion geriatrica integral','valoracion geriatrica']},
+    {letter:'H',q:'Empieza por H: Elevacion de la glucosa en sangre por encima de 126 mg/dl en ayunas',answers:['hiperglucemia']},
+    {letter:'I',q:'Empieza por I: Hormona producida por el pancreas que regula los niveles de glucosa en sangre, deficitaria en diabetes tipo 1',answers:['insulina']},
+    {letter:'J',q:'Contiene la J: Orden de colocacion de la ropa de cama que incluye sabana bajera, entremetida, sabana encimera, manta y colcha',answers:['bajera','sabana bajera','juego de cama']},
+    {letter:'K',q:'Contiene la K: Tipo de bastones que se apoyan en los antebrazos y son los mas usados en rehabilitacion',answers:['bastones ingleses','muletas','muleta']},
+    {letter:'L',q:'Empieza por L: Signo precoz de muerte que consiste en las manchas violaceas en zonas declives del cadaver por acumulacion de sangre',answers:['livideces','livideces cadavericas','livor mortis']},
+    {letter:'M',q:'Empieza por M: Mascarilla de oxigenoterapia de alto flujo con sistema que permite regular la concentracion de oxigeno inspirado',answers:['mascarilla venturi','venturi','mascarilla']},
+    {letter:'N',q:'Empieza por N: Macronutriente esencial con 4 kcal por gramo, base de los tejidos y enzimas, formada por aminoacidos',answers:['nutrientes','proteinas','proteina']},
+    {letter:'O',q:'Empieza por O: Ley Organica 3/2007 para la igualdad efectiva entre mujeres y hombres',answers:['organica','ley organica 3/2007','ley organica 3 2007','lo 3/2007']},
+    {letter:'P',q:'Empieza por P: Principio bioetico de no hacer dano al paciente, tambien llamado primum non nocere',answers:['principio de no maleficencia','no maleficencia']},
+    {letter:'Q',q:'Contiene la Q: Tipo de quemadura de primer grado que solo afecta a la epidermis, con enrojecimiento y dolor',answers:['quemadura de primer grado','primer grado','quemadura primer grado','eritema']},
+    {letter:'R',q:'Empieza por R: Rigidez del cadaver que aparece entre 2-4 horas despues de la muerte por contraccion muscular',answers:['rigor mortis','rigidez cadaverica']},
+    {letter:'S',q:'Empieza por S: Cama articulada que permite rotar al paciente y se utiliza en grandes quemados y politraumatizados',answers:['stryker','cama stryker','cama de stryker']},
+    {letter:'T',q:'Empieza por T: Temperatura corporal normal en la axila, que oscila entre 36 y 37 grados centigrados',answers:['temperatura','temperatura axilar','36','36.5']},
+    {letter:'U',q:'Empieza por U: Sigla que designa la unidad de cuidados intensivos',answers:['uci','unidad de cuidados intensivos']},
+    {letter:'V',q:'Empieza por V: Tipo de aislamiento hospitalario que requiere habitacion con presion negativa para enfermedades como tuberculosis',answers:['via aerea','aislamiento aereo','aislamiento respiratorio']},
+    {letter:'W',q:'Contiene la W: Norma de prevencion de riesgos laborales, ley 31 del ano 1995',answers:['ley 31/1995','ley 31 1995','ley de prevencion','ley de prevencion de riesgos laborales']},
+    {letter:'X',q:'Contiene la X: Tipo de asfixia por obstruccion de las vias aereas por un cuerpo extrano, conocida como atragantamiento',answers:['asfixia','obstruccion','atragantamiento','ovace']},
+    {letter:'Y',q:'Contiene la Y: Via de administracion de medicamentos mediante inyeccion directa en el torrente sanguineo venoso',answers:['intravenosa','inyeccion intravenosa','endovenosa','iv']},
+    {letter:'Z',q:'Contiene la Z: Organo glandular situado detras del estomago que produce insulina y glucagon',answers:['pancreas']}
+  ],
+  // ===== ROSCO 5 =====
+  [
+    {letter:'A',q:'Empieza por A: Baston con cuatro puntos de apoyo que ofrece mayor estabilidad en la deambulacion',answers:['andador','baston cuadripode','andador con ruedas']},
+    {letter:'B',q:'Empieza por B: Principio bioetico que obliga a hacer el bien al paciente y actuar en su beneficio',answers:['beneficencia','principio de beneficencia']},
+    {letter:'C',q:'Empieza por C: Cinco fases del duelo segun Kubler-Ross: negacion, ira, negociacion, depresion y...',answers:['aceptacion']},
+    {letter:'D',q:'Empieza por D: Dieta terapeutica que restringe la ingesta de sodio, indicada en hipertension y edemas',answers:['dieta hiposodica','dieta sin sal','dieta baja en sodio']},
+    {letter:'E',q:'Empieza por E: Clasificacion de las faltas disciplinarias en el convenio del SEPAD: leves, graves y muy...',answers:['graves','especialmente graves','muy graves']},
+    {letter:'F',q:'Empieza por F: Factor de riesgo de caidas en ancianos relacionado con la toma de mas de 4 medicamentos',answers:['farmacologico','polifarmacia','polimedicacion']},
+    {letter:'G',q:'Empieza por G: Tipo de lavado que se realiza en pacientes encamados desde la zona genital, de delante hacia atras',answers:['genital','lavado genital','higiene genital']},
+    {letter:'H',q:'Empieza por H: Tipo de hemorragia en la que la sangre sale a borbotones, de color rojo brillante, procedente de una arteria',answers:['hemorragia arterial','arterial']},
+    {letter:'I',q:'Empieza por I: Via de administracion de medicamentos con aguja en angulo de 15 grados, entre la epidermis y la dermis',answers:['intradermica','via intradermica','id']},
+    {letter:'J',q:'Contiene la J: Principio bioetico que establece la distribucion equitativa de los recursos sanitarios',answers:['justicia','principio de justicia']},
+    {letter:'K',q:'Contiene la K: Sindrome de desgaste profesional caracterizado por agotamiento, despersonalizacion y baja realizacion personal',answers:['burnout','sindrome de burnout']},
+    {letter:'L',q:'Empieza por L: Ropa de cama que se coloca sobre el colchon y se fija por debajo del mismo, en contacto directo con el paciente',answers:['sabana bajera','bajera','lenzuelo']},
+    {letter:'M',q:'Empieza por M: Piramide que jerarquiza las necesidades humanas en cinco niveles: fisiologicas, seguridad, sociales, estima y autorrealizacion',answers:['maslow','piramide de maslow','abraham maslow']},
+    {letter:'N',q:'Empieza por N: Tipo de dieta absoluta en la que el paciente no puede ingerir ningun alimento ni liquido por via oral',answers:['nada por boca','npo','dieta absoluta','nada']},
+    {letter:'O',q:'Empieza por O: Terapia de administracion de oxigeno a pacientes con insuficiencia respiratoria',answers:['oxigenoterapia','oxigeno']},
+    {letter:'P',q:'Empieza por P: Posicion del paciente tumbado de lado, usada para la administracion de enemas, tambien llamada posicion de Sims',answers:['posicion de sims','sims','posicion lateral de seguridad']},
+    {letter:'Q',q:'Contiene la Q: Tipo de cama hospitalaria que se presenta con la ropa recogida en forma de abanico para recibir al paciente del quirofano',answers:['quirofano','cama quirurgica','cama de anestesia','cama de quirofano']},
+    {letter:'R',q:'Empieza por R: Pendiente maxima permitida para rampas de acceso de sillas de ruedas, que es del 8 al 10 por ciento',answers:['rampa','rampas','rampa accesible']},
+    {letter:'S',q:'Empieza por S: Posicion lateral izquierda con pierna superior flexionada usada para enemas y examen rectal',answers:['sims','posicion de sims']},
+    {letter:'T',q:'Empieza por T: Amortajamiento o preparacion del cadaver que incluye lavado, identificacion, vendaje y colocacion del sudario',answers:['tanatopractico','tanatopaxia','cuidados postmortem','amortajamiento']},
+    {letter:'U',q:'Empieza por U: Tipo de sonda urinaria de un solo uso para vaciado puntual de la vejiga, sin balon de fijacion',answers:['uretral','sonda uretral','sondaje intermitente','nelaton','sonda nelaton']},
+    {letter:'V',q:'Empieza por V: Tipo de discriminacion laboral en la que la mujer no puede ascender a puestos directivos, llamada techo de cristal',answers:['vertical','techo de cristal','discriminacion vertical']},
+    {letter:'W',q:'Contiene la W: Organizacion mundial de la salud que definio la escalera analgesica de tres escalones',answers:['oms','organizacion mundial de la salud','who']},
+    {letter:'X',q:'Contiene la X: Tipo de riesgo laboral por contacto con agentes biologicos como sangre y fluidos corporales',answers:['exposicion','riesgo biologico','biologico']},
+    {letter:'Y',q:'Contiene la Y: Tipo de ayuda para la deambulacion formada por dos barras metalicas con empunadura que se apoyan en las axilas',answers:['muletas axilares','muletas','muleta']},
+    {letter:'Z',q:'Contiene la Z: Organo del cuerpo humano situado en la pelvis que almacena la orina producida por los rinones',answers:['vejiga','vejiga urinaria']}
+  ]
 ];
+
+// Select a random rosco
+const questions = allRoscos[Math.floor(Math.random() * allRoscos.length)];
 
 let state=[], current=0, timer=200, interval=null, correct=0, wrong=0, passed=0, playing=false;
 
@@ -132,25 +271,101 @@ function findNext(){
   return false;
 }
 
+// --- Voice Recognition ---
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 3;
+}
+
+function toggleMic() {
+  if (!recognition) {
+    const st = document.getElementById('micStatus');
+    if (st) { st.textContent = 'Tu navegador no soporta voz'; st.className = 'mic-status error'; }
+    return;
+  }
+  if (isListening) {
+    recognition.stop();
+    return;
+  }
+  const inp = document.getElementById('ansInput');
+  const micBtn = document.getElementById('micBtn');
+  const st = document.getElementById('micStatus');
+  if (!inp || !micBtn) return;
+
+  isListening = true;
+  micBtn.classList.add('listening');
+  micBtn.textContent = '\u23F9\uFE0F';
+  if (st) { st.textContent = 'Escuchando...'; st.className = 'mic-status'; }
+
+  recognition.onresult = function(e) {
+    let transcript = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      transcript = e.results[i][0].transcript;
+    }
+    inp.value = transcript.trim();
+    if (st) st.textContent = '\uD83C\uDFA4 "' + transcript.trim() + '"';
+    // Auto-submit on final result
+    if (e.results[e.results.length - 1].isFinal) {
+      setTimeout(() => submitAnswer(), 300);
+    }
+  };
+
+  recognition.onerror = function(e) {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '\uD83C\uDFA4';
+    if (st) {
+      if (e.error === 'not-allowed') {
+        st.textContent = 'Permite el micr\u00F3fono en ajustes';
+      } else {
+        st.textContent = 'No te he o\u00EDdo, int\u00E9ntalo de nuevo';
+      }
+      st.className = 'mic-status error';
+    }
+  };
+
+  recognition.onend = function() {
+    isListening = false;
+    if (micBtn) { micBtn.classList.remove('listening'); micBtn.textContent = '\uD83C\uDFA4'; }
+  };
+
+  recognition.start();
+}
+
 function showQuestion(){
   document.querySelectorAll('.letter-circle').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('lc'+current);
   el.classList.add('active');
   const qa=document.getElementById('qArea');
+  const micSupported = !!recognition;
   qa.innerHTML=`
     <div class="question-text">${questions[current].q}</div>
     <div class="input-row">
-      <input type="text" id="ansInput" placeholder="Tu respuesta..." autocomplete="off" autocapitalize="none" autofocus>
+      <input type="text" id="ansInput" placeholder="Escribe o usa el micro..." autocomplete="off" autocapitalize="none" autofocus>
+      ${micSupported ? '<button class="btn btn-mic" id="micBtn" onclick="toggleMic()">\uD83C\uDFA4</button>' : ''}
       <button class="btn btn-submit" onclick="submitAnswer()">OK</button>
     </div>
     <div class="action-row">
       <button class="btn btn-pass" onclick="passQuestion()">PASAPALABRA</button>
-    </div>`;
+    </div>
+    ${micSupported ? '<div class="mic-status" id="micStatus"></div>' : ''}`;
   document.getElementById('ansInput').addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer()});
   setTimeout(()=>{const inp=document.getElementById('ansInput');if(inp)inp.focus()},100);
 }
 
+function stopMic(){
+  if(recognition && isListening){try{recognition.stop()}catch(e){} isListening=false;}
+}
+
 function submitAnswer(){
+  stopMic();
   const inp=document.getElementById('ansInput');
   if(!inp)return;
   const val=normalize(inp.value);
@@ -173,6 +388,7 @@ function submitAnswer(){
 function countPending(){return state.filter(s=>s==='pending'||s==='passed').length}
 
 function passQuestion(){
+  stopMic();
   if(state[current]==='pending'){passed++;state[current]='passed';
     const el=document.getElementById('lc'+current);el.className='letter-circle passed';el.classList.remove('active');
   }
@@ -206,7 +422,36 @@ function endGame(){
     `<span style="color:#4caf50">Aciertos: ${correct}</span><br>
      <span style="color:#f44336">Fallos: ${wrong}</span><br>
      <span style="color:#ff9800">Sin responder: ${26-correct-wrong}</span><br><br>
-     Puntuacion: ${correct} / 26`;
+     Puntuaci\u00F3n: ${correct} / 26`;
+
+  // Build answers review section
+  let reviewHTML = '';
+  let hasReview = false;
+  questions.forEach((q, i) => {
+    if (state[i] === 'wrong' || state[i] === 'passed' || state[i] === 'pending') {
+      hasReview = true;
+      const cls = state[i] === 'wrong' ? 'wrong-answer' : 'passed-answer';
+      const label = state[i] === 'wrong' ? 'Fallada' : 'Sin responder';
+      reviewHTML += `
+        <div class="answer-item ${cls}">
+          <div class="answer-letter">${q.letter}</div>
+          <div class="answer-detail">
+            <div class="a-question">${q.q}</div>
+            <div class="a-correct">Respuesta: ${q.answers[0]}</div>
+          </div>
+        </div>`;
+    }
+  });
+
+  if (hasReview) {
+    document.getElementById('answersReview').innerHTML = `
+      <div class="answers-section">
+        <h3>Respuestas correctas</h3>
+        ${reviewHTML}
+      </div>`;
+  } else {
+    document.getElementById('answersReview').innerHTML = '';
+  }
 }
 
 initRosco();

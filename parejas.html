@@ -110,6 +110,12 @@ h1{font-size:1.6em;text-align:center;margin-bottom:4px;background:linear-gradien
       <button class="opt-btn" data-cat="tecnicas" onclick="selectCat(this)">Tecnicas</button>
       <button class="opt-btn" data-cat="farmaco" onclick="selectCat(this)">Farmacologia</button>
       <button class="opt-btn" data-cat="patologias" onclick="selectCat(this)">Patologias</button>
+      <button class="opt-btn" data-cat="nutricion" onclick="selectCat(this)">Nutricion</button>
+      <button class="opt-btn" data-cat="emergencias" onclick="selectCat(this)">Emergencias</button>
+      <button class="opt-btn" data-cat="bioetica" onclick="selectCat(this)">Bioetica</button>
+      <button class="opt-btn" data-cat="convenio" onclick="selectCat(this)">Convenio</button>
+      <button class="opt-btn" data-cat="upp" onclick="selectCat(this)">UPP</button>
+      <button class="opt-btn" data-cat="esterilizacion" onclick="selectCat(this)">Esterilizacion</button>
     </div>
   </div>
   <button class="play-btn" onclick="startGame()">Jugar</button>
@@ -142,41 +148,43 @@ h1{font-size:1.6em;text-align:center;margin-bottom:4px;background:linear-gradien
 
 <script>
 // ============================================================
-// DATA: 80+ pairs extracted from TCAE SEPAD 2026 study materials
+// DATA: ~200 pairs extracted from TCAE SEPAD 2026 study materials
 // ============================================================
 const parejas = [
-  // ESCALAS
+  // ESCALAS (16)
   { concept: "Escala Norton", definition: "Riesgo UPP: <14 = riesgo (5 items)", category: "escalas" },
-  { concept: "Escala Braden", definition: "Riesgo UPP: <13 = alto riesgo (6 items)", category: "escalas" },
-  { concept: "Barthel", definition: "ABVD: 0-100 puntos (10 items)", category: "escalas" },
-  { concept: "Lawton-Brody", definition: "AIVD instrumentales: 0-8 puntos", category: "escalas" },
+  { concept: "Escala Braden", definition: "Riesgo UPP: <18 = riesgo (6 items)", category: "escalas" },
+  { concept: "Barthel", definition: "AVD basicas: 0-100 puntos (10 items)", category: "escalas" },
+  { concept: "Lawton-Brody", definition: "AVD instrumentales: 0-8 puntos", category: "escalas" },
   { concept: "Glasgow", definition: "Nivel consciencia: 3-15 (<8 = coma)", category: "escalas" },
   { concept: "EVA (dolor)", definition: "Escala Visual Analogica: 0-10", category: "escalas" },
-  { concept: "Pfeiffer (SPMSQ)", definition: "Deterioro cognitivo: >=5 errores", category: "escalas" },
+  { concept: "Pfeiffer (SPMSQ)", definition: "Deterioro cognitivo: 10 preguntas, >=5 errores", category: "escalas" },
   { concept: "Downton", definition: "Riesgo de caidas: >=3 alto riesgo", category: "escalas" },
   { concept: "Tinetti", definition: "Equilibrio y marcha: <19 alto riesgo", category: "escalas" },
   { concept: "MMSE (Minimental)", definition: "Estado cognitivo: 0-30 (<24 deterioro)", category: "escalas" },
   { concept: "GDS-Reisberg", definition: "7 fases deterioro cognitivo Alzheimer", category: "escalas" },
   { concept: "Yesavage (GDS)", definition: "Screening depresion en ancianos", category: "escalas" },
   { concept: "Escala Zarit", definition: "Sobrecarga cuidador: >=47 sobrecarga", category: "escalas" },
-  { concept: "Katz", definition: "ABVD: bano, vestido, WC, movilidad, continencia, alimentacion", category: "escalas" },
+  { concept: "Katz", definition: "6 ABVD: bano, vestido, WC, movilidad, continencia, alimentacion", category: "escalas" },
   { concept: "Escala OARS", definition: "Valoracion recursos sociales del anciano", category: "escalas" },
   { concept: "Escala Morse", definition: "Riesgo de caidas hospitalario", category: "escalas" },
+  { concept: "TUG", definition: "Timed Up and Go: >20s alto riesgo caida", category: "escalas" },
 
-  // POSICIONES
-  { concept: "Fowler", definition: "Semisentado cabecero 45: comer, disnea", category: "posiciones" },
+  // POSICIONES (12)
+  { concept: "Fowler", definition: "Semisentado 45-90: problemas respiratorios", category: "posiciones" },
   { concept: "Semi-Fowler", definition: "Cabecero a 30 grados: disnea leve", category: "posiciones" },
   { concept: "Fowler alta", definition: "Cabecero a 90 grados: disnea severa", category: "posiciones" },
-  { concept: "Trendelenburg", definition: "Pies elevados 15-30, cabeza baja: shock", category: "posiciones" },
-  { concept: "Anti-Trendelenburg", definition: "Cabeza elevada 15-30: cirugia abdominal", category: "posiciones" },
+  { concept: "Trendelenburg", definition: "Cabeza mas baja que pies: shock", category: "posiciones" },
+  { concept: "Morestin", definition: "Anti-Trendelenburg: reflujo gastroesofagico", category: "posiciones" },
   { concept: "Sims", definition: "Lateral izq + pierna flexionada: enemas", category: "posiciones" },
-  { concept: "Litotomia", definition: "Supino + estribos: sondaje mujer, ginecologia", category: "posiciones" },
+  { concept: "Litotomia", definition: "Ginecologica, parto, sondaje mujer", category: "posiciones" },
   { concept: "Roser / Proetz", definition: "Cabeza colgando: intubacion, lavado cabello", category: "posiciones" },
-  { concept: "Genupectoral", definition: "= Mahometana: exploracion rectal", category: "posiciones" },
+  { concept: "Genupectoral", definition: "Rodillas-pecho: exploracion rectal", category: "posiciones" },
   { concept: "Kraske (navaja)", definition: "Cirugia de la zona coxigea", category: "posiciones" },
   { concept: "Decubito supino", definition: "Boca arriba: exploracion abdominal", category: "posiciones" },
+  { concept: "Decubito prono", definition: "Boca abajo: cirugia dorsal", category: "posiciones" },
 
-  // LEGISLACION
+  // LEGISLACION (14)
   { concept: "Ley 41/2002", definition: "Autonomia del paciente, consentimiento informado", category: "legislacion" },
   { concept: "Ley 39/2006", definition: "Dependencia: SAAD, grados, prestaciones", category: "legislacion" },
   { concept: "Ley 14/1986", definition: "Ley General de Sanidad", category: "legislacion" },
@@ -189,8 +197,10 @@ const parejas = [
   { concept: "Ley 33/2011", definition: "Ley General de Salud Publica", category: "legislacion" },
   { concept: "Virginia Henderson", definition: "Modelo de 14 necesidades fundamentales", category: "legislacion" },
   { concept: "Piramide de Maslow", definition: "5 niveles: fisiologicas a autorrealizacion", category: "legislacion" },
+  { concept: "LO 3/2007", definition: "Igualdad efectiva mujeres y hombres", category: "legislacion" },
+  { concept: "LO 1/2004", definition: "Violencia de genero: medidas proteccion integral", category: "legislacion" },
 
-  // TEMPERATURAS
+  // TEMPERATURAS (10)
   { concept: "Hipotermia", definition: "Temperatura corporal < 35 C", category: "temperaturas" },
   { concept: "Febricula", definition: "Temperatura entre 37-38 C (no es fiebre)", category: "temperaturas" },
   { concept: "Fiebre", definition: "Temperatura >= 38 C", category: "temperaturas" },
@@ -202,7 +212,7 @@ const parejas = [
   { concept: "Bano encamado", definition: "Agua a 37-40 C (temperatura corporal)", category: "temperaturas" },
   { concept: "Enema limpieza", definition: "Solucion a 35-37 C (temperatura corporal)", category: "temperaturas" },
 
-  // ANATOMIA
+  // ANATOMIA (12)
   { concept: "Hueso hioides", definition: "Unico hueso que no articula con ningun otro", category: "anatomia" },
   { concept: "Columna vertebral", definition: "7C + 12D + 5L + 5S + 4-5 coxis", category: "anatomia" },
   { concept: "Carpo (muneca)", definition: "Formado por 8 huesecillos", category: "anatomia" },
@@ -211,8 +221,12 @@ const parejas = [
   { concept: "Aduccion", definition: "Acercamiento al plano medio corporal", category: "anatomia" },
   { concept: "Acetilcolina", definition: "Neurotransmisor disminuido en Alzheimer", category: "anatomia" },
   { concept: "Celulas beta pancreaticas", definition: "Producen insulina, destruidas en DM1", category: "anatomia" },
+  { concept: "Epidermis", definition: "Capa mas externa de la piel, avascular", category: "anatomia" },
+  { concept: "Dermis", definition: "Capa media de la piel, con vasos y nervios", category: "anatomia" },
+  { concept: "Hipodermis", definition: "Capa profunda, tejido adiposo subcutaneo", category: "anatomia" },
+  { concept: "Periostio", definition: "Membrana que recubre el hueso externamente", category: "anatomia" },
 
-  // CONSTANTES VITALES
+  // CONSTANTES VITALES (11)
   { concept: "Frecuencia cardiaca normal", definition: "60-100 lpm (<60 bradi / >100 taqui)", category: "constantes" },
   { concept: "Frecuencia respiratoria", definition: "12-20 rpm (medir sin que lo sepa)", category: "constantes" },
   { concept: "TA normal", definition: "120/80 mmHg (>=140/90 hipertension)", category: "constantes" },
@@ -222,8 +236,10 @@ const parejas = [
   { concept: "Oliguria", definition: "Diuresis < 400 mL/dia", category: "constantes" },
   { concept: "Anuria", definition: "Diuresis < 100 mL/dia", category: "constantes" },
   { concept: "IMC normal", definition: "18,5-24,9 (<18,5 bajo / >30 obesidad)", category: "constantes" },
+  { concept: "Poliuria", definition: "Diuresis > 3.000 mL/dia", category: "constantes" },
+  { concept: "Bradipnea", definition: "Frecuencia respiratoria < 12 rpm", category: "constantes" },
 
-  // TECNICAS Y PROCEDIMIENTOS
+  // TECNICAS Y PROCEDIMIENTOS (16)
   { concept: "Lavado manos social", definition: "40-60 segundos con jabon normal", category: "tecnicas" },
   { concept: "Lavado manos quirurgico", definition: "3-5 minutos con cepillo y antiseptico", category: "tecnicas" },
   { concept: "Friccion alcoholica", definition: "20-30 segundos con solucion hidroalcoholica", category: "tecnicas" },
@@ -238,8 +254,10 @@ const parejas = [
   { concept: "Esputo", definition: "Recoger por la manana al despertar, en ayunas", category: "tecnicas" },
   { concept: "Regla 5 correctos", definition: "Paciente, medicamento, dosis, via y hora", category: "tecnicas" },
   { concept: "Esquinas de mitra", definition: "Tecnica para fijar sabana bajera a la cama", category: "tecnicas" },
+  { concept: "Hemocultivo", definition: "2 muestras de sitios distintos, pico febril", category: "tecnicas" },
+  { concept: "Coprocultivo", definition: "Muestra de heces, evitar contaminacion orina", category: "tecnicas" },
 
-  // FARMACOLOGIA / VIAS
+  // FARMACOLOGIA / VIAS (12)
   { concept: "Via intradermica (ID)", definition: "Angulo 15 grados, bisel arriba", category: "farmaco" },
   { concept: "Via subcutanea (SC)", definition: "Angulo 45 grados con pellizco", category: "farmaco" },
   { concept: "Via intramuscular (IM)", definition: "Angulo 90 grados, aguja 21-23G", category: "farmaco" },
@@ -250,24 +268,147 @@ const parejas = [
   { concept: "Gotas oticas nino", definition: "Tirar pabellon abajo y atras", category: "farmaco" },
   { concept: "Gafas nasales O2", definition: "FiO2 24-40%, bajo flujo 1-4 L/min", category: "farmaco" },
   { concept: "Mascarilla Venturi", definition: "FiO2 precisa 24-50%, colores segun %", category: "farmaco" },
+  { concept: "Cubierta enterica", definition: "No triturar, se disuelve en intestino", category: "farmaco" },
+  { concept: "Via intravenosa (IV)", definition: "Efecto inmediato, directa a sangre", category: "farmaco" },
 
-  // PATOLOGIAS
+  // PATOLOGIAS (20)
   { concept: "Alzheimer", definition: "Demencia mas frecuente: progresiva e irreversible", category: "patologias" },
   { concept: "Delirium", definition: "Sindrome confusional AGUDO, fluctuante, reversible", category: "patologias" },
-  { concept: "Pseudodemencia depresiva", definition: "Parece demencia pero es depresion (reversible)", category: "patologias" },
+  { concept: "Pseudodemencia", definition: "Parece demencia pero es depresion (reversible)", category: "patologias" },
   { concept: "Hipoglucemia (<70)", definition: "Sudor, temblor, taquicardia: dar azucar rapido", category: "patologias" },
   { concept: "Cetoacidosis diabetica", definition: "Complicacion DM1: aliento a manzana cetonico", category: "patologias" },
   { concept: "Pie diabetico", definition: "Neuropatia + vasculopatia periferica", category: "patologias" },
-  { concept: "UPP Estadio I", definition: "Eritema que NO palidece, piel intacta", category: "patologias" },
-  { concept: "UPP Estadio IV", definition: "Afecta musculo, hueso, tendones: necrosis", category: "patologias" },
-  { concept: "Fases duelo (Kubler-Ross)", definition: "Negacion, ira, negociacion, depresion, aceptacion", category: "patologias" },
   { concept: "Anciano fragil", definition: ">80 anos, vive solo, polifarmacia, caidas", category: "patologias" },
-  { concept: "Spaulding: Critico", definition: "Bisturi, cateter IV: requiere ESTERILIZAR", category: "patologias" },
   { concept: "Residuos Grupo III", definition: "Biosanitarios especiales: bolsa ROJA", category: "patologias" },
-  { concept: "Cama Stryker", definition: "Giro 360: grandes quemados, politraumatizados", category: "patologias" },
   { concept: "Ejercicios de Kegel", definition: "Fortalecen suelo pelvico (incont. esfuerzo)", category: "patologias" },
   { concept: "Resp. Cheyne-Stokes", definition: "Ciclos apnea-hiperpnea: mal pronostico", category: "patologias" },
-  { concept: "Resp. Kussmaul", definition: "Rapida y profunda: cetoacidosis diabetica", category: "patologias" }
+  { concept: "Resp. Kussmaul", definition: "Rapida y profunda: cetoacidosis diabetica", category: "patologias" },
+  { concept: "Lipodistrofia", definition: "Por no rotar punto inyeccion insulina", category: "patologias" },
+  { concept: "Parafimosis", definition: "Por no recolocar prepucio tras higiene", category: "patologias" },
+  { concept: "Disfagia", definition: "Dificultad para tragar, usar espesantes", category: "patologias" },
+  { concept: "Sarcopenia", definition: "Perdida masa muscular asociada a envejecimiento", category: "patologias" },
+  { concept: "Osteoporosis", definition: "Perdida densidad osea, riesgo fracturas", category: "patologias" },
+  { concept: "Incontinencia urgencia", definition: "Deseo imperioso de orinar, no da tiempo", category: "patologias" },
+  { concept: "Incontinencia esfuerzo", definition: "Escape al toser, reir o estornudar", category: "patologias" },
+  { concept: "Sindrome inmovilismo", definition: "Deterioro funcional por reposo prolongado", category: "patologias" },
+  { concept: "Polifarmacia", definition: "Uso de 5 o mas medicamentos cronicos", category: "patologias" },
+
+  // NUTRICION (10)
+  { concept: "Dieta hiposodica", definition: "Baja en sal, indicada para HTA", category: "nutricion" },
+  { concept: "Dieta astringente", definition: "Para diarrea: arroz, zanahoria, platano", category: "nutricion" },
+  { concept: "Dieta hiperproteica", definition: "UPP, quemados, postquirurgicos", category: "nutricion" },
+  { concept: "SNG", definition: "Sonda nasogastrica, nutricion enteral", category: "nutricion" },
+  { concept: "PEG", definition: "Gastrostomia, sonda directa al estomago", category: "nutricion" },
+  { concept: "NPT", definition: "Nutricion parenteral total, via central", category: "nutricion" },
+  { concept: "Vitaminas ADEK", definition: "Liposolubles, se almacenan en grasa", category: "nutricion" },
+  { concept: "Vitaminas grupo B y C", definition: "Hidrosolubles, se eliminan por orina", category: "nutricion" },
+  { concept: "Dieta blanda", definition: "Alimentos de facil masticacion y digestion", category: "nutricion" },
+  { concept: "Dieta absoluta", definition: "Nada por boca, pre/postquirurgico inmediato", category: "nutricion" },
+
+  // ESTERILIZACION Y LIMPIEZA (10)
+  { concept: "Autoclave", definition: "Vapor 121 C, metodo esterilizacion mas usado", category: "esterilizacion" },
+  { concept: "ETO (Oxido etileno)", definition: "Gas toxico, baja temperatura, material termosensible", category: "esterilizacion" },
+  { concept: "Poupinel", definition: "Calor seco, 170 C, vidrio y metal", category: "esterilizacion" },
+  { concept: "Glutaraldehido", definition: "Desinfectante quimico alto nivel", category: "esterilizacion" },
+  { concept: "Spaulding critico", definition: "Esterilizar: bisturi, cateter IV", category: "esterilizacion" },
+  { concept: "Spaulding semicritico", definition: "Desinfeccion alto nivel: endoscopio", category: "esterilizacion" },
+  { concept: "Spaulding no critico", definition: "Desinfeccion bajo nivel: fonendo, termometro", category: "esterilizacion" },
+  { concept: "AGHO", definition: "Acidos grasos hiperoxigenados, prevencion UPP", category: "esterilizacion" },
+  { concept: "Lejia (hipoclorito)", definition: "Desinfectante mas usado en superficies", category: "esterilizacion" },
+  { concept: "Plasma H2O2", definition: "Esterilizacion baja temperatura, sin residuos toxicos", category: "esterilizacion" },
+
+  // EMERGENCIAS (10)
+  { concept: "PAS", definition: "Proteger, Avisar, Socorrer", category: "emergencias" },
+  { concept: "Maniobra Heimlich", definition: "Compresiones abdominales, atragantamiento", category: "emergencias" },
+  { concept: "DEA", definition: "Desfibrilador, lo usa cualquier persona", category: "emergencias" },
+  { concept: "PLS", definition: "Posicion lateral seguridad, inconsciente que respira", category: "emergencias" },
+  { concept: "Frente-menton", definition: "Maniobra para abrir via aerea", category: "emergencias" },
+  { concept: "RCP adulto", definition: "30 compresiones : 2 ventilaciones", category: "emergencias" },
+  { concept: "Cadena supervivencia", definition: "Alerta, RCP, desfibrilacion, SVA", category: "emergencias" },
+  { concept: "Triaje Manchester", definition: "5 colores: rojo, naranja, amarillo, verde, azul", category: "emergencias" },
+  { concept: "Quemadura 2 grado", definition: "Ampollas (flictenas), afecta epidermis y dermis", category: "emergencias" },
+  { concept: "Regla de los 9", definition: "Wallace: calcula superficie corporal quemada", category: "emergencias" },
+
+  // BIOETICA Y DUELO (12)
+  { concept: "Kubler-Ross", definition: "5 fases duelo: negacion, ira, negociacion, depresion, aceptacion", category: "bioetica" },
+  { concept: "Autonomia", definition: "Paciente decide, consentimiento informado", category: "bioetica" },
+  { concept: "Beneficencia", definition: "Hacer el bien al paciente", category: "bioetica" },
+  { concept: "No maleficencia", definition: "No danar, primum non nocere", category: "bioetica" },
+  { concept: "Justicia", definition: "Distribucion equitativa de recursos", category: "bioetica" },
+  { concept: "Distanasia", definition: "Encarnizamiento terapeutico, prolongar agonia", category: "bioetica" },
+  { concept: "Claudicacion familiar", definition: "Agotamiento del cuidador principal", category: "bioetica" },
+  { concept: "Eutanasia", definition: "Provocar muerte para evitar sufrimiento", category: "bioetica" },
+  { concept: "Ortotanasia", definition: "Muerte digna, sin acelerar ni retrasar", category: "bioetica" },
+  { concept: "Voluntades anticipadas", definition: "Documento de instrucciones previas del paciente", category: "bioetica" },
+  { concept: "Secreto profesional", definition: "Obligacion de guardar confidencialidad", category: "bioetica" },
+  { concept: "Duelo patologico", definition: "Duelo prolongado >12 meses, no resuelto", category: "bioetica" },
+
+  // CONVENIO SEPAD (8)
+  { concept: "Grupo IV SEPAD", definition: "Clasificacion profesional del TCAE", category: "convenio" },
+  { concept: "Excedencia voluntaria", definition: "De 4 meses a 5 anos", category: "convenio" },
+  { concept: "Falta muy grave", definition: "Prescribe en 60 dias", category: "convenio" },
+  { concept: "Falta grave", definition: "Prescribe en 20 dias", category: "convenio" },
+  { concept: "Falta leve", definition: "Prescribe en 10 dias", category: "convenio" },
+  { concept: "Periodo de prueba", definition: "2 meses para personal no cualificado", category: "convenio" },
+  { concept: "Jornada anual SEPAD", definition: "1.592 horas anuales de trabajo", category: "convenio" },
+  { concept: "Vacaciones SEPAD", definition: "22 dias habiles al ano", category: "convenio" },
+
+  // UPP (10)
+  { concept: "UPP Estadio I", definition: "Eritema que NO palidece, piel intacta", category: "upp" },
+  { concept: "UPP Estadio II", definition: "Ampolla/flictena, afecta epidermis y dermis", category: "upp" },
+  { concept: "UPP Estadio III", definition: "Perdida total piel, afecta subcutaneo", category: "upp" },
+  { concept: "UPP Estadio IV", definition: "Afecta musculo, hueso: necrosis profunda", category: "upp" },
+  { concept: "SEMP", definition: "Superficies especiales manejo presion (colchones antiescaras)", category: "upp" },
+  { concept: "Cama Stryker", definition: "Giro 360: grandes quemados, politraumatizados", category: "upp" },
+  { concept: "Localizacion sacro", definition: "Zona mas frecuente de UPP en supino", category: "upp" },
+  { concept: "Localizacion trocanter", definition: "Zona mas frecuente de UPP en lateral", category: "upp" },
+  { concept: "Localizacion talon", definition: "2a zona mas frecuente de UPP en supino", category: "upp" },
+  { concept: "Cura humeda UPP", definition: "Mantener lecho humedo, favorece cicatrizacion", category: "upp" },
+
+  // TIPOS DE CAMA (4)
+  { concept: "Cama articulada", definition: "La mas comun, 3 segmentos moviles", category: "tecnicas" },
+  { concept: "Cama Judet/Egerton", definition: "Para traumatismos vertebrales", category: "tecnicas" },
+  { concept: "Cama de Balkan", definition: "Marcos y poleas para tracciones", category: "tecnicas" },
+  { concept: "Cama electrocirc.", definition: "Cama circular electrica, movilizacion total", category: "tecnicas" },
+
+  // EXTRAS - MORE PAIRS TO REACH ~200
+  // Mas anatomia
+  { concept: "Rotacion externa", definition: "Girar extremidad hacia fuera del cuerpo", category: "anatomia" },
+  { concept: "Rotacion interna", definition: "Girar extremidad hacia dentro del cuerpo", category: "anatomia" },
+  { concept: "Diafragma", definition: "Musculo principal de la respiracion", category: "anatomia" },
+  { concept: "Esternon", definition: "Hueso plano central del torax anterior", category: "anatomia" },
+
+  // Mas constantes
+  { concept: "Taquipnea", definition: "Frecuencia respiratoria > 20 rpm", category: "constantes" },
+  { concept: "Apnea", definition: "Ausencia de respiracion", category: "constantes" },
+  { concept: "Disnea", definition: "Dificultad respiratoria subjetiva", category: "constantes" },
+  { concept: "Ortopnea", definition: "Disnea al estar tumbado, mejora sentado", category: "constantes" },
+
+  // Mas tecnicas
+  { concept: "Vendaje espiga", definition: "Ascendente-descendente, articulaciones", category: "tecnicas" },
+  { concept: "Vendaje circular", definition: "Vueltas superpuestas, fijar apositos", category: "tecnicas" },
+  { concept: "Vendaje espiral", definition: "Vueltas ascendentes parcialmente superpuestas", category: "tecnicas" },
+  { concept: "Aislamiento contacto", definition: "Bata + guantes, SARM, Clostridium", category: "tecnicas" },
+  { concept: "Aislamiento gotas", definition: "Mascarilla quirurgica, gripe, meningitis", category: "tecnicas" },
+  { concept: "Aislamiento aereo", definition: "Mascarilla FFP2, tuberculosis, varicela", category: "tecnicas" },
+
+  // Mas farmaco
+  { concept: "Heparina SC", definition: "Abdomen, no aspirar, no masajear", category: "farmaco" },
+  { concept: "Mantoux", definition: "Intradermica, lectura a 48-72 horas", category: "farmaco" },
+  { concept: "Efecto adverso", definition: "Efecto no deseado a dosis terapeuticas", category: "farmaco" },
+
+  // Mas legislacion
+  { concept: "Documento tipo Ulises", definition: "Instrucciones previas en salud mental", category: "legislacion" },
+
+  // Mas patologias
+  { concept: "Parkinson", definition: "Temblor reposo, rigidez, bradicinesia", category: "patologias" },
+  { concept: "ACV isquemico", definition: "Ictus por obstruccion vascular cerebral", category: "patologias" },
+  { concept: "EPOC", definition: "Enfermedad pulmonar obstructiva cronica", category: "patologias" },
+  { concept: "ICC", definition: "Insuficiencia cardiaca congestiva, edemas", category: "patologias" },
+  { concept: "Esclerosis multiple", definition: "Desmielinizacion SNC, brotes y remisiones", category: "patologias" },
+  { concept: "Herpes zoster", definition: "Reactivacion varicela, dolor neuropatico", category: "patologias" },
+  { concept: "Sarna (escabiosis)", definition: "Sarcoptes scabiei, prurito nocturno intenso", category: "patologias" },
+  { concept: "Pediculosis", definition: "Infestacion por piojos, prurito cuero cabelludo", category: "patologias" }
 ];
 
 // ============================================================
