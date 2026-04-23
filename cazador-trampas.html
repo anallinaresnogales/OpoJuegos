@@ -117,6 +117,16 @@ h1{font-size:1.6em;text-align:center;margin:12px 0 4px;background:linear-gradien
     <span class="topic-chip">Inyecciones</span>
     <span class="topic-chip">RCP</span>
     <span class="topic-chip">Inf. Nosocomial</span>
+    <span class="topic-chip">Diabetes</span>
+    <span class="topic-chip">UPP</span>
+    <span class="topic-chip">Nutricion</span>
+    <span class="topic-chip">Cuidados terminales</span>
+    <span class="topic-chip">Demencias</span>
+    <span class="topic-chip">Incontinencia</span>
+    <span class="topic-chip">Quemaduras</span>
+    <span class="topic-chip">SEPAD</span>
+    <span class="topic-chip">Caidas</span>
+    <span class="topic-chip">Igualdad</span>
   </div>
   <button class="btn-start" onclick="startGame()">Empezar a cazar trampas</button>
 </div>
@@ -168,7 +178,7 @@ h1{font-size:1.6em;text-align:center;margin:12px 0 4px;background:linear-gradien
 
 <script>
 const trampas = [
-  // ===== LEGISLACION =====
+  // ===== LEGISLACION (Tema 1, 15) =====
   // Traps
   { statement: "La Ley 14/1986 es la Ley de Cohesion y Calidad del Sistema Nacional de Salud", isTrap: true, explanation: "TRAMPA: La Ley 14/1986 es la Ley GENERAL de Sanidad (la primera, la madre de todas). La de Cohesion es la 16/2003.", topic: "Legislacion" },
   { statement: "La Ley 16/2003 es la Ley General de Sanidad", isTrap: true, explanation: "TRAMPA: La Ley 16/2003 es la Ley de COHESION y Calidad del SNS. La Ley General de Sanidad es la 14/1986.", topic: "Legislacion" },
@@ -197,18 +207,22 @@ const trampas = [
   { statement: "El articulo 149.1.16 CE atribuye al Estado la competencia sobre bases y coordinacion general de la sanidad", isTrap: false, explanation: "CORRECTO: Las bases de la sanidad son competencia del Estado segun el art. 149.1.16 CE.", topic: "Constitucion" },
   { statement: "La Constitucion Espanola se estructura en un Titulo Preliminar y 10 titulos numerados", isTrap: false, explanation: "CORRECTO: La CE tiene Titulo Preliminar + 10 titulos (del I al X).", topic: "Constitucion" },
 
-  // ===== DESINFECCION / ESTERILIZACION =====
+  // ===== DESINFECCION / ESTERILIZACION (Tema 12) =====
   // Traps
   { statement: "La desinfeccion elimina todos los microorganismos incluidas las esporas", isTrap: true, explanation: "TRAMPA: La desinfeccion NO elimina esporas. Solo la esterilizacion elimina TODOS los microorganismos incluidas esporas.", topic: "Esterilizacion" },
   { statement: "La esterilizacion solo elimina bacterias, no virus ni hongos", isTrap: true, explanation: "TRAMPA: La esterilizacion elimina TODO: bacterias, virus, hongos, esporas... Es el proceso mas completo.", topic: "Esterilizacion" },
   { statement: "La antisepsia se aplica sobre objetos y superficies inanimadas", isTrap: true, explanation: "TRAMPA: La antisepsia se aplica sobre TEJIDOS VIVOS (piel, mucosas). Sobre objetos se aplica desinfeccion.", topic: "Esterilizacion" },
   { statement: "La asepsia consiste en aplicar un producto sobre la piel del paciente", isTrap: true, explanation: "TRAMPA: La asepsia es la AUSENCIA de microorganismos (un estado, no una accion). Aplicar producto sobre la piel es antisepsia.", topic: "Esterilizacion" },
   { statement: "El orden correcto es: limpieza, descontaminacion, desinfeccion y esterilizacion", isTrap: true, explanation: "TRAMPA: El orden correcto es DESCONTAMINACION -> LIMPIEZA -> DESINFECCION -> ESTERILIZACION. La descontaminacion va ANTES de la limpieza.", topic: "Esterilizacion" },
+  { statement: "En la clasificacion de Spaulding, el material semicritico es el que contacta con piel intacta", isTrap: true, explanation: "TRAMPA: El material semicritico contacta con MUCOSAS o piel no intacta. El que contacta con piel intacta es material NO CRITICO.", topic: "Esterilizacion" },
+  { statement: "Los residuos del grupo III son residuos asimilables a urbanos", isTrap: true, explanation: "TRAMPA: Los residuos del grupo III son residuos SANITARIOS ESPECIALES (biocontaminados). Los asimilables a urbanos son del grupo II.", topic: "Esterilizacion" },
   // Correct
   { statement: "La desinfeccion elimina la mayoria de microorganismos pero NO las esporas", isTrap: false, explanation: "CORRECTO: La desinfeccion reduce la carga microbiana pero no es capaz de destruir las esporas bacterianas.", topic: "Esterilizacion" },
   { statement: "La esterilizacion elimina todos los microorganismos, incluidas las esporas", isTrap: false, explanation: "CORRECTO: La esterilizacion es el proceso mas completo: destruye todo tipo de vida microbiana incluidas esporas.", topic: "Esterilizacion" },
   { statement: "La antisepsia se aplica sobre tejidos vivos como la piel y mucosas", isTrap: false, explanation: "CORRECTO: Los antisepticos se usan sobre tejidos vivos (piel, mucosas) a diferencia de los desinfectantes que van sobre superficies.", topic: "Esterilizacion" },
   { statement: "El orden correcto del procesado de material es: descontaminacion, limpieza, desinfeccion y esterilizacion", isTrap: false, explanation: "CORRECTO: Descontaminacion (1ro) -> Limpieza (2do) -> Desinfeccion (3ro) -> Esterilizacion (4to).", topic: "Esterilizacion" },
+  { statement: "En la clasificacion de Spaulding, el material critico es el que penetra en tejidos esteriles o vasos sanguineos", isTrap: false, explanation: "CORRECTO: Material critico = contacto con tejidos esteriles o sangre. Requiere esterilizacion.", topic: "Esterilizacion" },
+  { statement: "Los residuos del grupo II son residuos sanitarios asimilables a urbanos", isTrap: false, explanation: "CORRECTO: Grupo I = generales. Grupo II = asimilables a urbanos. Grupo III = especiales. Grupo IV = citotoxicos.", topic: "Esterilizacion" },
 
   // ===== AISLAMIENTOS =====
   // Traps
@@ -244,7 +258,7 @@ const trampas = [
   { statement: "Se denomina oliguria a un volumen de orina inferior a 400 ml al dia", isTrap: false, explanation: "CORRECTO: Oliguria = menos de 400 ml/dia. No confundir con anuria que es menos de 100 ml/dia.", topic: "Tiempos y volumenes" },
   { statement: "La historia clinica debe conservarse un minimo de 5 anos desde el alta del paciente", isTrap: false, explanation: "CORRECTO: Segun la Ley 41/2002, la historia clinica se conserva al menos 5 anos desde la fecha de alta.", topic: "Tiempos y volumenes" },
 
-  // ===== ESCALAS =====
+  // ===== ESCALAS (Tema 2, 13, 18) =====
   // Traps
   { statement: "La escala de Norton se utiliza para valorar las actividades basicas de la vida diaria", isTrap: true, explanation: "TRAMPA: La escala de Norton se usa para valorar el riesgo de UPP (ulceras por presion). Para ABVD se usa la escala de Barthel.", topic: "Escalas" },
   { statement: "La escala de Barthel mide el riesgo de ulceras por presion", isTrap: true, explanation: "TRAMPA: Barthel mide las ABVD (Actividades Basicas de la Vida Diaria). El riesgo de UPP se mide con Norton.", topic: "Escalas" },
@@ -252,6 +266,9 @@ const trampas = [
   { statement: "La escala EVA se utiliza para medir el nivel de consciencia", isTrap: true, explanation: "TRAMPA: La escala EVA (Escala Visual Analogica) mide el DOLOR de 0 a 10. La consciencia se mide con Glasgow.", topic: "Escalas" },
   { statement: "La escala de Lawton-Brody se usa para valorar el riesgo de caidas", isTrap: true, explanation: "TRAMPA: Lawton-Brody mide las AIVD (Actividades Instrumentales de la Vida Diaria). No tiene que ver con caidas.", topic: "Escalas" },
   { statement: "El test de Pfeiffer valora el grado de dependencia funcional", isTrap: true, explanation: "TRAMPA: Pfeiffer valora el DETERIORO COGNITIVO (capacidad de pensar). La dependencia la miden Barthel y Lawton.", topic: "Escalas" },
+  { statement: "En la escala de Norton, una puntuacion inferior a 12 indica riesgo de UPP", isTrap: true, explanation: "TRAMPA: En Norton, el riesgo de UPP se establece con puntuacion inferior a 14 (no 12). Menor de 14 = riesgo.", topic: "Escalas" },
+  { statement: "La escala de Braden indica riesgo de UPP con puntuacion inferior a 14", isTrap: true, explanation: "TRAMPA: En Braden, el riesgo de UPP se establece con puntuacion inferior a 18 (no 14). El 14 es de Norton.", topic: "Escalas" },
+  { statement: "La escala de Downton se utiliza para valorar el riesgo de ulceras por presion", isTrap: true, explanation: "TRAMPA: La escala de Downton valora el riesgo de CAIDAS, no de UPP. Para UPP se usan Norton y Braden.", topic: "Escalas" },
   // Correct
   { statement: "La escala de Norton valora el riesgo de desarrollar ulceras por presion (UPP)", isTrap: false, explanation: "CORRECTO: Norton = UPP. Valora estado fisico, mental, actividad, movilidad e incontinencia. A menor puntuacion, mayor riesgo.", topic: "Escalas" },
   { statement: "La escala de Barthel mide la capacidad para realizar las actividades basicas de la vida diaria", isTrap: false, explanation: "CORRECTO: Barthel = ABVD (comer, vestirse, banarse, etc.). Es la escala mas utilizada para dependencia funcional basica.", topic: "Escalas" },
@@ -259,44 +276,56 @@ const trampas = [
   { statement: "La escala EVA (Escala Visual Analogica) mide la intensidad del dolor de 0 a 10", isTrap: false, explanation: "CORRECTO: EVA = dolor. El paciente senala su dolor en una linea de 0 (sin dolor) a 10 (maximo dolor).", topic: "Escalas" },
   { statement: "La escala de Lawton-Brody mide las actividades instrumentales de la vida diaria (AIVD)", isTrap: false, explanation: "CORRECTO: Lawton = AIVD (usar telefono, cocinar, manejar dinero, etc.). Son actividades mas complejas que las basicas.", topic: "Escalas" },
   { statement: "El test de Pfeiffer se utiliza para detectar deterioro cognitivo", isTrap: false, explanation: "CORRECTO: Pfeiffer = deterioro cognitivo. Consta de 10 preguntas sencillas. 3 o mas errores sugieren deterioro.", topic: "Escalas" },
+  { statement: "En la escala de Norton, una puntuacion inferior a 14 indica riesgo de ulceras por presion", isTrap: false, explanation: "CORRECTO: Norton < 14 = riesgo de UPP. A menor puntuacion, mayor riesgo.", topic: "Escalas" },
+  { statement: "En la escala de Braden, una puntuacion inferior a 18 indica riesgo de UPP", isTrap: false, explanation: "CORRECTO: Braden < 18 = riesgo de UPP. Es otra escala validada junto con Norton.", topic: "Escalas" },
+  { statement: "La escala de Downton se utiliza para valorar el riesgo de caidas en pacientes", isTrap: false, explanation: "CORRECTO: Downton = riesgo de caidas. Junto con Tinetti, son las escalas principales para caidas.", topic: "Escalas" },
 
-  // ===== POSICIONES DEL PACIENTE =====
+  // ===== POSICIONES DEL PACIENTE (Tema 7) =====
   // Traps
   { statement: "La posicion de Fowler eleva el cabecero de la cama 30 grados", isTrap: true, explanation: "TRAMPA: Fowler eleva el cabecero a 45°. La posicion de 30° es Semi-Fowler.", topic: "Posiciones" },
   { statement: "La posicion de Trendelenburg coloca al paciente con la cabeza mas alta que los pies", isTrap: true, explanation: "TRAMPA: En Trendelenburg los PIES estan mas altos que la cabeza. Es justo al reves de lo que parece logico.", topic: "Posiciones" },
   { statement: "La posicion de Sims es un decubito prono completo", isTrap: true, explanation: "TRAMPA: Sims es un decubito LATERAL izquierdo con la pierna superior flexionada (semi-lateral), no prono.", topic: "Posiciones" },
   { statement: "La posicion de litotomia coloca al paciente en decubito lateral", isTrap: true, explanation: "TRAMPA: La litotomia es en decubito SUPINO con las piernas en estribos. Se usa en ginecologia y sondaje femenino.", topic: "Posiciones" },
   { statement: "La posicion anti-Trendelenburg coloca los pies del paciente mas altos que la cabeza", isTrap: true, explanation: "TRAMPA: Anti-Trendelenburg es la CONTRARIA a Trendelenburg: la CABEZA esta mas alta que los pies.", topic: "Posiciones" },
+  { statement: "La posicion genupectoral coloca al paciente en decubito supino con las rodillas flexionadas", isTrap: true, explanation: "TRAMPA: La posicion genupectoral coloca al paciente apoyado sobre RODILLAS y PECHO (boca abajo). Se usa para exploraciones rectales.", topic: "Posiciones" },
+  { statement: "La posicion de Morestin es igual que la de Trendelenburg", isTrap: true, explanation: "TRAMPA: Morestin (anti-Trendelenburg) es lo CONTRARIO a Trendelenburg: cabeza elevada y pies bajos. Se usa en cirugia abdominal.", topic: "Posiciones" },
   // Correct
   { statement: "La posicion de Fowler eleva el cabecero de la cama a 45 grados", isTrap: false, explanation: "CORRECTO: Fowler = 45°. Semi-Fowler = 30°. Es una posicion semisentada para facilitar la respiracion.", topic: "Posiciones" },
   { statement: "En la posicion de Trendelenburg los pies estan mas elevados que la cabeza", isTrap: false, explanation: "CORRECTO: Trendelenburg = pies arriba. Se usa en casos de shock, hipotension, etc.", topic: "Posiciones" },
   { statement: "La posicion de Sims es un decubito lateral izquierdo con la pierna superior flexionada", isTrap: false, explanation: "CORRECTO: Sims = semi-lateral izquierdo. Se usa para administrar enemas, exploracion rectal, etc.", topic: "Posiciones" },
   { statement: "La posicion de litotomia coloca al paciente en decubito supino con las piernas en estribos", isTrap: false, explanation: "CORRECTO: Litotomia = supino + piernas elevadas en estribos. Se usa en ginecologia y sondaje vesical femenino.", topic: "Posiciones" },
   { statement: "La posicion anti-Trendelenburg eleva la cabeza por encima de los pies", isTrap: false, explanation: "CORRECTO: Anti-Trendelenburg = cabeza arriba, pies abajo. Es la contraria a Trendelenburg.", topic: "Posiciones" },
+  { statement: "La posicion genupectoral coloca al paciente apoyado sobre rodillas y pecho", isTrap: false, explanation: "CORRECTO: Genupectoral = rodillas + pecho. Se usa para exploraciones rectales y administracion de enemas.", topic: "Posiciones" },
 
-  // ===== ANGULOS DE INYECCION =====
+  // ===== ANGULOS DE INYECCION (Tema 17) =====
   // Traps
   { statement: "La inyeccion intradermica se administra con un angulo de 45 grados", isTrap: true, explanation: "TRAMPA: La intradermica se administra a 15° (casi paralela a la piel). Es la mas superficial = menos angulo.", topic: "Inyecciones" },
   { statement: "La inyeccion subcutanea se administra con un angulo de 90 grados", isTrap: true, explanation: "TRAMPA: La subcutanea se administra a 45° con pellizco. El angulo de 90° es para la intramuscular.", topic: "Inyecciones" },
   { statement: "La inyeccion intramuscular se administra con un angulo de 45 grados", isTrap: true, explanation: "TRAMPA: La intramuscular se administra a 90° (perpendicular). Es la mas profunda = maximo angulo.", topic: "Inyecciones" },
   { statement: "La inyeccion intravenosa se administra con un angulo de 90 grados", isTrap: true, explanation: "TRAMPA: La intravenosa se administra a 15-30° (angulo bajo, casi paralelo a la vena). La de 90° es intramuscular.", topic: "Inyecciones" },
+  { statement: "Los 5 correctos de la medicacion son: paciente, medicamento, dosis, hora y diagnostico", isTrap: true, explanation: "TRAMPA: Los 5 correctos son: paciente, medicamento, dosis, hora y VIA de administracion. No incluye diagnostico.", topic: "Inyecciones" },
   // Correct
   { statement: "La inyeccion intradermica se administra con un angulo de 15 grados, casi paralela a la piel", isTrap: false, explanation: "CORRECTO: Intradermica = 15° (la mas superficial). Se usa para pruebas alergicas y Mantoux.", topic: "Inyecciones" },
   { statement: "La inyeccion subcutanea se administra con un angulo de 45 grados realizando un pellizco en la piel", isTrap: false, explanation: "CORRECTO: Subcutanea = 45° con pellizco. Se usa para heparina, insulina, etc.", topic: "Inyecciones" },
   { statement: "La inyeccion intramuscular se administra con un angulo de 90 grados, perpendicular a la piel", isTrap: false, explanation: "CORRECTO: Intramuscular = 90° (perpendicular). Es la via de mayor profundidad. Se usa para vacunas, antibioticos, etc.", topic: "Inyecciones" },
   { statement: "La inyeccion intravenosa se administra con un angulo de 15 a 30 grados", isTrap: false, explanation: "CORRECTO: Intravenosa = 15-30° (angulo bajo para entrar en la vena). Regla: ID(15) < SC(45) < IM(90). IV es especial (15-30).", topic: "Inyecciones" },
+  { statement: "Los 5 correctos de la medicacion son: paciente correcto, medicamento correcto, dosis correcta, hora correcta y via correcta", isTrap: false, explanation: "CORRECTO: Los 5 correctos son la regla de oro de la administracion de medicamentos.", topic: "Inyecciones" },
 
-  // ===== RCP BASICA ADULTO =====
+  // ===== RCP BASICA ADULTO (Tema 19) =====
   // Traps
   { statement: "La relacion compresiones-ventilaciones en RCP basica del adulto es de 15:2", isTrap: true, explanation: "TRAMPA: La relacion correcta es 30:2 (30 compresiones por cada 2 ventilaciones). 15:2 es un dato antiguo.", topic: "RCP" },
   { statement: "La frecuencia de las compresiones en RCP debe ser de 80 a 100 por minuto", isTrap: true, explanation: "TRAMPA: La frecuencia correcta es 100-120 compresiones por minuto. Minimo 100, maximo 120.", topic: "RCP" },
   { statement: "La profundidad de las compresiones toracicas en adulto debe ser de 3 a 4 cm", isTrap: true, explanation: "TRAMPA: La profundidad debe ser de 5-6 cm en adulto. 3-4 cm es insuficiente.", topic: "RCP" },
   { statement: "En la RCP basica se debe empezar siempre por las ventilaciones antes de las compresiones", isTrap: true, explanation: "TRAMPA: Se empieza por las COMPRESIONES (secuencia C-A-B: Compresiones - Airway - Breathing). Primero comprimir.", topic: "RCP" },
+  { statement: "La conducta PAS significa Prevenir, Alertar, Socorrer", isTrap: true, explanation: "TRAMPA: PAS significa PROTEGER, Avisar (Alertar) y Socorrer. La P es de Proteger, no Prevenir.", topic: "RCP" },
+  { statement: "La maniobra de Heimlich se utiliza en pacientes inconscientes con obstruccion de via aerea", isTrap: true, explanation: "TRAMPA: La maniobra de Heimlich se usa en pacientes CONSCIENTES con obstruccion. En inconscientes se inicia RCP.", topic: "RCP" },
   // Correct
   { statement: "En la RCP basica del adulto la relacion es de 30 compresiones por cada 2 ventilaciones", isTrap: false, explanation: "CORRECTO: 30:2 es la relacion universal para RCP basica en adultos (un solo reanimador o dos).", topic: "RCP" },
   { statement: "La frecuencia de compresiones en RCP debe ser de 100 a 120 por minuto", isTrap: false, explanation: "CORRECTO: Entre 100 y 120 compresiones por minuto. Ni demasiado lento ni demasiado rapido.", topic: "RCP" },
   { statement: "La profundidad de las compresiones toracicas en adulto debe ser de al menos 5 cm y no superar los 6 cm", isTrap: false, explanation: "CORRECTO: 5-6 cm de profundidad en adulto para que las compresiones sean efectivas.", topic: "RCP" },
   { statement: "La secuencia de RCP basica sigue el orden C-A-B: Compresiones, Via aerea, Ventilaciones", isTrap: false, explanation: "CORRECTO: Primero Compresiones (C), luego abrir Via Aerea (A) y despues Ventilaciones (B).", topic: "RCP" },
+  { statement: "La conducta PAS significa Proteger, Avisar y Socorrer", isTrap: false, explanation: "CORRECTO: PAS = Proteger (el lugar), Avisar (al 112) y Socorrer (atender a la victima).", topic: "RCP" },
+  { statement: "La maniobra de Heimlich se aplica a pacientes conscientes con obstruccion completa de via aerea", isTrap: false, explanation: "CORRECTO: Heimlich = compresiones abdominales en paciente CONSCIENTE que no puede toser ni hablar.", topic: "RCP" },
 
   // ===== INFECCION NOSOCOMIAL =====
   // Traps
@@ -308,7 +337,223 @@ const trampas = [
   { statement: "La infeccion nosocomial mas frecuente es la infeccion del tracto urinario (ITU), asociada al sondaje vesical", isTrap: false, explanation: "CORRECTO: La ITU es la infeccion nosocomial mas frecuente, principalmente por el uso de sondas vesicales.", topic: "Inf. Nosocomial" },
   { statement: "La neumonia nosocomial es la infeccion hospitalaria con mayor mortalidad", isTrap: false, explanation: "CORRECTO: La neumonia (especialmente la asociada a ventilacion mecanica) es la infeccion nosocomial mas grave y con mayor mortalidad.", topic: "Inf. Nosocomial" },
   { statement: "El lavado de manos social o higienico tiene una duracion de 40 a 60 segundos", isTrap: false, explanation: "CORRECTO: El lavado social/higienico con agua y jabon normal dura entre 40 y 60 segundos.", topic: "Inf. Nosocomial" },
-  { statement: "El lavado de manos quirurgico dura entre 3 y 5 minutos, desde las unas hasta los codos", isTrap: false, explanation: "CORRECTO: El lavado quirurgico es mas largo (3-5 min) con cepillo y antiseptico, cubriendo de las unas a los codos.", topic: "Inf. Nosocomial" }
+  { statement: "El lavado de manos quirurgico dura entre 3 y 5 minutos, desde las unas hasta los codos", isTrap: false, explanation: "CORRECTO: El lavado quirurgico es mas largo (3-5 min) con cepillo y antiseptico, cubriendo de las unas a los codos.", topic: "Inf. Nosocomial" },
+  { statement: "La medida mas importante para prevenir la infeccion nosocomial es el lavado de manos", isTrap: false, explanation: "CORRECTO: El lavado de manos es la medida mas eficaz y mas importante para prevenir infecciones hospitalarias.", topic: "Inf. Nosocomial" },
+
+  // ===== DIABETES (Tema 4) =====
+  // Traps
+  { statement: "La insulina se administra por via intramuscular a 90 grados", isTrap: true, explanation: "TRAMPA: La insulina se administra por via SUBCUTANEA a 45° con pellizco. NUNCA intramuscular.", topic: "Diabetes" },
+  { statement: "La insulina sin abrir se conserva a temperatura ambiente", isTrap: true, explanation: "TRAMPA: La insulina sin abrir se conserva en NEVERA a 2-8°C. Una vez abierta, puede estar a temperatura ambiente hasta 28 dias.", topic: "Diabetes" },
+  { statement: "La diabetes tipo 1 es la mas frecuente y aparece en adultos mayores", isTrap: true, explanation: "TRAMPA: La tipo 1 aparece generalmente en JOVENES y es la MENOS frecuente (5-10%). La tipo 2 es la mas frecuente (90-95%).", topic: "Diabetes" },
+  { statement: "La diabetes tipo 2 se trata siempre con insulina desde el diagnostico", isTrap: true, explanation: "TRAMPA: La tipo 2 se trata inicialmente con DIETA, EJERCICIO y ANTIDIABETICOS ORALES. La insulina se usa en la tipo 1 o en tipo 2 avanzada.", topic: "Diabetes" },
+  { statement: "En el pie diabetico, se recomienda caminar descalzo para mejorar la circulacion", isTrap: true, explanation: "TRAMPA: En el pie diabetico NUNCA se debe caminar descalzo. Se deben usar zapatos comodos y cerrados para evitar heridas.", topic: "Diabetes" },
+  // Correct
+  { statement: "La insulina se administra por via subcutanea con un angulo de 45 grados", isTrap: false, explanation: "CORRECTO: La insulina siempre se administra subcutanea a 45° con pellizco. Zonas: abdomen, muslos, brazos, gluteos.", topic: "Diabetes" },
+  { statement: "La insulina sin abrir debe conservarse en nevera a una temperatura de 2-8°C", isTrap: false, explanation: "CORRECTO: La insulina sin abrir va en nevera (2-8°C). Una vez abierta, puede mantenerse a temperatura ambiente maximo 28 dias.", topic: "Diabetes" },
+  { statement: "La diabetes tipo 2 es la mas frecuente, representando el 90-95% de los casos", isTrap: false, explanation: "CORRECTO: La diabetes tipo 2 es la mas comun. Se asocia a obesidad, sedentarismo y aparece generalmente en adultos.", topic: "Diabetes" },
+  { statement: "En el cuidado del pie diabetico se deben usar zapatos cerrados y comodos, nunca caminar descalzo", isTrap: false, explanation: "CORRECTO: El pie diabetico tiene riesgo de heridas que no cicatrizan. Se debe proteger siempre con calzado adecuado.", topic: "Diabetes" },
+
+  // ===== INCONTINENCIA URINARIA (Tema 5) =====
+  // Traps
+  { statement: "La sonda Foley es una sonda vesical de un solo uso, sin balon", isTrap: true, explanation: "TRAMPA: La sonda Foley tiene BALON de retencion para mantenerla en la vejiga. Las sondas de un solo uso sin balon son las de tipo Nelaton.", topic: "Incontinencia" },
+  { statement: "Los ejercicios de Kegel sirven para fortalecer los musculos de las extremidades inferiores", isTrap: true, explanation: "TRAMPA: Los ejercicios de Kegel fortalecen el suelo PELVICO, no las extremidades. Se usan para la incontinencia urinaria.", topic: "Incontinencia" },
+  { statement: "La incontinencia de urgencia se produce al toser, estornudar o realizar esfuerzos", isTrap: true, explanation: "TRAMPA: Esa descripcion corresponde a la incontinencia de ESFUERZO. La de urgencia es la necesidad imperiosa e incontrolable de orinar.", topic: "Incontinencia" },
+  // Correct
+  { statement: "La sonda Foley es una sonda vesical permanente con balon de retencion", isTrap: false, explanation: "CORRECTO: La sonda Foley tiene un balon que se infla dentro de la vejiga para mantenerla fija. Se usa en sondaje permanente.", topic: "Incontinencia" },
+  { statement: "Los ejercicios de Kegel fortalecen la musculatura del suelo pelvico y ayudan en la incontinencia urinaria", isTrap: false, explanation: "CORRECTO: Los ejercicios de Kegel consisten en contraer y relajar los musculos del suelo pelvico de forma repetida.", topic: "Incontinencia" },
+  { statement: "La incontinencia urinaria de esfuerzo se produce al toser, estornudar o realizar esfuerzos fisicos", isTrap: false, explanation: "CORRECTO: En la incontinencia de esfuerzo, el aumento de presion abdominal (tos, estornudo) provoca la fuga de orina.", topic: "Incontinencia" },
+
+  // ===== ENEMAS Y OSTOMIAS (Tema 6) =====
+  // Traps
+  { statement: "Para administrar un enema, el paciente se coloca en posicion de Fowler", isTrap: true, explanation: "TRAMPA: Para administrar un enema, el paciente se coloca en posicion de SIMS (decubito lateral izquierdo). No en Fowler.", topic: "Enemas y ostomias" },
+  { statement: "Una colostomia en el colon ascendente produce heces solidas y formadas", isTrap: true, explanation: "TRAMPA: Las colostomias del colon ASCENDENTE producen heces LIQUIDAS. Las heces solidas se dan en colostomias del colon descendente o sigmoides.", topic: "Enemas y ostomias" },
+  { statement: "El enema de limpieza utiliza una solucion de aceite mineral", isTrap: true, explanation: "TRAMPA: El enema de limpieza usa solucion SALINA o agua jabonosa. El enema de aceite (oleoso) es un tipo diferente: emoliente/de retencion.", topic: "Enemas y ostomias" },
+  // Correct
+  { statement: "Para administrar un enema, el paciente se coloca en posicion de Sims (decubito lateral izquierdo)", isTrap: false, explanation: "CORRECTO: Sims facilita la administracion del enema por la anatomia del colon. El liquido fluye mejor en lateral izquierdo.", topic: "Enemas y ostomias" },
+  { statement: "Una colostomia en el colon descendente o sigmoides produce heces formadas y semiformadas", isTrap: false, explanation: "CORRECTO: Cuanto mas distal la colostomia (descendente/sigmoides), mas formadas son las heces porque se absorbe mas agua.", topic: "Enemas y ostomias" },
+  { statement: "El enema de retencion (oleoso) se administra para reblandecer las heces y facilitar su evacuacion", isTrap: false, explanation: "CORRECTO: Los enemas oleosos/emolientes reblandecen las heces. Se retienen 30-60 minutos antes de evacuar.", topic: "Enemas y ostomias" },
+
+  // ===== ALZHEIMER Y DEMENCIAS (Tema 3) =====
+  // Traps
+  { statement: "El delirium es un proceso cronico e irreversible, similar a la demencia", isTrap: true, explanation: "TRAMPA: El delirium es AGUDO y REVERSIBLE. La demencia es cronica e irreversible. Son conceptos opuestos que el examen cruza.", topic: "Demencias" },
+  { statement: "La demencia tiene un inicio brusco y suele resolverse en dias", isTrap: true, explanation: "TRAMPA: La demencia tiene inicio INSIDIOSO y PROGRESIVO. El inicio brusco y la resolucion rapida corresponden al DELIRIUM.", topic: "Demencias" },
+  { statement: "La escala de Yesavage se utiliza para medir el deterioro cognitivo en ancianos", isTrap: true, explanation: "TRAMPA: Yesavage mide la DEPRESION geriatrica, no el deterioro cognitivo. Para deterioro cognitivo se usan Pfeiffer o MMSE.", topic: "Demencias" },
+  { statement: "El Mini-Mental State Examination (MMSE) es una escala para detectar depresion", isTrap: true, explanation: "TRAMPA: El MMSE (Folstein) detecta DETERIORO COGNITIVO. La depresion geriatrica se mide con la escala de Yesavage.", topic: "Demencias" },
+  // Correct
+  { statement: "El delirium es un cuadro agudo, fluctuante y potencialmente reversible", isTrap: false, explanation: "CORRECTO: Delirium = agudo + fluctuante + reversible. Se diferencia de la demencia que es cronica e irreversible.", topic: "Demencias" },
+  { statement: "La demencia es un proceso cronico, progresivo e irreversible de deterioro cognitivo", isTrap: false, explanation: "CORRECTO: Demencia = cronica + progresiva + irreversible. El Alzheimer es la causa mas frecuente de demencia.", topic: "Demencias" },
+  { statement: "La escala de Yesavage es un instrumento especifico para detectar depresion geriatrica", isTrap: false, explanation: "CORRECTO: Yesavage (GDS) = depresion en ancianos. Tiene version corta (15 items) y larga (30 items).", topic: "Demencias" },
+  { statement: "El MMSE (Mini-Mental State Examination) de Folstein se utiliza para detectar deterioro cognitivo", isTrap: false, explanation: "CORRECTO: MMSE = deterioro cognitivo. Puntuacion maxima 30. Menos de 24 sugiere deterioro.", topic: "Demencias" },
+
+  // ===== NUTRICION (Tema 11) =====
+  // Traps
+  { statement: "Los hidratos de carbono aportan 9 kcal por gramo", isTrap: true, explanation: "TRAMPA: Los hidratos de carbono aportan 4 kcal/g. Los que aportan 9 kcal/g son las GRASAS.", topic: "Nutricion" },
+  { statement: "Las grasas aportan 4 kcal por gramo, igual que las proteinas", isTrap: true, explanation: "TRAMPA: Las grasas aportan 9 kcal/g (son las mas caloricos). Las proteinas y los hidratos de carbono aportan 4 kcal/g.", topic: "Nutricion" },
+  { statement: "Las proteinas aportan 9 kcal por gramo", isTrap: true, explanation: "TRAMPA: Las proteinas aportan 4 kcal/g. Los 9 kcal/g corresponden a las GRASAS.", topic: "Nutricion" },
+  { statement: "La nutricion parenteral se administra a traves de una sonda nasogastrica", isTrap: true, explanation: "TRAMPA: La nutricion parenteral se administra por via INTRAVENOSA (directamente a la sangre). La sonda nasogastrica se usa en nutricion ENTERAL.", topic: "Nutricion" },
+  { statement: "La nutricion enteral se administra directamente al torrente sanguineo", isTrap: true, explanation: "TRAMPA: La nutricion enteral va al TUBO DIGESTIVO (por sonda o via oral). Al torrente sanguineo va la PARENTERAL.", topic: "Nutricion" },
+  // Correct
+  { statement: "Los hidratos de carbono aportan 4 kcal por gramo y las proteinas tambien 4 kcal por gramo", isTrap: false, explanation: "CORRECTO: HC = 4 kcal/g. Proteinas = 4 kcal/g. Grasas = 9 kcal/g. Regla: 4-4-9.", topic: "Nutricion" },
+  { statement: "Las grasas son el macronutriente mas calorico, con 9 kcal por gramo", isTrap: false, explanation: "CORRECTO: Grasas = 9 kcal/g, el doble que los hidratos de carbono y proteinas (4 kcal/g cada uno).", topic: "Nutricion" },
+  { statement: "La nutricion enteral se administra al tubo digestivo mediante sonda nasogastrica u otra via digestiva", isTrap: false, explanation: "CORRECTO: Enteral = al tubo digestivo (sonda nasogastrica, gastrostomia, yeyunostomia o via oral).", topic: "Nutricion" },
+  { statement: "La nutricion parenteral se administra por via intravenosa, directamente al torrente sanguineo", isTrap: false, explanation: "CORRECTO: Parenteral = intravenosa. Se usa cuando el tubo digestivo no funciona o no se puede utilizar.", topic: "Nutricion" },
+
+  // ===== ULCERAS POR PRESION (Tema 13) =====
+  // Traps
+  { statement: "En el estadio I de las ulceras por presion ya hay perdida de la integridad de la piel", isTrap: true, explanation: "TRAMPA: En el estadio I la piel esta INTACTA pero con eritema que NO blanquea a la presion. La perdida de piel comienza en el estadio II.", topic: "UPP" },
+  { statement: "En el estadio II de las UPP se observa exposicion de musculo o hueso", isTrap: true, explanation: "TRAMPA: En el estadio II hay perdida parcial de piel (ampolla o erosion superficial). La exposicion de musculo/hueso es del estadio IV.", topic: "UPP" },
+  { statement: "El estadio III de las UPP se caracteriza por un eritema que no blanquea", isTrap: true, explanation: "TRAMPA: El eritema que no blanquea es el estadio I. El estadio III implica perdida TOTAL del espesor de la piel con afectacion del tejido subcutaneo.", topic: "UPP" },
+  // Correct
+  { statement: "El estadio I de las UPP presenta eritema que no blanquea a la presion, con piel intacta", isTrap: false, explanation: "CORRECTO: Estadio I = piel integra + eritema no blanqueable. Es la fase inicial y reversible.", topic: "UPP" },
+  { statement: "El estadio II de las UPP muestra perdida parcial de piel con ampolla o erosion superficial", isTrap: false, explanation: "CORRECTO: Estadio II = perdida parcial de piel. Puede verse como ampolla (flictena) o erosion superficial.", topic: "UPP" },
+  { statement: "El estadio IV de las UPP implica perdida total de piel con exposicion de musculo, hueso o tendon", isTrap: false, explanation: "CORRECTO: Estadio IV = el mas grave. Destruccion total con exposicion de estructuras profundas.", topic: "UPP" },
+
+  // ===== CONSTANTES VITALES (Tema 14) =====
+  // Traps
+  { statement: "La frecuencia cardiaca normal en reposo en un adulto es de 40 a 60 latidos por minuto", isTrap: true, explanation: "TRAMPA: La frecuencia cardiaca normal es de 60-100 lpm. Entre 40-60 seria BRADICARDIA.", topic: "Constantes vitales" },
+  { statement: "La tension arterial normal en un adulto es de 140/90 mmHg", isTrap: true, explanation: "TRAMPA: 140/90 mmHg ya se considera HIPERTENSION. La TA normal es aproximadamente 120/80 mmHg.", topic: "Constantes vitales" },
+  { statement: "La saturacion de oxigeno (SpO2) normal es superior al 90%", isTrap: true, explanation: "TRAMPA: La SpO2 normal debe ser igual o superior al 95%. Por debajo de 90% se considera hipoxemia severa.", topic: "Constantes vitales" },
+  { statement: "Se denomina taquicardia a la frecuencia cardiaca inferior a 60 lpm", isTrap: true, explanation: "TRAMPA: Menos de 60 lpm es BRADICARDIA. La taquicardia es cuando supera los 100 lpm.", topic: "Constantes vitales" },
+  // Correct
+  { statement: "La frecuencia cardiaca normal en reposo en un adulto es de 60 a 100 latidos por minuto", isTrap: false, explanation: "CORRECTO: FC normal = 60-100 lpm. Menos de 60 = bradicardia. Mas de 100 = taquicardia.", topic: "Constantes vitales" },
+  { statement: "La tension arterial normal en un adulto es aproximadamente 120/80 mmHg", isTrap: false, explanation: "CORRECTO: TA normal = 120 (sistolica) / 80 (diastolica) mmHg. Por encima de 140/90 se considera HTA.", topic: "Constantes vitales" },
+  { statement: "La saturacion de oxigeno (SpO2) normal debe ser igual o superior al 95%", isTrap: false, explanation: "CORRECTO: SpO2 >= 95% es normal. Entre 90-95% hay hipoxemia moderada. Menos de 90% es severa.", topic: "Constantes vitales" },
+  { statement: "Se denomina bradicardia a la frecuencia cardiaca inferior a 60 lpm y taquicardia a la superior a 100 lpm", isTrap: false, explanation: "CORRECTO: Bradicardia < 60 lpm. Taquicardia > 100 lpm. Son los dos extremos de la normalidad (60-100).", topic: "Constantes vitales" },
+
+  // ===== CUIDADOS TERMINALES (Tema 10) =====
+  // Traps
+  { statement: "Las fases de duelo de Kubler-Ross son 4: negacion, ira, depresion y aceptacion", isTrap: true, explanation: "TRAMPA: Son 5 fases: NEGACION, IRA, NEGOCIACION, DEPRESION y ACEPTACION. Falta la fase de negociacion (pacto/regateo).", topic: "Cuidados terminales" },
+  { statement: "La escalera analgesica de la OMS tiene 4 escalones", isTrap: true, explanation: "TRAMPA: La escalera analgesica de la OMS tiene 3 escalones: 1° no opioides, 2° opioides debiles, 3° opioides potentes.", topic: "Cuidados terminales" },
+  { statement: "El primer escalon de la escalera analgesica de la OMS incluye la morfina", isTrap: true, explanation: "TRAMPA: La morfina esta en el TERCER escalon (opioides potentes). El primer escalon incluye analgesicos no opioides como paracetamol o AINEs.", topic: "Cuidados terminales" },
+  // Correct
+  { statement: "Las 5 fases de duelo de Kubler-Ross son: negacion, ira, negociacion, depresion y aceptacion", isTrap: false, explanation: "CORRECTO: Las 5 fases de Kubler-Ross: 1.Negacion, 2.Ira, 3.Negociacion (pacto), 4.Depresion, 5.Aceptacion.", topic: "Cuidados terminales" },
+  { statement: "La escalera analgesica de la OMS tiene 3 escalones para el tratamiento del dolor", isTrap: false, explanation: "CORRECTO: 1° analgesicos no opioides (paracetamol, AINEs), 2° opioides debiles (codeina, tramadol), 3° opioides potentes (morfina, fentanilo).", topic: "Cuidados terminales" },
+  { statement: "El principio bioetico de no maleficencia significa no hacer dano al paciente", isTrap: false, explanation: "CORRECTO: No maleficencia = primum non nocere (lo primero es no hacer dano). Es uno de los 4 principios bioeticos.", topic: "Cuidados terminales" },
+
+  // ===== CAMAS HOSPITALARIAS (Tema 16) =====
+  // Traps
+  { statement: "La cama de Judet se utiliza para pacientes con grandes quemados", isTrap: true, explanation: "TRAMPA: La cama de Judet se usa en TRAUMATOLOGIA (pacientes politraumatizados). Para grandes quemados se usa la cama electrocircular o de Stryker.", topic: "Camas hospitalarias" },
+  { statement: "El marco de Balkan se utiliza en pacientes con quemaduras extensas", isTrap: true, explanation: "TRAMPA: El marco de Balkan se usa en TRAUMATOLOGIA (traccion y rehabilitacion). Consiste en un arco metalico sobre la cama.", topic: "Camas hospitalarias" },
+  // Correct
+  { statement: "La cama electrocircular de Stryker permite girar al paciente sin moverlo manualmente, util en grandes quemados", isTrap: false, explanation: "CORRECTO: La cama de Stryker rota 180° y facilita el cambio postural en quemados y lesiones medulares.", topic: "Camas hospitalarias" },
+  { statement: "El marco de Balkan es un arco metalico que se coloca sobre la cama para traccion y rehabilitacion", isTrap: false, explanation: "CORRECTO: El marco de Balkan permite colgar poleas y pesas para traccion de fracturas.", topic: "Camas hospitalarias" },
+
+  // ===== QUEMADURAS (Tema 20) =====
+  // Traps
+  { statement: "Las quemaduras de primer grado producen ampollas (flictenas)", isTrap: true, explanation: "TRAMPA: Las de 1er grado solo producen ERITEMA (enrojecimiento). Las AMPOLLAS son de 2do grado.", topic: "Quemaduras" },
+  { statement: "Las quemaduras de segundo grado se caracterizan por la formacion de escaras", isTrap: true, explanation: "TRAMPA: Las escaras (tejido necrotico) son de las quemaduras de 3er grado. Las de 2do grado presentan ampollas/flictenas.", topic: "Quemaduras" },
+  { statement: "La regla de Wallace asigna un 18% de superficie corporal a cada miembro superior", isTrap: true, explanation: "TRAMPA: Cada miembro superior representa el 9% (no 18%). El 18% corresponde a cada miembro inferior, al torso anterior y al torso posterior.", topic: "Quemaduras" },
+  { statement: "En una hemorragia arterial, la sangre es oscura y sale de forma continua", isTrap: true, explanation: "TRAMPA: En la hemorragia ARTERIAL la sangre es ROJA brillante y sale a BORBOTONES (pulsatil). La oscura y continua es VENOSA.", topic: "Quemaduras" },
+  // Correct
+  { statement: "Las quemaduras de primer grado solo afectan a la epidermis y producen eritema (enrojecimiento)", isTrap: false, explanation: "CORRECTO: 1er grado = solo epidermis = eritema. Ejemplo tipico: quemadura solar leve.", topic: "Quemaduras" },
+  { statement: "Las quemaduras de segundo grado afectan a la dermis y producen ampollas o flictenas", isTrap: false, explanation: "CORRECTO: 2do grado = epidermis + dermis = ampollas. Muy dolorosas por la exposicion de terminaciones nerviosas.", topic: "Quemaduras" },
+  { statement: "Las quemaduras de tercer grado destruyen todo el espesor de la piel formando escaras", isTrap: false, explanation: "CORRECTO: 3er grado = destruccion total de la piel. Aspecto de escara (blanquecino/negruzco). Indolora por destruccion nerviosa.", topic: "Quemaduras" },
+  { statement: "Segun la regla de Wallace, cada miembro superior representa el 9% de la superficie corporal total", isTrap: false, explanation: "CORRECTO: Regla de los 9 (Wallace): cabeza 9%, cada brazo 9%, torso anterior 18%, torso posterior 18%, cada pierna 18%, genitales 1%.", topic: "Quemaduras" },
+
+  // ===== CAIDAS (Tema 18) =====
+  // Traps
+  { statement: "Las caidas son el segundo accidente mas frecuente en personas mayores de 65 anos", isTrap: true, explanation: "TRAMPA: Las caidas son el accidente MAS FRECUENTE en mayores de 65 anos, no el segundo.", topic: "Caidas" },
+  { statement: "La escala de Tinetti valora el riesgo de ulceras por presion", isTrap: true, explanation: "TRAMPA: La escala de Tinetti valora la MARCHA y el EQUILIBRIO (riesgo de caidas). Las UPP se valoran con Norton o Braden.", topic: "Caidas" },
+  // Correct
+  { statement: "Las caidas son el accidente mas frecuente en personas mayores de 65 anos", isTrap: false, explanation: "CORRECTO: Las caidas son el accidente numero uno en mayores. La prevencion de caidas es una prioridad asistencial.", topic: "Caidas" },
+  { statement: "La escala de Tinetti valora la marcha y el equilibrio para detectar riesgo de caidas", isTrap: false, explanation: "CORRECTO: Tinetti = marcha + equilibrio. Junto con Downton, son las principales escalas de riesgo de caidas.", topic: "Caidas" },
+
+  // ===== CONTENCION MECANICA (Tema 21) =====
+  // Traps
+  { statement: "La contencion mecanica puede aplicarse como primera opcion cuando el paciente esta agitado", isTrap: true, explanation: "TRAMPA: La contencion mecanica es siempre el ULTIMO RECURSO. Primero se intentan medidas verbales y farmacologicas.", topic: "Contencion mecanica" },
+  { statement: "La contencion mecanica no necesita prescripcion medica, la decide el TCAE", isTrap: true, explanation: "TRAMPA: La contencion mecanica SIEMPRE requiere PRESCRIPCION MEDICA. El TCAE la aplica pero no la prescribe.", topic: "Contencion mecanica" },
+  { statement: "En la contencion mecanica, el paciente debe ser vigilado cada 2 horas", isTrap: true, explanation: "TRAMPA: El paciente contenido debe vigilarse cada 15-30 MINUTOS (no cada 2 horas). La vigilancia frecuente es esencial.", topic: "Contencion mecanica" },
+  // Correct
+  { statement: "La contencion mecanica es siempre el ultimo recurso, tras agotar medidas menos restrictivas", isTrap: false, explanation: "CORRECTO: Primero contencion verbal, luego farmacologica, y solo al final mecanica. Es una medida excepcional.", topic: "Contencion mecanica" },
+  { statement: "La contencion mecanica requiere prescripcion medica y el paciente debe vigilarse cada 15-30 minutos", isTrap: false, explanation: "CORRECTO: Requiere orden medica. Se vigila la circulacion, piel, necesidades basicas cada 15-30 min.", topic: "Contencion mecanica" },
+
+  // ===== SEPAD Y CONDICIONES LABORALES (Tema 22, 23) =====
+  // Traps
+  { statement: "En el SEPAD, el TCAE pertenece al Grupo III de clasificacion profesional", isTrap: true, explanation: "TRAMPA: El TCAE pertenece al Grupo IV (no III) en la clasificacion profesional del SEPAD.", topic: "SEPAD" },
+  { statement: "La jornada laboral del TCAE en el SEPAD es de 40 horas semanales", isTrap: true, explanation: "TRAMPA: La jornada laboral es de 35 horas semanales (no 40). Es un dato que cambian frecuentemente en examenes.", topic: "SEPAD" },
+  { statement: "Las vacaciones anuales del personal del SEPAD son de 30 dias naturales", isTrap: true, explanation: "TRAMPA: Las vacaciones son de 22 dias HABILES (no 30 naturales). Es un cambio tipico de trampa.", topic: "SEPAD" },
+  { statement: "El permiso por matrimonio en el SEPAD es de 7 dias naturales", isTrap: true, explanation: "TRAMPA: El permiso por matrimonio es de 15 dias naturales (no 7). Es uno de los permisos mas generosos.", topic: "SEPAD" },
+  { statement: "Las faltas leves prescriben a los 20 dias", isTrap: true, explanation: "TRAMPA: Las faltas leves prescriben a los 10 dias. Las de 20 dias son las GRAVES.", topic: "SEPAD" },
+  { statement: "Las faltas muy graves prescriben a los 30 dias", isTrap: true, explanation: "TRAMPA: Las faltas muy graves prescriben a los 60 dias (no 30). La secuencia es: leves 10d, graves 20d, muy graves 60d.", topic: "SEPAD" },
+  // Correct
+  { statement: "En el SEPAD, el TCAE esta clasificado en el Grupo IV de clasificacion profesional", isTrap: false, explanation: "CORRECTO: TCAE = Grupo IV. Es importante recordar este dato para el examen.", topic: "SEPAD" },
+  { statement: "La jornada laboral del TCAE en el SEPAD es de 35 horas semanales", isTrap: false, explanation: "CORRECTO: 35 horas/semana es la jornada ordinaria del personal del SEPAD.", topic: "SEPAD" },
+  { statement: "Las vacaciones anuales del personal del SEPAD son de 22 dias habiles", isTrap: false, explanation: "CORRECTO: 22 dias habiles de vacaciones anuales retribuidas.", topic: "SEPAD" },
+  { statement: "El permiso por matrimonio en el SEPAD es de 15 dias naturales", isTrap: false, explanation: "CORRECTO: 15 dias naturales por matrimonio. Es uno de los permisos mas largos.", topic: "SEPAD" },
+  { statement: "Las faltas disciplinarias prescriben: leves a los 10 dias, graves a los 20 dias y muy graves a los 60 dias", isTrap: false, explanation: "CORRECTO: Prescripcion de faltas: leves 10d, graves 20d, muy graves 60d.", topic: "SEPAD" },
+
+  // ===== PRL (Tema 24) =====
+  // Traps
+  { statement: "El peso maximo que puede manipular un trabajador es de 30 kg", isTrap: true, explanation: "TRAMPA: El peso maximo recomendado de manipulacion manual de cargas es 25 kg (no 30 kg).", topic: "PRL" },
+  { statement: "El sindrome de burnout se caracteriza por sintomas fisicos de intoxicacion", isTrap: true, explanation: "TRAMPA: El burnout es un sindrome de AGOTAMIENTO EMOCIONAL, despersonalizacion y baja realizacion personal. No es una intoxicacion.", topic: "PRL" },
+  // Correct
+  { statement: "Segun la normativa de PRL, el peso maximo recomendado de manipulacion manual de cargas es de 25 kg", isTrap: false, explanation: "CORRECTO: 25 kg es el peso maximo recomendado. En condiciones especiales puede reducirse a 15 kg.", topic: "PRL" },
+  { statement: "El sindrome de burnout se manifiesta con agotamiento emocional, despersonalizacion y baja realizacion personal", isTrap: false, explanation: "CORRECTO: Las 3 dimensiones del burnout segun Maslach: agotamiento emocional, despersonalizacion, falta de realizacion personal.", topic: "PRL" },
+  { statement: "La Ley de Prevencion de Riesgos Laborales (31/1995) establece el derecho de los trabajadores a una proteccion eficaz en materia de seguridad y salud", isTrap: false, explanation: "CORRECTO: La Ley 31/1995 reconoce el derecho a la proteccion eficaz y el deber del empresario de garantizarla.", topic: "PRL" },
+
+  // ===== IGUALDAD (Tema 25) =====
+  // Traps
+  { statement: "La Ley Organica 3/2007 para la igualdad obliga a las empresas de mas de 100 trabajadores a tener un plan de igualdad", isTrap: true, explanation: "TRAMPA: La obligacion es para empresas de mas de 50 trabajadores (no 100). Se fue ampliando progresivamente.", topic: "Igualdad" },
+  { statement: "La discriminacion indirecta es la que se produce de forma explicita y consciente hacia una persona por su sexo", isTrap: true, explanation: "TRAMPA: Esa descripcion corresponde a la discriminacion DIRECTA. La indirecta es una norma aparentemente neutra que perjudica a un grupo.", topic: "Igualdad" },
+  // Correct
+  { statement: "La LO 3/2007 para la igualdad efectiva de mujeres y hombres obliga a tener plan de igualdad a empresas de mas de 50 trabajadores", isTrap: false, explanation: "CORRECTO: Desde el RD 901/2020 todas las empresas de mas de 50 trabajadores deben tener plan de igualdad.", topic: "Igualdad" },
+  { statement: "La discriminacion indirecta es una disposicion aparentemente neutra que pone en desventaja a personas de un sexo respecto al otro", isTrap: false, explanation: "CORRECTO: Indirecta = norma neutra en apariencia pero con efecto discriminatorio. Directa = trato desfavorable explicito.", topic: "Igualdad" },
+
+  // ===== HIGIENE Y MUESTRAS (Tema 9) =====
+  // Traps
+  { statement: "En el lavado genital femenino se lava desde el ano hacia la vulva", isTrap: true, explanation: "TRAMPA: SIEMPRE se lava de VULVA hacia ANO (de adelante hacia atras) para evitar contaminar la uretra con bacterias fecales.", topic: "Higiene" },
+  { statement: "Para recoger un urocultivo no es necesario lavar previamente los genitales", isTrap: true, explanation: "TRAMPA: Para el urocultivo es IMPRESCINDIBLE el lavado previo de genitales para evitar contaminar la muestra.", topic: "Higiene" },
+  { statement: "En el bano del paciente encamado, se empieza por los miembros inferiores y se termina por la cara", isTrap: true, explanation: "TRAMPA: Se empieza por la CARA (lo mas limpio) y se termina por los miembros inferiores y genitales (lo menos limpio). De limpio a sucio.", topic: "Higiene" },
+  // Correct
+  { statement: "En el lavado genital femenino se lava siempre de vulva hacia ano, de delante hacia atras", isTrap: false, explanation: "CORRECTO: Siempre de delante (uretra) hacia atras (ano) para evitar arrastrar bacterias fecales hacia la uretra.", topic: "Higiene" },
+  { statement: "Para recoger una muestra de orina para urocultivo se debe realizar lavado genital previo y recoger la orina de la mitad del chorro", isTrap: false, explanation: "CORRECTO: Lavado previo + chorro medio para minimizar la contaminacion de la muestra.", topic: "Higiene" },
+  { statement: "En el bano del paciente encamado se sigue el principio de lavar de lo mas limpio a lo mas sucio", isTrap: false, explanation: "CORRECTO: Se empieza por la cara, luego tronco, extremidades superiores, inferiores y por ultimo genitales.", topic: "Higiene" },
+
+  // ===== AMBULATION Y MOVILIZACION (Tema 8) =====
+  // Traps
+  { statement: "Al subir escaleras con muletas, se sube primero la pierna afectada", isTrap: true, explanation: "TRAMPA: Al SUBIR se sube primero la pierna SANA ('lo bueno sube primero'). Al bajar, primero la pierna afectada y las muletas.", topic: "Movilizacion" },
+  { statement: "La pendiente maxima de una rampa para silla de ruedas es del 15%", isTrap: true, explanation: "TRAMPA: La pendiente maxima recomendada es del 8% (algunas normativas permiten hasta 10%). El 15% seria excesiva e insegura.", topic: "Movilizacion" },
+  // Correct
+  { statement: "Al subir escaleras con muletas, primero sube la pierna sana y despues la pierna afectada con las muletas", isTrap: false, explanation: "CORRECTO: Subir = pierna sana primero. Bajar = pierna afectada y muletas primero. Regla: 'lo bueno sube, lo malo baja'.", topic: "Movilizacion" },
+  { statement: "La pendiente maxima recomendada para una rampa de silla de ruedas es del 8%", isTrap: false, explanation: "CORRECTO: El 8% es la pendiente maxima estandar para garantizar la accesibilidad y seguridad del usuario.", topic: "Movilizacion" },
+
+  // ===== OXIGENOTERAPIA (Tema 14) =====
+  // Traps
+  { statement: "Las gafas nasales son un dispositivo de alto flujo de oxigeno", isTrap: true, explanation: "TRAMPA: Las gafas nasales son un dispositivo de BAJO FLUJO (1-5 litros/min). Un dispositivo de alto flujo es la mascarilla Venturi.", topic: "Oxigenoterapia" },
+  { statement: "La mascarilla Venturi es un sistema de bajo flujo que administra concentraciones imprecisas de oxigeno", isTrap: true, explanation: "TRAMPA: La mascarilla Venturi es un sistema de ALTO FLUJO que permite administrar concentraciones PRECISAS de oxigeno (FiO2 exacta).", topic: "Oxigenoterapia" },
+  // Correct
+  { statement: "Las gafas nasales son un sistema de bajo flujo de oxigeno que administra entre 1 y 5 litros por minuto", isTrap: false, explanation: "CORRECTO: Gafas nasales = bajo flujo (1-5 L/min). Son comodas y permiten hablar y comer.", topic: "Oxigenoterapia" },
+  { statement: "La mascarilla Venturi (tipo Ventimask) es un sistema de alto flujo que permite administrar una FiO2 precisa y controlada", isTrap: false, explanation: "CORRECTO: Venturi = alto flujo + FiO2 precisa. Se selecciona la concentracion mediante adaptadores de colores.", topic: "Oxigenoterapia" },
+
+  // ===== RESIDENCIAS Y LEY 39/2006 (Tema 1) =====
+  // Traps
+  { statement: "La Ley 39/2006 es la Ley General de Sanidad", isTrap: true, explanation: "TRAMPA: La Ley 39/2006 es la Ley de DEPENDENCIA (Promocion de la Autonomia Personal y Atencion a Personas en Situacion de Dependencia). La General de Sanidad es la 14/1986.", topic: "Dependencia" },
+  { statement: "Segun la Ley 39/2006, los grados de dependencia son cuatro: leve, moderada, severa y gran dependencia", isTrap: true, explanation: "TRAMPA: Los grados de dependencia son TRES: Grado I (moderada), Grado II (severa) y Grado III (gran dependencia). No existe grado 'leve'.", topic: "Dependencia" },
+  { statement: "La funcion principal del TCAE en residencias es el diagnostico de los residentes", isTrap: true, explanation: "TRAMPA: El TCAE NO diagnostica. Sus funciones incluyen cuidados basicos de higiene, alimentacion, movilizacion y comunicacion al equipo. El diagnostico es del medico.", topic: "Dependencia" },
+  // Correct
+  { statement: "La Ley 39/2006 es la Ley de Promocion de la Autonomia Personal y Atencion a las Personas en Situacion de Dependencia", isTrap: false, explanation: "CORRECTO: La Ley 39/2006 es la llamada 'Ley de Dependencia'. Creo el Sistema para la Autonomia y Atencion a la Dependencia (SAAD).", topic: "Dependencia" },
+  { statement: "La Ley 39/2006 establece tres grados de dependencia: Grado I (moderada), Grado II (severa) y Grado III (gran dependencia)", isTrap: false, explanation: "CORRECTO: Grado I = moderada, Grado II = severa, Grado III = gran dependencia. El baremo valora la capacidad de la persona.", topic: "Dependencia" },
+  { statement: "Las funciones del TCAE incluyen cuidados basicos de higiene, alimentacion, movilizacion y apoyo emocional, bajo la supervision de enfermeria", isTrap: false, explanation: "CORRECTO: El TCAE realiza cuidados basicos siempre bajo supervision del/la enfermero/a. Nunca diagnostica ni prescribe.", topic: "Dependencia" },
+
+  // ===== VALORACION GERIATRICA - KATZ (Tema 2) =====
+  // Traps
+  { statement: "El indice de Katz valora las actividades instrumentales de la vida diaria", isTrap: true, explanation: "TRAMPA: Katz valora las actividades BASICAS de la vida diaria (ABVD): banarse, vestirse, ir al WC, movilidad, continencia y alimentacion. Las AIVD las mide Lawton.", topic: "Escalas" },
+  // Correct
+  { statement: "El indice de Katz valora 6 actividades basicas de la vida diaria: bano, vestido, uso del WC, movilidad, continencia y alimentacion", isTrap: false, explanation: "CORRECTO: Katz evalua ABVD. Clasifica de la A (independiente en todas) a la G (dependiente en todas).", topic: "Escalas" },
+
+  // ===== BIOÉTICA (Tema 15) =====
+  // Traps
+  { statement: "Los 4 principios bioeticos son: beneficencia, no maleficencia, autonomia y solidaridad", isTrap: true, explanation: "TRAMPA: Los 4 principios son beneficencia, no maleficencia, autonomia y JUSTICIA (no solidaridad).", topic: "Cuidados terminales" },
+  { statement: "El principio de autonomia permite al profesional sanitario decidir por el paciente sin consultarle", isTrap: true, explanation: "TRAMPA: El principio de autonomia reconoce el derecho del PACIENTE a decidir sobre su propia salud. El profesional informa, el paciente decide.", topic: "Cuidados terminales" },
+  // Correct
+  { statement: "Los 4 principios bioeticos son: beneficencia, no maleficencia, autonomia y justicia", isTrap: false, explanation: "CORRECTO: Los 4 principios de Beauchamp y Childress: beneficencia (hacer el bien), no maleficencia (no danar), autonomia (respetar decisiones) y justicia (equidad).", topic: "Cuidados terminales" },
+  { statement: "El principio de autonomia reconoce el derecho del paciente a tomar decisiones informadas sobre su salud", isTrap: false, explanation: "CORRECTO: Autonomia = el paciente decide tras ser informado. Es la base del consentimiento informado.", topic: "Cuidados terminales" },
+
+  // ===== CUIDADOS POST-MORTEM (Tema 15) =====
+  // Traps
+  { statement: "En los cuidados post-mortem se coloca al paciente en posicion de Trendelenburg", isTrap: true, explanation: "TRAMPA: Se coloca en DECUBITO SUPINO con una ligera elevacion de la cabeza (para evitar livideces en la cara). No en Trendelenburg.", topic: "Cuidados terminales" },
+  // Correct
+  { statement: "En los cuidados post-mortem se coloca al paciente en decubito supino con ligera elevacion de la cabeza", isTrap: false, explanation: "CORRECTO: Decubito supino, cabeza ligeramente elevada. Se retiran sondas, vias, y se asea al paciente.", topic: "Cuidados terminales" }
 ];
 
 let currentQuestions = [];
